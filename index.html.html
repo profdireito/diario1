@@ -300,6 +300,7 @@ tr:nth-child(even) td{background:#f8fafc}
             <button class="tab" onclick="setMod('notas',this)">📊 Notas</button>
             <button class="tab" onclick="setMod('ativ',this)">✅ Atividades</button>
             <button class="tab" onclick="setMod('desemp',this)">📈 Desempenho</button>
+            <button class="tab" onclick="setMod('quiz',this)">🎯 Quiz</button>
           </div>
           <div class="card" id="modcon"></div>
         </div>
@@ -942,6 +943,137 @@ function setAtivNota(aid,atid,val){
 }
 function markAllAtiv(atid,marc){
   const t=getTurma();t.alunos.forEach(a=>{if(!a.atividades)a.atividades={};if(!a.atividades[atid])a.atividades[atid]={};a.atividades[atid].visto=marc;});save();renderMod();
+}
+
+
+// ═══════════════════════════════
+// QUIZ — IMPORTAR NOTAS
+// ═══════════════════════════════
+let quizResultados = []; // carregados do Firebase
+let quizLoading = false;
+let quizNomeAv = 'Quiz Direito Adm.'; // nome da avaliação a lançar
+
+async function carregarQuizFirebase(){
+  quizLoading = true;
+  rQuiz();
+  try {
+    const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap = await getDocs(collection(_db, 'quiz_resultados'));
+    quizResultados = [];
+    snap.forEach(doc => quizResultados.push({ id: doc.id, ...doc.data() }));
+    quizResultados.sort((a,b) => (b.dataHora||'').localeCompare(a.dataHora||''));
+  } catch(e) {
+    quizResultados = [];
+    console.error('Erro ao carregar quiz:', e);
+  }
+  quizLoading = false;
+  rQuiz();
+}
+
+function rQuiz(){
+  const el = document.getElementById('modcon');
+  if(!el) return;
+  const t = getTurma(); if(!t) return;
+
+  if(quizLoading){
+    el.innerHTML = '<div class="lbox"><div class="spin" style="font-size:26px">⟳</div><p style="margin-top:8px;font-size:12px">Carregando resultados do quiz...</p></div>';
+    return;
+  }
+
+  // Filtrar resultados pela turma atual (por nome que bate com algum aluno)
+  const nomesAlunos = (t.alunos||[]).map(a => a.nome.toLowerCase().trim());
+  const resultadosTurma = quizResultados.filter(r =>
+    nomesAlunos.some(n => n.includes(r.nome.toLowerCase().trim().split(' ')[0]) ||
+      r.nome.toLowerCase().trim().includes(n.split(' ')[0]))
+  );
+
+  // Stats
+  const total = resultadosTurma.length;
+  const mediaQ = total ? Math.round(resultadosTurma.reduce((s,r)=>s+(r.placar||0),0)/total) : 0;
+  const ac70 = resultadosTurma.filter(r=>(r.placar||0)>=70).length;
+
+  // Converter placar (0-100%) para nota (0-10)
+  const toNota = pct => (pct / 10).toFixed(1);
+
+  el.innerHTML = `
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+      <button class="btn bp bsm" onclick="carregarQuizFirebase()">🔄 Atualizar</button>
+      <div style="flex:1;min-width:140px">
+        <input type="text" value="${quizNomeAv}" onchange="quizNomeAv=this.value"
+          placeholder="Nome da avaliação" title="Nome que aparecerá em Notas"/>
+      </div>
+      <button class="btn ba bsm" onclick="importarNotasQuiz()" ${total===0?'disabled':''}>📥 Lançar Notas na Turma</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:10px">A nota é calculada: placar % ÷ 10. Ex: 80% → 8.0</p>
+    <div class="sgrid">
+      <div class="sbox"><div class="sv cb">${total}</div><div class="sl">Responderam</div></div>
+      <div class="sbox"><div class="sv cg">${ac70}</div><div class="sl">Acima de 70%</div></div>
+      <div class="sbox"><div class="sv ca">${mediaQ}%</div><div class="sl">Média do Quiz</div></div>
+      <div class="sbox"><div class="sv cs">${(t.alunos||[]).length - total}</div><div class="sl">Não fizeram</div></div>
+    </div>
+    ${total === 0 ?
+      '<div class="empty"><div class="ei">🎯</div><p>Nenhum resultado encontrado para esta turma ainda.<br>Clique em Atualizar para buscar.</p></div>' :
+      `<div class="tbl-wrap"><table>
+        <thead><tr><th>Aluno (Quiz)</th><th>Aluno (Turma)</th><th class="c">Placar</th><th class="c">Nota</th><th class="c">Data</th></tr></thead>
+        <tbody>
+          ${resultadosTurma.map(r => {
+            const alunoMatch = (t.alunos||[]).find(a =>
+              a.nome.toLowerCase().includes(r.nome.toLowerCase().trim().split(' ')[0]) ||
+              r.nome.toLowerCase().includes(a.nome.toLowerCase().split(' ')[0])
+            );
+            const dt = r.dataHora ? new Date(r.dataHora).toLocaleDateString('pt-BR') : '—';
+            const nota = toNota(r.placar||0);
+            const ncor = nota>=6?'#16a34a':nota>=5?'#d97706':'#dc2626';
+            return \`<tr>
+              <td style="font-size:12px;font-weight:600">\${r.nome}<div style="font-size:10px;color:var(--muted)">\${r.turma}</div></td>
+              <td style="font-size:12px;color:\${alunoMatch?'var(--verde2)':'var(--danger)'}">\${alunoMatch?alunoMatch.nome:'⚠ Não encontrado'}</td>
+              <td class="c"><span style="font-weight:700">\${r.placar||0}%</span></td>
+              <td class="c"><span style="font-weight:900;color:\${ncor}">\${nota}</span></td>
+              <td class="c" style="font-size:11px;color:var(--muted)">\${dt}</td>
+            </tr>\`;
+          }).join('')}
+        </tbody>
+      </table></div>`
+    }
+    <div id="quiz-import-msg" style="margin-top:8px;font-size:12px;min-height:16px;color:var(--verde2)"></div>
+  `;
+
+  // Auto-carregar na primeira vez
+  if(quizResultados.length === 0 && !quizLoading && _db) carregarQuizFirebase();
+}
+
+function importarNotasQuiz(){
+  const t = getTurma(); if(!t) return;
+  const nomesAlunos = (t.alunos||[]).map(a => a.nome.toLowerCase().trim());
+  const resultadosTurma = quizResultados.filter(r =>
+    nomesAlunos.some(n => n.includes(r.nome.toLowerCase().trim().split(' ')[0]) ||
+      r.nome.toLowerCase().trim().includes(n.split(' ')[0]))
+  );
+  if(!resultadosTurma.length){ alert('Nenhum resultado para lançar.'); return; }
+  if(!quizNomeAv.trim()){ alert('Informe o nome da avaliação.'); return; }
+
+  let lançados = 0, naoEncontrados = 0;
+  resultadosTurma.forEach(r => {
+    const alunoMatch = (t.alunos||[]).find(a =>
+      a.nome.toLowerCase().includes(r.nome.toLowerCase().trim().split(' ')[0]) ||
+      r.nome.toLowerCase().includes(a.nome.toLowerCase().split(' ')[0])
+    );
+    if(alunoMatch){
+      if(!alunoMatch.notas) alunoMatch.notas = {};
+      alunoMatch.notas[quizNomeAv] = parseFloat((r.placar/10).toFixed(1));
+      lançados++;
+    } else { naoEncontrados++; }
+  });
+
+  // Adicionar avaliação na lista se não existir
+  if(!t.avaliacoes) t.avaliacoes = ['AV1','AV2','AV3'];
+  if(!t.avaliacoes.includes(quizNomeAv)) t.avaliacoes.push(quizNomeAv);
+
+  save();
+  const msg = document.getElementById('quiz-import-msg');
+  msg.style.color = 'var(--verde2)';
+  msg.textContent = \`✓ \${lançados} nota(s) lançada(s)!\${naoEncontrados?' '+naoEncontrados+' aluno(s) não encontrado(s).':''} Veja em Notas.\`;
+  setTimeout(()=>msg.textContent='', 5000);
 }
 
 // ═══════════════════════════════
