@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/><!-- v20260402145303 -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Professor Digital</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
@@ -224,7 +223,6 @@ tr:nth-child(even) td{background:#f8fafc}
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="lcard">
     <div class="l-logo">
@@ -243,7 +241,6 @@ tr:nth-child(even) td{background:#f8fafc}
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div id="hdr">
     <div class="hdr-l">
@@ -280,7 +277,6 @@ tr:nth-child(even) td{background:#f8fafc}
     </div>
 
     <div id="content">
-      <!-- TURMAS -->
       <div id="sec-turmas">
         <div class="empty" id="nomsg" style="display:none">
           <div class="ei">🏫</div><p>Nenhuma turma cadastrada.</p>
@@ -310,11 +306,8 @@ tr:nth-child(even) td{background:#f8fafc}
           <div class="card" id="modcon"></div>
         </div>
       </div>
-      <!-- AGENDA -->
       <div id="sec-agenda" style="display:none"><div class="card" id="agcon"></div></div>
-      <!-- PLANO IA -->
       <div id="sec-plano" style="display:none"><div class="card" id="plcon"></div></div>
-      <!-- RESULTADOS QUIZ -->
       <div id="sec-resultados" style="display:none"><div class="card" id="rescon"></div></div>
     </div>
   </div>
@@ -328,7 +321,6 @@ tr:nth-child(even) td{background:#f8fafc}
   </nav>
 </div>
 
-<!-- MODAIS -->
 <div class="mbg" id="mperfil"><div class="modal">
   <div class="mtitle">Perfil do Aluno <button class="mclose" onclick="fecharM('mperfil')">✕</button></div>
   <div id="perfilcon"></div>
@@ -431,7 +423,7 @@ tr:nth-child(even) td{background:#f8fafc}
 
 <script>
 // ---
-// ESTADO
+// ESTADO E UTILITARIOS
 // ---
 let AUTH={user:'professor',pass:'1234'};
 let DB={turmas:[],atividades:{},eventosAgenda:{}};
@@ -448,10 +440,57 @@ const DIA_F=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const CORES=['#1A4A2E','#2E7D4A','#5BAD6F','#C4880A','#1E6091','#7D3C98','#922B21','#0E6655','#154360','#6E2F8E'];
 
-// Firebase - sincronizacao inteligente por data
 let _db = null;
 let _syncTimer = null;
 let _syncing = false;
+
+var DB_INICIAL = {"turmas": [{"id": "l7jqflfw", "nome": "MAT T1 - 1 Periodo Manha", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 1", "horarios": [], "alunos": [{"id": "l983kgn9", "nome": "Adlinef Santana Rodrigues", "mat": "20260406", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0ovn1auv", "nome": "Alex Sandro Amorim Pereira", "mat": "20260416", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t9ab98ao", "nome": "Ana Clara de Souza Bressan", "mat": "20260418", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2jjv9oti", "nome": "Anelissa de Paula Amaral", "mat": "20260398", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d7la8az6", "nome": "Anna Clara Souza Ferreira", "mat": "20260413", "notas": {}, "freq": {}, "atividades": {}}, {"id": "qskqjpqg", "nome": "Brenda Regiane Santos Batista", "mat": "20260400", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4yzuv7x5", "nome": "Clara Lessa Ferreira", "mat": "20260395", "notas": {}, "freq": {}, "atividades": {}}, {"id": "b6r63pqx", "nome": "Dardielle Vitoria dos Santos Siqueira", "mat": "20260415", "notas": {}, "freq": {}, "atividades": {}}, {"id": "o55lszpi", "nome": "Dayanne Francisca Vieira", "mat": "20260391", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n5rfuu8w", "nome": "Eliane Rodrigues Pereira Alves", "mat": "20260389", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2kt1hgu3", "nome": "Emanuelle Fabricia Pereira Praes", "mat": "20260412", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sgtp1yc2", "nome": "Emily Gabrielle Lopes dos Santos", "mat": "20260414", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9sexhuv6", "nome": "Fernanda Teixeira Santos", "mat": "20260419", "notas": {}, "freq": {}, "atividades": {}}, {"id": "90xrr64x", "nome": "Gabriel Caua Araujo Santos", "mat": "20260404", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yfz44pzt", "nome": "Gabriele Eduarda Melo de Jesus", "mat": "20221251", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yc171m7j", "nome": "Gilson Farlley Oliveira Andrade", "mat": "20260399", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9gymj5dw", "nome": "Hidelane de Souza Silva Alves", "mat": "20260397", "notas": {}, "freq": {}, "atividades": {}}, {"id": "jmsxgojj", "nome": "Iori Henrique Marques Cortez", "mat": "20260405", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4qml02ex", "nome": "Janaina de Jesus Carneiro Goncalves", "mat": "20260403", "notas": {}, "freq": {}, "atividades": {}}, {"id": "aa8zh92q", "nome": "Joyce Santos Goncalves", "mat": "20260407", "notas": {}, "freq": {}, "atividades": {}}, {"id": "qg29xi7r", "nome": "Julia Ferreira Batista", "mat": "15010008", "notas": {}, "freq": {}, "atividades": {}}, {"id": "s506fxfa", "nome": "Kaylane Nicolle Dias Alves", "mat": "20260401", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a56ccv7s", "nome": "Livia Karolyne Vieira Boas", "mat": "20260409", "notas": {}, "freq": {}, "atividades": {}}, {"id": "03fx2hna", "nome": "Lucas Gabriel da Consolacao Ferreira", "mat": "20220531", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a9wcvuwz", "nome": "Marco Tulio Rodrigues Souza", "mat": "20221419", "notas": {}, "freq": {}, "atividades": {}}, {"id": "w5ijmbwe", "nome": "Maria Clara Menezes Carvalho", "mat": "20260392", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5ay4qp0t", "nome": "Miriely dos Reis da Silva", "mat": "20260402", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yokxqbl3", "nome": "Pamella Thais Adriano Prates", "mat": "13010197", "notas": {}, "freq": {}, "atividades": {}}, {"id": "kyasl334", "nome": "Ryane Dias Ribeiro", "mat": "20260387", "notas": {}, "freq": {}, "atividades": {}}, {"id": "mrb7siij", "nome": "Samyra Gabriele da Silva Freire", "mat": "20260393", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vqvuoy9c", "nome": "Sarah Daniele Santos Carvalho", "mat": "20260410", "notas": {}, "freq": {}, "atividades": {}}, {"id": "eb2puvih", "nome": "Shara Vitoria da Silva Mota", "mat": "20260411", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ot9kamkq", "nome": "Tailane Monique Batista Souza", "mat": "20260394", "notas": {}, "freq": {}, "atividades": {}}, {"id": "75sglb6l", "nome": "Talita Emanuely Pereira", "mat": "20260408", "notas": {}, "freq": {}, "atividades": {}}, {"id": "99z13rfb", "nome": "Vitoria Tauane dos Santos Dias", "mat": "20260388", "notas": {}, "freq": {}, "atividades": {}}, {"id": "lgbbp79u", "nome": "Vivian Ariane Santos Anacleto", "mat": "20210412", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "t21mh239", "nome": "MAT T2 - 1 Periodo Manha", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 2", "horarios": [], "alunos": [{"id": "ldlep1ju", "nome": "Ana Claudia Pereira da Silva", "mat": "20260424", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a9upjv1c", "nome": "Anna Clara Rodrigues Dias", "mat": "20260426", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y1v7l4ci", "nome": "Anna Vitoria Alves Vieira", "mat": "20221490", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0t4w5y1f", "nome": "Arlinda de Cassia Cavalcante Monteiro", "mat": "20260430", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ecq4si8l", "nome": "Camila Fernanda Cardoso de Souza", "mat": "20260440", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ll9mwup3", "nome": "Cibelle Soares da Rocha", "mat": "20260420", "notas": {}, "freq": {}, "atividades": {}}, {"id": "kn35g8mf", "nome": "Clara Meirian Alves Veloso", "mat": "20260439", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ghjimgym", "nome": "Claudia Danielle Pereira Santos", "mat": "20260421", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bf3wpdub", "nome": "Dalila Aniele Souza Pires", "mat": "20260442", "notas": {}, "freq": {}, "atividades": {}}, {"id": "gvvqd2mg", "nome": "Dayanne Souza Santos", "mat": "20210199", "notas": {}, "freq": {}, "atividades": {}}, {"id": "eoiruo13", "nome": "Emilly Araujo Costa", "mat": "20260396", "notas": {}, "freq": {}, "atividades": {}}, {"id": "94dbeoxq", "nome": "Emilly Araujo Costa II", "mat": "20260436", "notas": {}, "freq": {}, "atividades": {}}, {"id": "50ymxncg", "nome": "Izabella Fernanda da Silva Gomes", "mat": "20260390", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ar3skjfw", "nome": "Jhonya Safira Peres", "mat": "20260429", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ir3iwk2w", "nome": "Joao Vitor Barroso Andrade", "mat": "20210321", "notas": {}, "freq": {}, "atividades": {}}, {"id": "e33qe1zh", "nome": "Joseniete Pereira", "mat": "20260434", "notas": {}, "freq": {}, "atividades": {}}, {"id": "z5bhgfow", "nome": "Joyce Ferreira de Oliveira", "mat": "20260423", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ur9lke7b", "nome": "Julio Cesar Oliveira Andrade", "mat": "20260435", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t90gxhtt", "nome": "Karoline Tamara dos Santos Moreira", "mat": "20260437", "notas": {}, "freq": {}, "atividades": {}}, {"id": "obo86gye", "nome": "Luanna Arianne Nascimento Silva", "mat": "20260438", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vv7d54vo", "nome": "Lucas Ariel Dias Macedo", "mat": "20260427", "notas": {}, "freq": {}, "atividades": {}}, {"id": "94e3zl7y", "nome": "Luis Fernando Macedo Peixoto", "mat": "13010183", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5miz2tek", "nome": "Maria Elisa Pereira de Freitas", "mat": "20260428", "notas": {}, "freq": {}, "atividades": {}}, {"id": "tscipj38", "nome": "Maria Isabela Boas Ribeiro", "mat": "20170078", "notas": {}, "freq": {}, "atividades": {}}, {"id": "mb2doro4", "nome": "Maria Julia Ribeiro Alves", "mat": "20260441", "notas": {}, "freq": {}, "atividades": {}}, {"id": "40vbh5r9", "nome": "Marilia de Cassia Andrade Alkmim Duarte", "mat": "20260433", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n7ycyaxy", "nome": "Marla Fabricia Pereira Santos", "mat": "20221221", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y8nhgxe5", "nome": "Matheus Elias Rocha Amorim", "mat": "20231684", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d2k6pevy", "nome": "Nathalia Fanny Rodrigues Silva", "mat": "20150076", "notas": {}, "freq": {}, "atividades": {}}, {"id": "l2p1u2mc", "nome": "Nathalia Vitoria Oliveira de Souza", "mat": "20150003", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xix6y0vz", "nome": "Samira Cristina Caldeira dos Santos", "mat": "20260417", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wf5uo0kz", "nome": "Silvane Regina Braganca", "mat": "20260425", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xoa25j9c", "nome": "Thais Gabriela Cunha", "mat": "20150041", "notas": {}, "freq": {}, "atividades": {}}, {"id": "3jsywbwx", "nome": "Vitoria Izabelle Santos Pimenta", "mat": "20260431", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bblxo4hc", "nome": "Willian Pires Barbosa", "mat": "20260432", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "sguyovii", "nome": "NOT T1 - 1 Periodo Noturno", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 3", "horarios": [], "alunos": [{"id": "uecvvriv", "nome": "Agatha Karine Cardoso Siqueira", "mat": "20260493", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7ugo0g1o", "nome": "Alice Almeida Dias", "mat": "20260528", "notas": {}, "freq": {}, "atividades": {}}, {"id": "r05v706n", "nome": "Amanda Silva Reis", "mat": "20260508", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5qj917as", "nome": "Ana Clara Ramos Araujo", "mat": "20260496", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vhkm4ikf", "nome": "Beatriz Soares Coimbra Silva", "mat": "20200007", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h1zmb21n", "nome": "Bruna Eduarda Andrade", "mat": "20260533", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4h8kp8lk", "nome": "Bruna Victoria Oliveira Andrade", "mat": "20260494", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vnwuzte0", "nome": "Carolina Silva Pereira", "mat": "20260520", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2bs3q4zc", "nome": "Cleiton Cesar Maia Pereira", "mat": "20260499", "notas": {}, "freq": {}, "atividades": {}}, {"id": "effos0ax", "nome": "Edson Gabriel das Neves Pereira", "mat": "20260513", "notas": {}, "freq": {}, "atividades": {}}, {"id": "381q2sul", "nome": "Eloa Cristina Souza dos Santos", "mat": "20260538", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4mhs6o16", "nome": "Emilly Kauanny Souza Veloso", "mat": "20260534", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ku9nrh8b", "nome": "Erika Patricia Santos Pereira", "mat": "20260506", "notas": {}, "freq": {}, "atividades": {}}, {"id": "egf4w1dr", "nome": "Geovana Daniely Medeiros da Silva", "mat": "20260585", "notas": {}, "freq": {}, "atividades": {}}, {"id": "1300yeyv", "nome": "Geovana Duarte Mello", "mat": "20260537", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0nib1m5d", "nome": "Helen Cristina Silva Fernandes", "mat": "20260502", "notas": {}, "freq": {}, "atividades": {}}, {"id": "pxxywkew", "nome": "Hellen Patricia Almeida Morais", "mat": "20231612", "notas": {}, "freq": {}, "atividades": {}}, {"id": "e6lddibl", "nome": "Hellen Sabrina Fernandes Alves", "mat": "20260526", "notas": {}, "freq": {}, "atividades": {}}, {"id": "8y3lfqv6", "nome": "Heloa Camile Ferreira Siqueira", "mat": "20260536", "notas": {}, "freq": {}, "atividades": {}}, {"id": "3gcz2vaw", "nome": "Hugo Felipe Oliveira", "mat": "20260503", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9vgoeld3", "nome": "Isabelle Cristine Rodrigues Oliveira", "mat": "20260515", "notas": {}, "freq": {}, "atividades": {}}, {"id": "i2mvj4i6", "nome": "Isadora Cristine Ferreira Soares", "mat": "20260505", "notas": {}, "freq": {}, "atividades": {}}, {"id": "itbcnlmx", "nome": "Joao Vitor dos Santos Rocha", "mat": "20260522", "notas": {}, "freq": {}, "atividades": {}}, {"id": "o5pxg39f", "nome": "Josimara Silva Ferreira", "mat": "20260509", "notas": {}, "freq": {}, "atividades": {}}, {"id": "euvuzq7j", "nome": "Jucileia dos Santos Costa Pereira", "mat": "20260511", "notas": {}, "freq": {}, "atividades": {}}, {"id": "i50lsj91", "nome": "Kathlen Tauane de Jesus Santos", "mat": "20260519", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a0pk799w", "nome": "Kauanne Meyrielle dos Reis Santos", "mat": "20260530", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2x27mcb7", "nome": "Keila Fabricia Alves Fonseca", "mat": "20260532", "notas": {}, "freq": {}, "atividades": {}}, {"id": "l27ekaqw", "nome": "Lara Cristiny Alves Azevedo", "mat": "20260524", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ywjcfuau", "nome": "Lara Malu Oliveira Santos", "mat": "20260510", "notas": {}, "freq": {}, "atividades": {}}, {"id": "w9w8maaw", "nome": "Luana Carolina Pereira", "mat": "20260056", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xlo1f0an", "nome": "Luana Helena da Costa Farias", "mat": "20260507", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7yokbilz", "nome": "Lucio Paulo Fernandes Gomes", "mat": "20260501", "notas": {}, "freq": {}, "atividades": {}}, {"id": "x35dflvc", "nome": "Maria Eduarda dos Santos Reis", "mat": "20260539", "notas": {}, "freq": {}, "atividades": {}}, {"id": "z2ybhqfs", "nome": "Maria Fernanda Silva Pereira", "mat": "20260516", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rig8g2zx", "nome": "Maria Julia Santos Costa", "mat": "20260498", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sootwkua", "nome": "Maria Luiza Siqueira Silva", "mat": "20260587", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n8cequnz", "nome": "Maria Sabrina Veloso", "mat": "20260495", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4kk65brt", "nome": "Maria Tereza Pereira Moreira", "mat": "20260527", "notas": {}, "freq": {}, "atividades": {}}, {"id": "nmuxhton", "nome": "Natalia Esthefany Soares Sousa", "mat": "20260523", "notas": {}, "freq": {}, "atividades": {}}, {"id": "nif3cdgb", "nome": "Rafael de Castro Souza", "mat": "20260525", "notas": {}, "freq": {}, "atividades": {}}, {"id": "on8jjlf3", "nome": "Sabrina Pereira Dias", "mat": "20260500", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vr84qh2s", "nome": "Samira Natalia Souza Peixoto", "mat": "20260504", "notas": {}, "freq": {}, "atividades": {}}, {"id": "u38ht1eo", "nome": "Samira Souza Martins", "mat": "20260531", "notas": {}, "freq": {}, "atividades": {}}, {"id": "c6m2qqw1", "nome": "Sarah Carolinne Dias Jorge", "mat": "20260514", "notas": {}, "freq": {}, "atividades": {}}, {"id": "mctay2hy", "nome": "Stefany Silva Nunes", "mat": "20260529", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5a9hxy6s", "nome": "Thiago Arthur Souza Lima", "mat": "20260535", "notas": {}, "freq": {}, "atividades": {}}, {"id": "iu1ip4rq", "nome": "Vitoria Samara Soares Santos", "mat": "20260521", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5h82q9wh", "nome": "Wigner Silva Cardoso", "mat": "20260517", "notas": {}, "freq": {}, "atividades": {}}, {"id": "036y8adj", "nome": "Yasmin dos Santos Soares", "mat": "20260518", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "goqrbn2h", "nome": "NOT T2 - 1 Periodo Noturno", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 4", "horarios": [], "alunos": [{"id": "91d16271", "nome": "Adriana Alves Silva", "mat": "20260555", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bc75og3f", "nome": "Ana Vitoria Duarte da Silva", "mat": "20260575", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4x7r4ocn", "nome": "Andressa Lorrayne Nascimento Silva", "mat": "20260543", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vgl6aflf", "nome": "Anna Lyce Moreira Lima", "mat": "20260558", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rthj7n5d", "nome": "Anna Paula Antunes", "mat": "14020298", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wlc491w1", "nome": "Anne Gabrielle Ferreira dos Santos", "mat": "20260566", "notas": {}, "freq": {}, "atividades": {}}, {"id": "aa2l15xr", "nome": "Anny Luiza Teixeira", "mat": "20260559", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2e72qkdh", "nome": "Arthur Gabriel Boas Cruz", "mat": "20260546", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yqwc06yr", "nome": "Ayressa Gabriele Fonseca Lopes", "mat": "20260560", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ct86diwq", "nome": "Barbara Izabel Bispo Santos", "mat": "20260572", "notas": {}, "freq": {}, "atividades": {}}, {"id": "dh7if90x", "nome": "Emanuelly Virginio Duarte Azevedo", "mat": "20260557", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bdc2pl48", "nome": "Emilly Thalita Moura de Souza", "mat": "20221328", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sa2xlcnq", "nome": "Emily Tauane Meira Souza", "mat": "20231685", "notas": {}, "freq": {}, "atividades": {}}, {"id": "int9f2xl", "nome": "Endrian Gabriel Soares Silva", "mat": "20260582", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7ws52jwx", "nome": "Eric Ryan Silva Macedo", "mat": "20260554", "notas": {}, "freq": {}, "atividades": {}}, {"id": "09pb2gsr", "nome": "Fernanda Graziela Santos Fonseca", "mat": "20260542", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ymvaji40", "nome": "Francisco Duraes Borem", "mat": "20260574", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6qut9uij", "nome": "Geiciane Silva Alves", "mat": "20260548", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rn3f9yp9", "nome": "Gustavo Henrique Oliveira da Paixao", "mat": "20260565", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ddpho2vm", "nome": "Helder Cleriston Moreira da Silva", "mat": "20260577", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0gymfqne", "nome": "Isabella Cardoso Vieira", "mat": "20260573", "notas": {}, "freq": {}, "atividades": {}}, {"id": "x6y3xskx", "nome": "Isis Daniele Medeiros Fonseca", "mat": "20253230", "notas": {}, "freq": {}, "atividades": {}}, {"id": "o71v9crd", "nome": "Jhennyfer Emanuelle da Silva", "mat": "20260583", "notas": {}, "freq": {}, "atividades": {}}, {"id": "lu3mh8wn", "nome": "Julio Cesar Santos Silva", "mat": "20260562", "notas": {}, "freq": {}, "atividades": {}}, {"id": "l0q26urg", "nome": "Junia Andressa Ramos Nogueira", "mat": "20260552", "notas": {}, "freq": {}, "atividades": {}}, {"id": "jy749hlr", "nome": "Kamila Izabela Cardoso", "mat": "20260581", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xyohf7gs", "nome": "Livia Marques Ferreira", "mat": "20260571", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7ecsm0cg", "nome": "Luana Pereira da Silva", "mat": "20260568", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vbzhsy9j", "nome": "Marcella Santos Goncalves", "mat": "20260579", "notas": {}, "freq": {}, "atividades": {}}, {"id": "nj914zch", "nome": "Marcelly Yasmin Duarte Carvalho", "mat": "20260561", "notas": {}, "freq": {}, "atividades": {}}, {"id": "30b07i4l", "nome": "Maria Cecilia Cardoso Meira", "mat": "20260584", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vhfbs3p1", "nome": "Maria Eduarda Ferreira Carvalho", "mat": "20260580", "notas": {}, "freq": {}, "atividades": {}}, {"id": "e0lw8gqb", "nome": "Maria Eduarda Oliveira de Souza", "mat": "20260567", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6c3d4e22", "nome": "Maria Eduarda Silva Praes", "mat": "20210004", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h9cjc5tn", "nome": "Maria Elisa Silva Souza", "mat": "20260569", "notas": {}, "freq": {}, "atividades": {}}, {"id": "apu92s1v", "nome": "Maria Fernanda Neves Tiago", "mat": "20260556", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0r2dkft4", "nome": "Maria Julia Lopes Goncalves", "mat": "20260553", "notas": {}, "freq": {}, "atividades": {}}, {"id": "abbjijlb", "nome": "Maria Luisa do Amaral Lima", "mat": "20260578", "notas": {}, "freq": {}, "atividades": {}}, {"id": "aej3cdt6", "nome": "Mariana Taina Alves Cardoso", "mat": "20260544", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h45y1h1d", "nome": "Natalia dos Santos Barbosa", "mat": "20260564", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0tdymy21", "nome": "Pacifica dos Santos Lima", "mat": "20260547", "notas": {}, "freq": {}, "atividades": {}}, {"id": "c0zeqgro", "nome": "Pedro Lucas Vieira Santos", "mat": "20260550", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6ki46zeu", "nome": "Sthefany Lorrana Almeida Santos", "mat": "20260570", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ntbtgh40", "nome": "Tauanne Karolayne Neves Silva", "mat": "20260576", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ckjcvrky", "nome": "Thamires Emanuelle Jardim de Souza", "mat": "20260540", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rjdgou8e", "nome": "Thayna Colen Silva", "mat": "20260563", "notas": {}, "freq": {}, "atividades": {}}, {"id": "hwc38n7n", "nome": "Vanessa Alves Ferreira", "mat": "20260551", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6if4leua", "nome": "Vitor Gabriel Santos Neres", "mat": "20260549", "notas": {}, "freq": {}, "atividades": {}}, {"id": "1yhqhyrv", "nome": "Yasmim dos Reis Dias", "mat": "20260545", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "iaj1iwnh", "nome": "VESP T1 - 1 Periodo Vespertino", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 1", "horarios": [], "alunos": [{"id": "lb1jn1ys", "nome": "Ana Julia Soares Noronha", "mat": "20260512", "notas": {}, "freq": {}, "atividades": {}}, {"id": "1y2jjlxs", "nome": "Ana Paula do Rosario Silva", "mat": "20260454", "notas": {}, "freq": {}, "atividades": {}}, {"id": "e6ipftje", "nome": "Anne Gabrielly dos Santos", "mat": "20260492", "notas": {}, "freq": {}, "atividades": {}}, {"id": "jf3y8lr5", "nome": "Bruna Eloa Ferreira Noronha", "mat": "20260459", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t73schj6", "nome": "Carlos Eduardo Silva Duarte", "mat": "20260465", "notas": {}, "freq": {}, "atividades": {}}, {"id": "23a97lim", "nome": "Daniela Vitoria Silva Souza", "mat": "20260448", "notas": {}, "freq": {}, "atividades": {}}, {"id": "k3huxb6u", "nome": "Elisangela Aparecida de Oliveira", "mat": "20210241", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9zlzn7r2", "nome": "Eloisa Thaina Cardoso Martins", "mat": "20260461", "notas": {}, "freq": {}, "atividades": {}}, {"id": "alqta9k6", "nome": "Emily Fernanda Rodrigues Pereira", "mat": "20170142", "notas": {}, "freq": {}, "atividades": {}}, {"id": "pvd80tvj", "nome": "Evellyn Cristina Santos Rodrigues", "mat": "20260471", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h3ikzcgg", "nome": "Flavia Alessandra Pereira Andrade", "mat": "20260480", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5b0ozfsa", "nome": "Gustavo Alves Santos", "mat": "20260462", "notas": {}, "freq": {}, "atividades": {}}, {"id": "jup7xef7", "nome": "Jeanne Rosa Moreira", "mat": "20260447", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d2ymx8uu", "nome": "Joyce Emanuelle Goncalves Santos", "mat": "20260452", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5nk3ozh0", "nome": "Julia Marcelly Duarte Dias", "mat": "20260477", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0bqge97e", "nome": "Lavinea Emanuelle Silva Souza", "mat": "20260483", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7rw3173l", "nome": "Leidi Laura Nunes Montes", "mat": "20260445", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bxzrgqu4", "nome": "Luanna Gabrielle de Souza Duarte", "mat": "20260444", "notas": {}, "freq": {}, "atividades": {}}, {"id": "zymaxn6p", "nome": "Marcela Tamara Silva Benevides", "mat": "20260469", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5vj3qsoq", "nome": "Maria Aparecida Silva de Oliveira", "mat": "20260453", "notas": {}, "freq": {}, "atividades": {}}, {"id": "20t763di", "nome": "Maria Clara Duraes Santos", "mat": "20260449", "notas": {}, "freq": {}, "atividades": {}}, {"id": "oj0eihwk", "nome": "Maria Vitoria Alves Carneiro", "mat": "20212477", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vy3lzhu6", "nome": "Mariana Oliveira Versiani", "mat": "20260491", "notas": {}, "freq": {}, "atividades": {}}, {"id": "r3zu6maj", "nome": "Miriam Fernanda Pereira da Silva", "mat": "20260474", "notas": {}, "freq": {}, "atividades": {}}, {"id": "dljq2jza", "nome": "Rayssa Vitoria Pereira Cruz", "mat": "20260485", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wrpx3on7", "nome": "Sarah Marianne do Carmo Ferreira", "mat": "20260458", "notas": {}, "freq": {}, "atividades": {}}, {"id": "zei6g00x", "nome": "Sherlen Sabrina Bispo Campos", "mat": "20260472", "notas": {}, "freq": {}, "atividades": {}}, {"id": "boz23uul", "nome": "Thaemilly Gabrielle de Souza Alves", "mat": "20260463", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5bzl0an1", "nome": "Thayla Ketlen Lemos Santos", "mat": "20260455", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wsqnbwbt", "nome": "Vitoria Aparecida Marques", "mat": "20260443", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "fgf5tza5", "nome": "VESP T2 - 1 Periodo Vespertino", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 2", "horarios": [], "alunos": [{"id": "ehmwx4ms", "nome": "Anna Julia Silva", "mat": "20260476", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4inis4co", "nome": "Arthur Mendes Reis", "mat": "20260460", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yjbcpzt8", "nome": "Bruna Emanuelle Costa", "mat": "20260489", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bvsgtkmg", "nome": "Carolayne Tayna Lopes Figueiredo", "mat": "20260446", "notas": {}, "freq": {}, "atividades": {}}, {"id": "siomn8ad", "nome": "Elaine Aparecida Matias", "mat": "12010117", "notas": {}, "freq": {}, "atividades": {}}, {"id": "r0dj69je", "nome": "Ellen Vitoria Boas Carneiro", "mat": "20260484", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0younw22", "nome": "Emilly Thayna Silva Goncalves", "mat": "20260464", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0f0icmh1", "nome": "Emily Vitoria Silva Amorim", "mat": "20260475", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9vn5we8g", "nome": "Evelyn Tamires Teles de Jesus", "mat": "20260490", "notas": {}, "freq": {}, "atividades": {}}, {"id": "s00jbzud", "nome": "Gleyce Aparecida Goncalves", "mat": "20260479", "notas": {}, "freq": {}, "atividades": {}}, {"id": "et043gcs", "nome": "Ivone Marinho dos Santos", "mat": "20260456", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9gf4q0mj", "nome": "Joao Vitor Almeida Macedo", "mat": "20260468", "notas": {}, "freq": {}, "atividades": {}}, {"id": "8z4m3ksv", "nome": "Julia dos Santos Costa Pereira", "mat": "20260466", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0ibklmd4", "nome": "Kevelyn Fernandes Alves", "mat": "20260482", "notas": {}, "freq": {}, "atividades": {}}, {"id": "3mmihi18", "nome": "Lavinia Emanuele Oliveira Lima", "mat": "20260487", "notas": {}, "freq": {}, "atividades": {}}, {"id": "m5fhis3k", "nome": "Leidmilla Souza Silva", "mat": "20260450", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rie0wyvb", "nome": "Luma Lorrane Nunes da Silva", "mat": "20260457", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a0nksb2i", "nome": "Marcos Leandro Goncalves Maia", "mat": "20260470", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ndrx3u5r", "nome": "Maria Clara Alves Teixeira de Jesus", "mat": "20260488", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7sxx6vfu", "nome": "Maria Julia Santos Soares", "mat": "20260478", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n53trk8m", "nome": "Mariana Domingues Alves", "mat": "20230009", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bjbpuw5j", "nome": "Marina de Souza Martins Neta", "mat": "20210198", "notas": {}, "freq": {}, "atividades": {}}, {"id": "iqdjvtc7", "nome": "Mateus Emanuel Pereira Silva", "mat": "20260481", "notas": {}, "freq": {}, "atividades": {}}, {"id": "x97ylib2", "nome": "Rayssa Aparecida Teles de Jesus", "mat": "20221554", "notas": {}, "freq": {}, "atividades": {}}, {"id": "gr870pez", "nome": "Sabrina Caroline Teixeira Santos", "mat": "20260473", "notas": {}, "freq": {}, "atividades": {}}, {"id": "fd46ktez", "nome": "Saulo Daniel Cruz Rocha", "mat": "20260467", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t39kf3y6", "nome": "Simone Nayara Catone de Jesus", "mat": "20260451", "notas": {}, "freq": {}, "atividades": {}}, {"id": "nliborp3", "nome": "Thalita Teles Almeida", "mat": "20260156", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bpqaijlw", "nome": "Valeria Pestanha Siqueira de Oliveira", "mat": "15010023", "notas": {}, "freq": {}, "atividades": {}}, {"id": "gn9x23yf", "nome": "Yasmin Pereira Silva", "mat": "20260486", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "iyfuec41", "nome": "3P VESP - 3 Periodo Vespertino", "disc": "Tecnico em Servicos Juridicos", "per": "3 Periodo", "sala": "Sala 3", "horarios": [], "alunos": [{"id": "gruroy53", "nome": "Ana Clara Andrade Silva", "mat": "20253136", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t5oxqsva", "nome": "Ana Clara Rodrigues Batista", "mat": "20253132", "notas": {}, "freq": {}, "atividades": {}}, {"id": "unq04ypt", "nome": "Anna Cecilia da Silva Praes", "mat": "20253139", "notas": {}, "freq": {}, "atividades": {}}, {"id": "oimsqod1", "nome": "Bianca Barros de Oliveira", "mat": "20253138", "notas": {}, "freq": {}, "atividades": {}}, {"id": "zduli40h", "nome": "Emanuelle Beatriz Rodrigues Oliveira", "mat": "20253145", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ul7zk8nz", "nome": "Erika Hipolito Virginio dos Santos", "mat": "20253129", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6uvm178y", "nome": "Esmeralda Teixeira Araujo Leite", "mat": "20253133", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rlj96edf", "nome": "Esther Emanuelle Gomes Santos", "mat": "20253143", "notas": {}, "freq": {}, "atividades": {}}, {"id": "3j7jwao3", "nome": "Gabriel Cardoso Dias Soares", "mat": "20253126", "notas": {}, "freq": {}, "atividades": {}}, {"id": "i77txzib", "nome": "Gabrielle Vitoria Fernandes Teixeira", "mat": "20240388", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xfv4h27r", "nome": "Hellen Laurianny Martins Silva", "mat": "20253113", "notas": {}, "freq": {}, "atividades": {}}, {"id": "8y5iaqw5", "nome": "Jennifer Amanda Pereira dos Santos", "mat": "20253141", "notas": {}, "freq": {}, "atividades": {}}, {"id": "dv3st1o5", "nome": "Joao Carlos dos Santos Silva", "mat": "20253128", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2dg2pb1u", "nome": "Julia Lorrane Souza Carvalho", "mat": "20253137", "notas": {}, "freq": {}, "atividades": {}}, {"id": "94zaoiku", "nome": "Kelly Stefane Pereira", "mat": "20253144", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wy2feonb", "nome": "Laura Francielle Duraes Rodrigues", "mat": "20253235", "notas": {}, "freq": {}, "atividades": {}}, {"id": "hkjtdyna", "nome": "Lavinia Danielle Cardoso Martins", "mat": "20253146", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ek34fc8x", "nome": "Marcela Marques Santana", "mat": "20253134", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6klftw8a", "nome": "Maria Luiza da Silva Barbosa", "mat": "20253115", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ljgkceov", "nome": "Maria Paula Andrade Nascimento", "mat": "20253142", "notas": {}, "freq": {}, "atividades": {}}, {"id": "v7jqjus9", "nome": "Maria Zelia de Jesus Macedo Siqueira", "mat": "20253131", "notas": {}, "freq": {}, "atividades": {}}, {"id": "fr7p8hrt", "nome": "Mariane de Kassia Cardoso", "mat": "20253121", "notas": {}, "freq": {}, "atividades": {}}, {"id": "do6e3vze", "nome": "Mariane Pereira Nascimento", "mat": "20253111", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d4l9i9m1", "nome": "Natalia Bianca Aguilar Santana", "mat": "20253118", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7cuw38gv", "nome": "Pyetra Gabriela Araujo Leite Pimenta", "mat": "20253130", "notas": {}, "freq": {}, "atividades": {}}, {"id": "fyhj0r8r", "nome": "Rayssa Mariane Ribeiro Campos", "mat": "20253124", "notas": {}, "freq": {}, "atividades": {}}, {"id": "o3jbogso", "nome": "Sirleia Cordeiro Lopes", "mat": "20253236", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d0griyv3", "nome": "Vitor Otavio Maia Leite", "mat": "20253302", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "oxw1z1aq", "nome": "3P NOT - 3 Periodo Noturno", "disc": "Tecnico em Servicos Juridicos", "per": "3 Periodo", "sala": "Sala 4", "horarios": [], "alunos": [{"id": "gb249j6c", "nome": "Agata Fernanda Vieira Leite", "mat": "20253178", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h3fz94rs", "nome": "Ana Luiza de Souza Oliveira", "mat": "20253163", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sok646ce", "nome": "Analice Alves dos Santos", "mat": "20253185", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n8batpe6", "nome": "Anne Karine Martins Moura", "mat": "20253166", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y1obfne2", "nome": "Arthur Baruck Dias de Souza", "mat": "20253170", "notas": {}, "freq": {}, "atividades": {}}, {"id": "dmtfq41k", "nome": "Barbara Sabrina Santos Ferreira", "mat": "20200105", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bps4enge", "nome": "Catia Regina de Souza", "mat": "20253158", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5aj06oev", "nome": "Cecilia Cabral de Souza", "mat": "20253177", "notas": {}, "freq": {}, "atividades": {}}, {"id": "95ja5ujm", "nome": "Elizangela Macedo Dias Simao", "mat": "20253114", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y3kvw5hf", "nome": "Emanuelle Krislaine Macedo Pereira", "mat": "20253161", "notas": {}, "freq": {}, "atividades": {}}, {"id": "co4lactd", "nome": "Emanuelly Ferreira Rolim", "mat": "20253148", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ym6ubapi", "nome": "Gabriela Eduarda Silva de Paula", "mat": "20231613", "notas": {}, "freq": {}, "atividades": {}}, {"id": "m1919a9w", "nome": "Ingrid Mariane Moreira de Souza", "mat": "20253174", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wat8e8lf", "nome": "Izabela Geovana Oliveira Soares", "mat": "20253151", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y8ahahcd", "nome": "Izabelle Lorrane Silva Souza", "mat": "20253156", "notas": {}, "freq": {}, "atividades": {}}, {"id": "upkzhb9n", "nome": "Juliana de Souza Pereira", "mat": "20253150", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sugot8jj", "nome": "Luane Santos Cruz", "mat": "20253160", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d66vhofa", "nome": "Lucas Fernandes Lopes da Silveira", "mat": "20253184", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a4znob7t", "nome": "Maria Cecilia de Souza Dias", "mat": "20253238", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0vc8i5rv", "nome": "Maria Clara dos Santos", "mat": "20253155", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ue85rgow", "nome": "Maria Eduarda Paixao Teles", "mat": "20253179", "notas": {}, "freq": {}, "atividades": {}}, {"id": "zocnjtcb", "nome": "Maria Luiza de Souza Silva", "mat": "20253183", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9hbm2wpw", "nome": "Mariana Leite Vieira", "mat": "20253182", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t1wxjblo", "nome": "Matheus Henrique Silva Fonseca", "mat": "20253242", "notas": {}, "freq": {}, "atividades": {}}, {"id": "56p95m5z", "nome": "Patricia Vilas Boas dos Reis", "mat": "20253149", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4osvo1wy", "nome": "Pedro Lucas Souza", "mat": "20253180", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sufq6x2i", "nome": "Vitoria Lima Goncalves de Souza", "mat": "20253153", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h122r18x", "nome": "Vitoria Soares Silva", "mat": "20253171", "notas": {}, "freq": {}, "atividades": {}}, {"id": "byxk8gex", "nome": "Yasmin Luana Moreira Guimaraes", "mat": "20253175", "notas": {}, "freq": {}, "atividades": {}}]}], "atividades": {}, "eventosAgenda": {}};
+
+function uid(){return Math.random().toString(36).slice(2,10)}
+function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
+function media(notas){const v=Object.values(notas||{}).filter(x=>x!==null&&x!==undefined&&!isNaN(+x)&&x!=='');return v.length?+(v.reduce((a,b)=>a+ +b,0)/v.length).toFixed(1):null}
+function sit(m){if(m===null)return{t:'-',c:'s'};if(m>=6)return{t:'Aprovado',c:'g'};if(m>=5)return{t:'Recup.',c:'a'};return{t:'Reprovado',c:'r'}}
+function freqP(a){const ds=Object.keys(a.freq||{});if(!ds.length)return null;return Math.round(ds.filter(d=>a.freq[d]==='P').length/ds.length*100)}
+function mg(){let s=0,n=0;DB.turmas.forEach(t=>(t.alunos||[]).forEach(a=>{const m=media(a.notas);if(m!==null){s+=m;n++;}}));return n?(s/n).toFixed(1):'-'}
+function getTurma(){return DB.turmas.find(t=>t.id===turmaId)}
+function getAvs(){const t=getTurma();return t?.avaliacoes||['AV1','AV2','AV3']}
+function getAtivs(){return DB.atividades[turmaId]||[]}
+
+// ---
+// SINCRONIZACAO FIREBASE E LOCAL STORAGE
+// ---
+function load(){
+  try{
+    var a=localStorage.getItem('pau');
+    if(a){var pa=JSON.parse(a);if(pa&&pa.user&&pa.pass)AUTH=pa;}
+    var d=localStorage.getItem('pdb');
+    if(d){
+      var parsed=JSON.parse(d);
+      if(parsed&&parsed.turmas&&parsed.turmas.length>0){
+        DB=parsed;
+        return;
+      }
+    }
+    DB=JSON.parse(JSON.stringify(DB_INICIAL));
+    localStorage.setItem('pdb',JSON.stringify(DB));
+  }catch(e){
+    DB=JSON.parse(JSON.stringify(DB_INICIAL));
+    localStorage.setItem('pdb',JSON.stringify(DB));
+  }
+}
+
+function save(){
+  try{
+    DB._updatedAt = new Date().toISOString();
+    localStorage.setItem('pdb',JSON.stringify(DB));
+    localStorage.setItem('pau',JSON.stringify(AUTH));
+    showSyncStatus(true,'Salvo');
+  }catch(e){}
+  if(_db){
+    clearTimeout(_syncTimer);
+    _syncTimer=setTimeout(()=>uploadParaFirebase(),2000);
+  }
+}
 
 function showSyncStatus(ok, msg){
   const el=document.getElementById('sync-status');
@@ -460,71 +499,24 @@ function showSyncStatus(ok, msg){
   el.style.color=ok?'#86efac':'#fca5a5';
 }
 
-function save(){
-  try{
-    // Marca timestamp da ultima alteracao local
-    DB._updatedAt = new Date().toISOString();
-    localStorage.setItem('pdb',JSON.stringify(DB));
-    localStorage.setItem('pau',JSON.stringify(AUTH));
-    showSyncStatus(true,'Salvo');
-  }catch(e){}
-  // Sobe para nuvem com debounce
-  if(_db){
-    clearTimeout(_syncTimer);
-    _syncTimer=setTimeout(()=>uploadParaFirebase(),2000);
-  }
-}
-
-async function publicarTurmasParaAlunos(){
-  if(!_db)return;
-  try{
-    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const turmasPublicas=DB.turmas.map(function(t){
-      return {
-        id:t.id,
-        nome:t.nome,
-        disc:t.disc,
-        per:t.per,
-        alunos:(t.alunos||[]).map(function(a){return {id:a.id,nome:a.nome,mat:a.mat};})
-      };
-    });
-    await setDoc(doc(_db,'publico','turmas'),{turmas:JSON.stringify(turmasPublicas),updatedAt:new Date().toISOString()});
-  }catch(e){console.log('Erro ao publicar turmas:',e);}
-}
-
-async function uploadParaFirebase(){
-  if(!_db||_syncing)return;
-  _syncing=true;
-  showSyncStatus(false,'Sincronizando...');
-  try{
-    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await setDoc(doc(_db,'professor','dados'),{
-      DB:JSON.stringify(DB),
-      updatedAt: DB._updatedAt || new Date().toISOString()
-    });
-    await setDoc(doc(_db,'professor','auth'),{AUTH:JSON.stringify(AUTH)});
-    showSyncStatus(true,'Nuvem OK');
-    publicarTurmasParaAlunos();
-  }catch(e){
-    showSyncStatus(false,'Erro nuvem');
-  }finally{_syncing=false;}
-}
-
 async function baixarDaNuvem(){
   if(!_db)return false;
   try{
     const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap=await getDoc(doc(_db,'professor','dados'));
     const snapA=await getDoc(doc(_db,'professor','auth'));
+    
     if(snapA.exists()){
       try{const rA=JSON.parse(snapA.data().AUTH||'{}');if(rA&&rA.user&&rA.pass)AUTH=rA;}catch(e){}
     }
+    
     if(snap.exists()){
       const nuvem=JSON.parse(snap.data().DB||'{}');
       const tsNuvem=snap.data().updatedAt||'';
       const tsLocal=DB._updatedAt||'';
       const tN=(nuvem.turmas||[]).length;
       const tL=(DB.turmas||[]).length;
+      
       if(tN>0){
         if(tsNuvem>tsLocal||tN>tL){
           DB=nuvem;
@@ -552,146 +544,90 @@ async function baixarDaNuvem(){
   }
 }
 
-function syncToFirebase(){uploadParaFirebase();}
-async function loadFromFirebase(){return await baixarDaNuvem();}
-
-async function initFirebase(){
+async function publicarTurmasParaAlunos(){
+  if(!_db)return;
   try{
-    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const {getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const cfg={
-      apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
-      authDomain:"professor-digital-8f792.firebaseapp.com",
-      projectId:"professor-digital-8f792",
-      storageBucket:"professor-digital-8f792.firebasestorage.app",
-      messagingSenderId:"4515274923",
-      appId:"1:4515274923:web:25e9bc6d350a411972d7ee"
-    };
-    const apps=getApps();
-    const app=apps.length?apps[0]:initializeApp(cfg);
-    _db=getFirestore(app);
-    showSyncStatus(false,'Conectando...');
-    // Baixa da nuvem (so substitui se nuvem for mais recente)
-    const atualizado=await baixarDaNuvem();
-    return atualizado;
-  }catch(e){
-    showSyncStatus(false,'Offline');
-    return false;
-  }
+    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const turmasPublicas=DB.turmas.map(function(t){
+      return {
+        id:t.id,
+        nome:t.nome,
+        disc:t.disc,
+        per:t.per,
+        alunos:(t.alunos||[]).map(function(a){return {id:a.id,nome:a.nome,mat:a.mat};})
+      };
+    });
+    await setDoc(doc(_db,'publico','turmas'),{turmas:JSON.stringify(turmasPublicas),updatedAt:new Date().toISOString()});
+  }catch(e){console.log('Erro ao publicar turmas:',e);}
 }
 
-
-var DB_INICIAL = {"turmas": [{"id": "l7jqflfw", "nome": "MAT T1 - 1 Periodo Manha", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 1", "horarios": [], "alunos": [{"id": "l983kgn9", "nome": "Adlinef Santana Rodrigues", "mat": "20260406", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0ovn1auv", "nome": "Alex Sandro Amorim Pereira", "mat": "20260416", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t9ab98ao", "nome": "Ana Clara de Souza Bressan", "mat": "20260418", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2jjv9oti", "nome": "Anelissa de Paula Amaral", "mat": "20260398", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d7la8az6", "nome": "Anna Clara Souza Ferreira", "mat": "20260413", "notas": {}, "freq": {}, "atividades": {}}, {"id": "qskqjpqg", "nome": "Brenda Regiane Santos Batista", "mat": "20260400", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4yzuv7x5", "nome": "Clara Lessa Ferreira", "mat": "20260395", "notas": {}, "freq": {}, "atividades": {}}, {"id": "b6r63pqx", "nome": "Dardielle Vitoria dos Santos Siqueira", "mat": "20260415", "notas": {}, "freq": {}, "atividades": {}}, {"id": "o55lszpi", "nome": "Dayanne Francisca Vieira", "mat": "20260391", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n5rfuu8w", "nome": "Eliane Rodrigues Pereira Alves", "mat": "20260389", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2kt1hgu3", "nome": "Emanuelle Fabricia Pereira Praes", "mat": "20260412", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sgtp1yc2", "nome": "Emily Gabrielle Lopes dos Santos", "mat": "20260414", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9sexhuv6", "nome": "Fernanda Teixeira Santos", "mat": "20260419", "notas": {}, "freq": {}, "atividades": {}}, {"id": "90xrr64x", "nome": "Gabriel Caua Araujo Santos", "mat": "20260404", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yfz44pzt", "nome": "Gabriele Eduarda Melo de Jesus", "mat": "20221251", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yc171m7j", "nome": "Gilson Farlley Oliveira Andrade", "mat": "20260399", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9gymj5dw", "nome": "Hidelane de Souza Silva Alves", "mat": "20260397", "notas": {}, "freq": {}, "atividades": {}}, {"id": "jmsxgojj", "nome": "Iori Henrique Marques Cortez", "mat": "20260405", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4qml02ex", "nome": "Janaina de Jesus Carneiro Goncalves", "mat": "20260403", "notas": {}, "freq": {}, "atividades": {}}, {"id": "aa8zh92q", "nome": "Joyce Santos Goncalves", "mat": "20260407", "notas": {}, "freq": {}, "atividades": {}}, {"id": "qg29xi7r", "nome": "Julia Ferreira Batista", "mat": "15010008", "notas": {}, "freq": {}, "atividades": {}}, {"id": "s506fxfa", "nome": "Kaylane Nicolle Dias Alves", "mat": "20260401", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a56ccv7s", "nome": "Livia Karolyne Vieira Boas", "mat": "20260409", "notas": {}, "freq": {}, "atividades": {}}, {"id": "03fx2hna", "nome": "Lucas Gabriel da Consolacao Ferreira", "mat": "20220531", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a9wcvuwz", "nome": "Marco Tulio Rodrigues Souza", "mat": "20221419", "notas": {}, "freq": {}, "atividades": {}}, {"id": "w5ijmbwe", "nome": "Maria Clara Menezes Carvalho", "mat": "20260392", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5ay4qp0t", "nome": "Miriely dos Reis da Silva", "mat": "20260402", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yokxqbl3", "nome": "Pamella Thais Adriano Prates", "mat": "13010197", "notas": {}, "freq": {}, "atividades": {}}, {"id": "kyasl334", "nome": "Ryane Dias Ribeiro", "mat": "20260387", "notas": {}, "freq": {}, "atividades": {}}, {"id": "mrb7siij", "nome": "Samyra Gabriele da Silva Freire", "mat": "20260393", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vqvuoy9c", "nome": "Sarah Daniele Santos Carvalho", "mat": "20260410", "notas": {}, "freq": {}, "atividades": {}}, {"id": "eb2puvih", "nome": "Shara Vitoria da Silva Mota", "mat": "20260411", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ot9kamkq", "nome": "Tailane Monique Batista Souza", "mat": "20260394", "notas": {}, "freq": {}, "atividades": {}}, {"id": "75sglb6l", "nome": "Talita Emanuely Pereira", "mat": "20260408", "notas": {}, "freq": {}, "atividades": {}}, {"id": "99z13rfb", "nome": "Vitoria Tauane dos Santos Dias", "mat": "20260388", "notas": {}, "freq": {}, "atividades": {}}, {"id": "lgbbp79u", "nome": "Vivian Ariane Santos Anacleto", "mat": "20210412", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "t21mh239", "nome": "MAT T2 - 1 Periodo Manha", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 2", "horarios": [], "alunos": [{"id": "ldlep1ju", "nome": "Ana Claudia Pereira da Silva", "mat": "20260424", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a9upjv1c", "nome": "Anna Clara Rodrigues Dias", "mat": "20260426", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y1v7l4ci", "nome": "Anna Vitoria Alves Vieira", "mat": "20221490", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0t4w5y1f", "nome": "Arlinda de Cassia Cavalcante Monteiro", "mat": "20260430", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ecq4si8l", "nome": "Camila Fernanda Cardoso de Souza", "mat": "20260440", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ll9mwup3", "nome": "Cibelle Soares da Rocha", "mat": "20260420", "notas": {}, "freq": {}, "atividades": {}}, {"id": "kn35g8mf", "nome": "Clara Meirian Alves Veloso", "mat": "20260439", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ghjimgym", "nome": "Claudia Danielle Pereira Santos", "mat": "20260421", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bf3wpdub", "nome": "Dalila Aniele Souza Pires", "mat": "20260442", "notas": {}, "freq": {}, "atividades": {}}, {"id": "gvvqd2mg", "nome": "Dayanne Souza Santos", "mat": "20210199", "notas": {}, "freq": {}, "atividades": {}}, {"id": "eoiruo13", "nome": "Emilly Araujo Costa", "mat": "20260396", "notas": {}, "freq": {}, "atividades": {}}, {"id": "94dbeoxq", "nome": "Emilly Araujo Costa II", "mat": "20260436", "notas": {}, "freq": {}, "atividades": {}}, {"id": "50ymxncg", "nome": "Izabella Fernanda da Silva Gomes", "mat": "20260390", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ar3skjfw", "nome": "Jhonya Safira Peres", "mat": "20260429", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ir3iwk2w", "nome": "Joao Vitor Barroso Andrade", "mat": "20210321", "notas": {}, "freq": {}, "atividades": {}}, {"id": "e33qe1zh", "nome": "Joseniete Pereira", "mat": "20260434", "notas": {}, "freq": {}, "atividades": {}}, {"id": "z5bhgfow", "nome": "Joyce Ferreira de Oliveira", "mat": "20260423", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ur9lke7b", "nome": "Julio Cesar Oliveira Andrade", "mat": "20260435", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t90gxhtt", "nome": "Karoline Tamara dos Santos Moreira", "mat": "20260437", "notas": {}, "freq": {}, "atividades": {}}, {"id": "obo86gye", "nome": "Luanna Arianne Nascimento Silva", "mat": "20260438", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vv7d54vo", "nome": "Lucas Ariel Dias Macedo", "mat": "20260427", "notas": {}, "freq": {}, "atividades": {}}, {"id": "94e3zl7y", "nome": "Luis Fernando Macedo Peixoto", "mat": "13010183", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5miz2tek", "nome": "Maria Elisa Pereira de Freitas", "mat": "20260428", "notas": {}, "freq": {}, "atividades": {}}, {"id": "tscipj38", "nome": "Maria Isabela Boas Ribeiro", "mat": "20170078", "notas": {}, "freq": {}, "atividades": {}}, {"id": "mb2doro4", "nome": "Maria Julia Ribeiro Alves", "mat": "20260441", "notas": {}, "freq": {}, "atividades": {}}, {"id": "40vbh5r9", "nome": "Marilia de Cassia Andrade Alkmim Duarte", "mat": "20260433", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n7ycyaxy", "nome": "Marla Fabricia Pereira Santos", "mat": "20221221", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y8nhgxe5", "nome": "Matheus Elias Rocha Amorim", "mat": "20231684", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d2k6pevy", "nome": "Nathalia Fanny Rodrigues Silva", "mat": "20150076", "notas": {}, "freq": {}, "atividades": {}}, {"id": "l2p1u2mc", "nome": "Nathalia Vitoria Oliveira de Souza", "mat": "20150003", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xix6y0vz", "nome": "Samira Cristina Caldeira dos Santos", "mat": "20260417", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wf5uo0kz", "nome": "Silvane Regina Braganca", "mat": "20260425", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xoa25j9c", "nome": "Thais Gabriela Cunha", "mat": "20150041", "notas": {}, "freq": {}, "atividades": {}}, {"id": "3jsywbwx", "nome": "Vitoria Izabelle Santos Pimenta", "mat": "20260431", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bblxo4hc", "nome": "Willian Pires Barbosa", "mat": "20260432", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "sguyovii", "nome": "NOT T1 - 1 Periodo Noturno", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 3", "horarios": [], "alunos": [{"id": "uecvvriv", "nome": "Agatha Karine Cardoso Siqueira", "mat": "20260493", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7ugo0g1o", "nome": "Alice Almeida Dias", "mat": "20260528", "notas": {}, "freq": {}, "atividades": {}}, {"id": "r05v706n", "nome": "Amanda Silva Reis", "mat": "20260508", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5qj917as", "nome": "Ana Clara Ramos Araujo", "mat": "20260496", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vhkm4ikf", "nome": "Beatriz Soares Coimbra Silva", "mat": "20200007", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h1zmb21n", "nome": "Bruna Eduarda Andrade", "mat": "20260533", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4h8kp8lk", "nome": "Bruna Victoria Oliveira Andrade", "mat": "20260494", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vnwuzte0", "nome": "Carolina Silva Pereira", "mat": "20260520", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2bs3q4zc", "nome": "Cleiton Cesar Maia Pereira", "mat": "20260499", "notas": {}, "freq": {}, "atividades": {}}, {"id": "effos0ax", "nome": "Edson Gabriel das Neves Pereira", "mat": "20260513", "notas": {}, "freq": {}, "atividades": {}}, {"id": "381q2sul", "nome": "Eloa Cristina Souza dos Santos", "mat": "20260538", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4mhs6o16", "nome": "Emilly Kauanny Souza Veloso", "mat": "20260534", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ku9nrh8b", "nome": "Erika Patricia Santos Pereira", "mat": "20260506", "notas": {}, "freq": {}, "atividades": {}}, {"id": "egf4w1dr", "nome": "Geovana Daniely Medeiros da Silva", "mat": "20260585", "notas": {}, "freq": {}, "atividades": {}}, {"id": "1300yeyv", "nome": "Geovana Duarte Mello", "mat": "20260537", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0nib1m5d", "nome": "Helen Cristina Silva Fernandes", "mat": "20260502", "notas": {}, "freq": {}, "atividades": {}}, {"id": "pxxywkew", "nome": "Hellen Patricia Almeida Morais", "mat": "20231612", "notas": {}, "freq": {}, "atividades": {}}, {"id": "e6lddibl", "nome": "Hellen Sabrina Fernandes Alves", "mat": "20260526", "notas": {}, "freq": {}, "atividades": {}}, {"id": "8y3lfqv6", "nome": "Heloa Camile Ferreira Siqueira", "mat": "20260536", "notas": {}, "freq": {}, "atividades": {}}, {"id": "3gcz2vaw", "nome": "Hugo Felipe Oliveira", "mat": "20260503", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9vgoeld3", "nome": "Isabelle Cristine Rodrigues Oliveira", "mat": "20260515", "notas": {}, "freq": {}, "atividades": {}}, {"id": "i2mvj4i6", "nome": "Isadora Cristine Ferreira Soares", "mat": "20260505", "notas": {}, "freq": {}, "atividades": {}}, {"id": "itbcnlmx", "nome": "Joao Vitor dos Santos Rocha", "mat": "20260522", "notas": {}, "freq": {}, "atividades": {}}, {"id": "o5pxg39f", "nome": "Josimara Silva Ferreira", "mat": "20260509", "notas": {}, "freq": {}, "atividades": {}}, {"id": "euvuzq7j", "nome": "Jucileia dos Santos Costa Pereira", "mat": "20260511", "notas": {}, "freq": {}, "atividades": {}}, {"id": "i50lsj91", "nome": "Kathlen Tauane de Jesus Santos", "mat": "20260519", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a0pk799w", "nome": "Kauanne Meyrielle dos Reis Santos", "mat": "20260530", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2x27mcb7", "nome": "Keila Fabricia Alves Fonseca", "mat": "20260532", "notas": {}, "freq": {}, "atividades": {}}, {"id": "l27ekaqw", "nome": "Lara Cristiny Alves Azevedo", "mat": "20260524", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ywjcfuau", "nome": "Lara Malu Oliveira Santos", "mat": "20260510", "notas": {}, "freq": {}, "atividades": {}}, {"id": "w9w8maaw", "nome": "Luana Carolina Pereira", "mat": "20260056", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xlo1f0an", "nome": "Luana Helena da Costa Farias", "mat": "20260507", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7yokbilz", "nome": "Lucio Paulo Fernandes Gomes", "mat": "20260501", "notas": {}, "freq": {}, "atividades": {}}, {"id": "x35dflvc", "nome": "Maria Eduarda dos Santos Reis", "mat": "20260539", "notas": {}, "freq": {}, "atividades": {}}, {"id": "z2ybhqfs", "nome": "Maria Fernanda Silva Pereira", "mat": "20260516", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rig8g2zx", "nome": "Maria Julia Santos Costa", "mat": "20260498", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sootwkua", "nome": "Maria Luiza Siqueira Silva", "mat": "20260587", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n8cequnz", "nome": "Maria Sabrina Veloso", "mat": "20260495", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4kk65brt", "nome": "Maria Tereza Pereira Moreira", "mat": "20260527", "notas": {}, "freq": {}, "atividades": {}}, {"id": "nmuxhton", "nome": "Natalia Esthefany Soares Sousa", "mat": "20260523", "notas": {}, "freq": {}, "atividades": {}}, {"id": "nif3cdgb", "nome": "Rafael de Castro Souza", "mat": "20260525", "notas": {}, "freq": {}, "atividades": {}}, {"id": "on8jjlf3", "nome": "Sabrina Pereira Dias", "mat": "20260500", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vr84qh2s", "nome": "Samira Natalia Souza Peixoto", "mat": "20260504", "notas": {}, "freq": {}, "atividades": {}}, {"id": "u38ht1eo", "nome": "Samira Souza Martins", "mat": "20260531", "notas": {}, "freq": {}, "atividades": {}}, {"id": "c6m2qqw1", "nome": "Sarah Carolinne Dias Jorge", "mat": "20260514", "notas": {}, "freq": {}, "atividades": {}}, {"id": "mctay2hy", "nome": "Stefany Silva Nunes", "mat": "20260529", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5a9hxy6s", "nome": "Thiago Arthur Souza Lima", "mat": "20260535", "notas": {}, "freq": {}, "atividades": {}}, {"id": "iu1ip4rq", "nome": "Vitoria Samara Soares Santos", "mat": "20260521", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5h82q9wh", "nome": "Wigner Silva Cardoso", "mat": "20260517", "notas": {}, "freq": {}, "atividades": {}}, {"id": "036y8adj", "nome": "Yasmin dos Santos Soares", "mat": "20260518", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "goqrbn2h", "nome": "NOT T2 - 1 Periodo Noturno", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 4", "horarios": [], "alunos": [{"id": "91d16271", "nome": "Adriana Alves Silva", "mat": "20260555", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bc75og3f", "nome": "Ana Vitoria Duarte da Silva", "mat": "20260575", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4x7r4ocn", "nome": "Andressa Lorrayne Nascimento Silva", "mat": "20260543", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vgl6aflf", "nome": "Anna Lyce Moreira Lima", "mat": "20260558", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rthj7n5d", "nome": "Anna Paula Antunes", "mat": "14020298", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wlc491w1", "nome": "Anne Gabrielle Ferreira dos Santos", "mat": "20260566", "notas": {}, "freq": {}, "atividades": {}}, {"id": "aa2l15xr", "nome": "Anny Luiza Teixeira", "mat": "20260559", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2e72qkdh", "nome": "Arthur Gabriel Boas Cruz", "mat": "20260546", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yqwc06yr", "nome": "Ayressa Gabriele Fonseca Lopes", "mat": "20260560", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ct86diwq", "nome": "Barbara Izabel Bispo Santos", "mat": "20260572", "notas": {}, "freq": {}, "atividades": {}}, {"id": "dh7if90x", "nome": "Emanuelly Virginio Duarte Azevedo", "mat": "20260557", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bdc2pl48", "nome": "Emilly Thalita Moura de Souza", "mat": "20221328", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sa2xlcnq", "nome": "Emily Tauane Meira Souza", "mat": "20231685", "notas": {}, "freq": {}, "atividades": {}}, {"id": "int9f2xl", "nome": "Endrian Gabriel Soares Silva", "mat": "20260582", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7ws52jwx", "nome": "Eric Ryan Silva Macedo", "mat": "20260554", "notas": {}, "freq": {}, "atividades": {}}, {"id": "09pb2gsr", "nome": "Fernanda Graziela Santos Fonseca", "mat": "20260542", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ymvaji40", "nome": "Francisco Duraes Borem", "mat": "20260574", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6qut9uij", "nome": "Geiciane Silva Alves", "mat": "20260548", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rn3f9yp9", "nome": "Gustavo Henrique Oliveira da Paixao", "mat": "20260565", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ddpho2vm", "nome": "Helder Cleriston Moreira da Silva", "mat": "20260577", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0gymfqne", "nome": "Isabella Cardoso Vieira", "mat": "20260573", "notas": {}, "freq": {}, "atividades": {}}, {"id": "x6y3xskx", "nome": "Isis Daniele Medeiros Fonseca", "mat": "20253230", "notas": {}, "freq": {}, "atividades": {}}, {"id": "o71v9crd", "nome": "Jhennyfer Emanuelle da Silva", "mat": "20260583", "notas": {}, "freq": {}, "atividades": {}}, {"id": "lu3mh8wn", "nome": "Julio Cesar Santos Silva", "mat": "20260562", "notas": {}, "freq": {}, "atividades": {}}, {"id": "l0q26urg", "nome": "Junia Andressa Ramos Nogueira", "mat": "20260552", "notas": {}, "freq": {}, "atividades": {}}, {"id": "jy749hlr", "nome": "Kamila Izabela Cardoso", "mat": "20260581", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xyohf7gs", "nome": "Livia Marques Ferreira", "mat": "20260571", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7ecsm0cg", "nome": "Luana Pereira da Silva", "mat": "20260568", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vbzhsy9j", "nome": "Marcella Santos Goncalves", "mat": "20260579", "notas": {}, "freq": {}, "atividades": {}}, {"id": "nj914zch", "nome": "Marcelly Yasmin Duarte Carvalho", "mat": "20260561", "notas": {}, "freq": {}, "atividades": {}}, {"id": "30b07i4l", "nome": "Maria Cecilia Cardoso Meira", "mat": "20260584", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vhfbs3p1", "nome": "Maria Eduarda Ferreira Carvalho", "mat": "20260580", "notas": {}, "freq": {}, "atividades": {}}, {"id": "e0lw8gqb", "nome": "Maria Eduarda Oliveira de Souza", "mat": "20260567", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6c3d4e22", "nome": "Maria Eduarda Silva Praes", "mat": "20210004", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h9cjc5tn", "nome": "Maria Elisa Silva Souza", "mat": "20260569", "notas": {}, "freq": {}, "atividades": {}}, {"id": "apu92s1v", "nome": "Maria Fernanda Neves Tiago", "mat": "20260556", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0r2dkft4", "nome": "Maria Julia Lopes Goncalves", "mat": "20260553", "notas": {}, "freq": {}, "atividades": {}}, {"id": "abbjijlb", "nome": "Maria Luisa do Amaral Lima", "mat": "20260578", "notas": {}, "freq": {}, "atividades": {}}, {"id": "aej3cdt6", "nome": "Mariana Taina Alves Cardoso", "mat": "20260544", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h45y1h1d", "nome": "Natalia dos Santos Barbosa", "mat": "20260564", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0tdymy21", "nome": "Pacifica dos Santos Lima", "mat": "20260547", "notas": {}, "freq": {}, "atividades": {}}, {"id": "c0zeqgro", "nome": "Pedro Lucas Vieira Santos", "mat": "20260550", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6ki46zeu", "nome": "Sthefany Lorrana Almeida Santos", "mat": "20260570", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ntbtgh40", "nome": "Tauanne Karolayne Neves Silva", "mat": "20260576", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ckjcvrky", "nome": "Thamires Emanuelle Jardim de Souza", "mat": "20260540", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rjdgou8e", "nome": "Thayna Colen Silva", "mat": "20260563", "notas": {}, "freq": {}, "atividades": {}}, {"id": "hwc38n7n", "nome": "Vanessa Alves Ferreira", "mat": "20260551", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6if4leua", "nome": "Vitor Gabriel Santos Neres", "mat": "20260549", "notas": {}, "freq": {}, "atividades": {}}, {"id": "1yhqhyrv", "nome": "Yasmim dos Reis Dias", "mat": "20260545", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "iaj1iwnh", "nome": "VESP T1 - 1 Periodo Vespertino", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 1", "horarios": [], "alunos": [{"id": "lb1jn1ys", "nome": "Ana Julia Soares Noronha", "mat": "20260512", "notas": {}, "freq": {}, "atividades": {}}, {"id": "1y2jjlxs", "nome": "Ana Paula do Rosario Silva", "mat": "20260454", "notas": {}, "freq": {}, "atividades": {}}, {"id": "e6ipftje", "nome": "Anne Gabrielly dos Santos", "mat": "20260492", "notas": {}, "freq": {}, "atividades": {}}, {"id": "jf3y8lr5", "nome": "Bruna Eloa Ferreira Noronha", "mat": "20260459", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t73schj6", "nome": "Carlos Eduardo Silva Duarte", "mat": "20260465", "notas": {}, "freq": {}, "atividades": {}}, {"id": "23a97lim", "nome": "Daniela Vitoria Silva Souza", "mat": "20260448", "notas": {}, "freq": {}, "atividades": {}}, {"id": "k3huxb6u", "nome": "Elisangela Aparecida de Oliveira", "mat": "20210241", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9zlzn7r2", "nome": "Eloisa Thaina Cardoso Martins", "mat": "20260461", "notas": {}, "freq": {}, "atividades": {}}, {"id": "alqta9k6", "nome": "Emily Fernanda Rodrigues Pereira", "mat": "20170142", "notas": {}, "freq": {}, "atividades": {}}, {"id": "pvd80tvj", "nome": "Evellyn Cristina Santos Rodrigues", "mat": "20260471", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h3ikzcgg", "nome": "Flavia Alessandra Pereira Andrade", "mat": "20260480", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5b0ozfsa", "nome": "Gustavo Alves Santos", "mat": "20260462", "notas": {}, "freq": {}, "atividades": {}}, {"id": "jup7xef7", "nome": "Jeanne Rosa Moreira", "mat": "20260447", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d2ymx8uu", "nome": "Joyce Emanuelle Goncalves Santos", "mat": "20260452", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5nk3ozh0", "nome": "Julia Marcelly Duarte Dias", "mat": "20260477", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0bqge97e", "nome": "Lavinea Emanuelle Silva Souza", "mat": "20260483", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7rw3173l", "nome": "Leidi Laura Nunes Montes", "mat": "20260445", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bxzrgqu4", "nome": "Luanna Gabrielle de Souza Duarte", "mat": "20260444", "notas": {}, "freq": {}, "atividades": {}}, {"id": "zymaxn6p", "nome": "Marcela Tamara Silva Benevides", "mat": "20260469", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5vj3qsoq", "nome": "Maria Aparecida Silva de Oliveira", "mat": "20260453", "notas": {}, "freq": {}, "atividades": {}}, {"id": "20t763di", "nome": "Maria Clara Duraes Santos", "mat": "20260449", "notas": {}, "freq": {}, "atividades": {}}, {"id": "oj0eihwk", "nome": "Maria Vitoria Alves Carneiro", "mat": "20212477", "notas": {}, "freq": {}, "atividades": {}}, {"id": "vy3lzhu6", "nome": "Mariana Oliveira Versiani", "mat": "20260491", "notas": {}, "freq": {}, "atividades": {}}, {"id": "r3zu6maj", "nome": "Miriam Fernanda Pereira da Silva", "mat": "20260474", "notas": {}, "freq": {}, "atividades": {}}, {"id": "dljq2jza", "nome": "Rayssa Vitoria Pereira Cruz", "mat": "20260485", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wrpx3on7", "nome": "Sarah Marianne do Carmo Ferreira", "mat": "20260458", "notas": {}, "freq": {}, "atividades": {}}, {"id": "zei6g00x", "nome": "Sherlen Sabrina Bispo Campos", "mat": "20260472", "notas": {}, "freq": {}, "atividades": {}}, {"id": "boz23uul", "nome": "Thaemilly Gabrielle de Souza Alves", "mat": "20260463", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5bzl0an1", "nome": "Thayla Ketlen Lemos Santos", "mat": "20260455", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wsqnbwbt", "nome": "Vitoria Aparecida Marques", "mat": "20260443", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "fgf5tza5", "nome": "VESP T2 - 1 Periodo Vespertino", "disc": "Tecnico em Servicos Juridicos", "per": "1 Periodo", "sala": "Sala 2", "horarios": [], "alunos": [{"id": "ehmwx4ms", "nome": "Anna Julia Silva", "mat": "20260476", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4inis4co", "nome": "Arthur Mendes Reis", "mat": "20260460", "notas": {}, "freq": {}, "atividades": {}}, {"id": "yjbcpzt8", "nome": "Bruna Emanuelle Costa", "mat": "20260489", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bvsgtkmg", "nome": "Carolayne Tayna Lopes Figueiredo", "mat": "20260446", "notas": {}, "freq": {}, "atividades": {}}, {"id": "siomn8ad", "nome": "Elaine Aparecida Matias", "mat": "12010117", "notas": {}, "freq": {}, "atividades": {}}, {"id": "r0dj69je", "nome": "Ellen Vitoria Boas Carneiro", "mat": "20260484", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0younw22", "nome": "Emilly Thayna Silva Goncalves", "mat": "20260464", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0f0icmh1", "nome": "Emily Vitoria Silva Amorim", "mat": "20260475", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9vn5we8g", "nome": "Evelyn Tamires Teles de Jesus", "mat": "20260490", "notas": {}, "freq": {}, "atividades": {}}, {"id": "s00jbzud", "nome": "Gleyce Aparecida Goncalves", "mat": "20260479", "notas": {}, "freq": {}, "atividades": {}}, {"id": "et043gcs", "nome": "Ivone Marinho dos Santos", "mat": "20260456", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9gf4q0mj", "nome": "Joao Vitor Almeida Macedo", "mat": "20260468", "notas": {}, "freq": {}, "atividades": {}}, {"id": "8z4m3ksv", "nome": "Julia dos Santos Costa Pereira", "mat": "20260466", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0ibklmd4", "nome": "Kevelyn Fernandes Alves", "mat": "20260482", "notas": {}, "freq": {}, "atividades": {}}, {"id": "3mmihi18", "nome": "Lavinia Emanuele Oliveira Lima", "mat": "20260487", "notas": {}, "freq": {}, "atividades": {}}, {"id": "m5fhis3k", "nome": "Leidmilla Souza Silva", "mat": "20260450", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rie0wyvb", "nome": "Luma Lorrane Nunes da Silva", "mat": "20260457", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a0nksb2i", "nome": "Marcos Leandro Goncalves Maia", "mat": "20260470", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ndrx3u5r", "nome": "Maria Clara Alves Teixeira de Jesus", "mat": "20260488", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7sxx6vfu", "nome": "Maria Julia Santos Soares", "mat": "20260478", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n53trk8m", "nome": "Mariana Domingues Alves", "mat": "20230009", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bjbpuw5j", "nome": "Marina de Souza Martins Neta", "mat": "20210198", "notas": {}, "freq": {}, "atividades": {}}, {"id": "iqdjvtc7", "nome": "Mateus Emanuel Pereira Silva", "mat": "20260481", "notas": {}, "freq": {}, "atividades": {}}, {"id": "x97ylib2", "nome": "Rayssa Aparecida Teles de Jesus", "mat": "20221554", "notas": {}, "freq": {}, "atividades": {}}, {"id": "gr870pez", "nome": "Sabrina Caroline Teixeira Santos", "mat": "20260473", "notas": {}, "freq": {}, "atividades": {}}, {"id": "fd46ktez", "nome": "Saulo Daniel Cruz Rocha", "mat": "20260467", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t39kf3y6", "nome": "Simone Nayara Catone de Jesus", "mat": "20260451", "notas": {}, "freq": {}, "atividades": {}}, {"id": "nliborp3", "nome": "Thalita Teles Almeida", "mat": "20260156", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bpqaijlw", "nome": "Valeria Pestanha Siqueira de Oliveira", "mat": "15010023", "notas": {}, "freq": {}, "atividades": {}}, {"id": "gn9x23yf", "nome": "Yasmin Pereira Silva", "mat": "20260486", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "iyfuec41", "nome": "3P VESP - 3 Periodo Vespertino", "disc": "Tecnico em Servicos Juridicos", "per": "3 Periodo", "sala": "Sala 3", "horarios": [], "alunos": [{"id": "gruroy53", "nome": "Ana Clara Andrade Silva", "mat": "20253136", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t5oxqsva", "nome": "Ana Clara Rodrigues Batista", "mat": "20253132", "notas": {}, "freq": {}, "atividades": {}}, {"id": "unq04ypt", "nome": "Anna Cecilia da Silva Praes", "mat": "20253139", "notas": {}, "freq": {}, "atividades": {}}, {"id": "oimsqod1", "nome": "Bianca Barros de Oliveira", "mat": "20253138", "notas": {}, "freq": {}, "atividades": {}}, {"id": "zduli40h", "nome": "Emanuelle Beatriz Rodrigues Oliveira", "mat": "20253145", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ul7zk8nz", "nome": "Erika Hipolito Virginio dos Santos", "mat": "20253129", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6uvm178y", "nome": "Esmeralda Teixeira Araujo Leite", "mat": "20253133", "notas": {}, "freq": {}, "atividades": {}}, {"id": "rlj96edf", "nome": "Esther Emanuelle Gomes Santos", "mat": "20253143", "notas": {}, "freq": {}, "atividades": {}}, {"id": "3j7jwao3", "nome": "Gabriel Cardoso Dias Soares", "mat": "20253126", "notas": {}, "freq": {}, "atividades": {}}, {"id": "i77txzib", "nome": "Gabrielle Vitoria Fernandes Teixeira", "mat": "20240388", "notas": {}, "freq": {}, "atividades": {}}, {"id": "xfv4h27r", "nome": "Hellen Laurianny Martins Silva", "mat": "20253113", "notas": {}, "freq": {}, "atividades": {}}, {"id": "8y5iaqw5", "nome": "Jennifer Amanda Pereira dos Santos", "mat": "20253141", "notas": {}, "freq": {}, "atividades": {}}, {"id": "dv3st1o5", "nome": "Joao Carlos dos Santos Silva", "mat": "20253128", "notas": {}, "freq": {}, "atividades": {}}, {"id": "2dg2pb1u", "nome": "Julia Lorrane Souza Carvalho", "mat": "20253137", "notas": {}, "freq": {}, "atividades": {}}, {"id": "94zaoiku", "nome": "Kelly Stefane Pereira", "mat": "20253144", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wy2feonb", "nome": "Laura Francielle Duraes Rodrigues", "mat": "20253235", "notas": {}, "freq": {}, "atividades": {}}, {"id": "hkjtdyna", "nome": "Lavinia Danielle Cardoso Martins", "mat": "20253146", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ek34fc8x", "nome": "Marcela Marques Santana", "mat": "20253134", "notas": {}, "freq": {}, "atividades": {}}, {"id": "6klftw8a", "nome": "Maria Luiza da Silva Barbosa", "mat": "20253115", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ljgkceov", "nome": "Maria Paula Andrade Nascimento", "mat": "20253142", "notas": {}, "freq": {}, "atividades": {}}, {"id": "v7jqjus9", "nome": "Maria Zelia de Jesus Macedo Siqueira", "mat": "20253131", "notas": {}, "freq": {}, "atividades": {}}, {"id": "fr7p8hrt", "nome": "Mariane de Kassia Cardoso", "mat": "20253121", "notas": {}, "freq": {}, "atividades": {}}, {"id": "do6e3vze", "nome": "Mariane Pereira Nascimento", "mat": "20253111", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d4l9i9m1", "nome": "Natalia Bianca Aguilar Santana", "mat": "20253118", "notas": {}, "freq": {}, "atividades": {}}, {"id": "7cuw38gv", "nome": "Pyetra Gabriela Araujo Leite Pimenta", "mat": "20253130", "notas": {}, "freq": {}, "atividades": {}}, {"id": "fyhj0r8r", "nome": "Rayssa Mariane Ribeiro Campos", "mat": "20253124", "notas": {}, "freq": {}, "atividades": {}}, {"id": "o3jbogso", "nome": "Sirleia Cordeiro Lopes", "mat": "20253236", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d0griyv3", "nome": "Vitor Otavio Maia Leite", "mat": "20253302", "notas": {}, "freq": {}, "atividades": {}}]}, {"id": "oxw1z1aq", "nome": "3P NOT - 3 Periodo Noturno", "disc": "Tecnico em Servicos Juridicos", "per": "3 Periodo", "sala": "Sala 4", "horarios": [], "alunos": [{"id": "gb249j6c", "nome": "Agata Fernanda Vieira Leite", "mat": "20253178", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h3fz94rs", "nome": "Ana Luiza de Souza Oliveira", "mat": "20253163", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sok646ce", "nome": "Analice Alves dos Santos", "mat": "20253185", "notas": {}, "freq": {}, "atividades": {}}, {"id": "n8batpe6", "nome": "Anne Karine Martins Moura", "mat": "20253166", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y1obfne2", "nome": "Arthur Baruck Dias de Souza", "mat": "20253170", "notas": {}, "freq": {}, "atividades": {}}, {"id": "dmtfq41k", "nome": "Barbara Sabrina Santos Ferreira", "mat": "20200105", "notas": {}, "freq": {}, "atividades": {}}, {"id": "bps4enge", "nome": "Catia Regina de Souza", "mat": "20253158", "notas": {}, "freq": {}, "atividades": {}}, {"id": "5aj06oev", "nome": "Cecilia Cabral de Souza", "mat": "20253177", "notas": {}, "freq": {}, "atividades": {}}, {"id": "95ja5ujm", "nome": "Elizangela Macedo Dias Simao", "mat": "20253114", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y3kvw5hf", "nome": "Emanuelle Krislaine Macedo Pereira", "mat": "20253161", "notas": {}, "freq": {}, "atividades": {}}, {"id": "co4lactd", "nome": "Emanuelly Ferreira Rolim", "mat": "20253148", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ym6ubapi", "nome": "Gabriela Eduarda Silva de Paula", "mat": "20231613", "notas": {}, "freq": {}, "atividades": {}}, {"id": "m1919a9w", "nome": "Ingrid Mariane Moreira de Souza", "mat": "20253174", "notas": {}, "freq": {}, "atividades": {}}, {"id": "wat8e8lf", "nome": "Izabela Geovana Oliveira Soares", "mat": "20253151", "notas": {}, "freq": {}, "atividades": {}}, {"id": "y8ahahcd", "nome": "Izabelle Lorrane Silva Souza", "mat": "20253156", "notas": {}, "freq": {}, "atividades": {}}, {"id": "upkzhb9n", "nome": "Juliana de Souza Pereira", "mat": "20253150", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sugot8jj", "nome": "Luane Santos Cruz", "mat": "20253160", "notas": {}, "freq": {}, "atividades": {}}, {"id": "d66vhofa", "nome": "Lucas Fernandes Lopes da Silveira", "mat": "20253184", "notas": {}, "freq": {}, "atividades": {}}, {"id": "a4znob7t", "nome": "Maria Cecilia de Souza Dias", "mat": "20253238", "notas": {}, "freq": {}, "atividades": {}}, {"id": "0vc8i5rv", "nome": "Maria Clara dos Santos", "mat": "20253155", "notas": {}, "freq": {}, "atividades": {}}, {"id": "ue85rgow", "nome": "Maria Eduarda Paixao Teles", "mat": "20253179", "notas": {}, "freq": {}, "atividades": {}}, {"id": "zocnjtcb", "nome": "Maria Luiza de Souza Silva", "mat": "20253183", "notas": {}, "freq": {}, "atividades": {}}, {"id": "9hbm2wpw", "nome": "Mariana Leite Vieira", "mat": "20253182", "notas": {}, "freq": {}, "atividades": {}}, {"id": "t1wxjblo", "nome": "Matheus Henrique Silva Fonseca", "mat": "20253242", "notas": {}, "freq": {}, "atividades": {}}, {"id": "56p95m5z", "nome": "Patricia Vilas Boas dos Reis", "mat": "20253149", "notas": {}, "freq": {}, "atividades": {}}, {"id": "4osvo1wy", "nome": "Pedro Lucas Souza", "mat": "20253180", "notas": {}, "freq": {}, "atividades": {}}, {"id": "sufq6x2i", "nome": "Vitoria Lima Goncalves de Souza", "mat": "20253153", "notas": {}, "freq": {}, "atividades": {}}, {"id": "h122r18x", "nome": "Vitoria Soares Silva", "mat": "20253171", "notas": {}, "freq": {}, "atividades": {}}, {"id": "byxk8gex", "nome": "Yasmin Luana Moreira Guimaraes", "mat": "20253175", "notas": {}, "freq": {}, "atividades": {}}]}], "atividades": {}, "eventosAgenda": {}};
-
-function load(){
+async function publicarAgendaParaAlunos(){
+  if(!_db)return;
   try{
-    var d=localStorage.getItem('pdb');
-    if(d){
-      var parsed=JSON.parse(d);
-      if(parsed&&parsed.turmas&&parsed.turmas.length>0){
-        DB=parsed;
-      } else {
-        DB=JSON.parse(JSON.stringify(DB_INICIAL));
-        localStorage.setItem('pdb',JSON.stringify(DB));
-      }
-    } else {
-      DB=JSON.parse(JSON.stringify(DB_INICIAL));
-      localStorage.setItem('pdb',JSON.stringify(DB));
+    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    let agendaPublica = [];
+    
+    // 1. Horários fixos das turmas
+    DB.turmas.forEach(function(t) {
+      (t.horarios || []).forEach(function(h) {
+        agendaPublica.push({
+          dia: DIA_F[h.dia],
+          hora: h.hora,
+          label: t.nome + (t.disc ? ' - ' + t.disc : '') + (t.sala ? ' (' + t.sala + ')' : '')
+        });
+      });
+    });
+
+    // 2. Eventos específicos de hoje 
+    const hoje = new Date();
+    const kHoje = hoje.getFullYear() + '-' + hoje.getMonth() + '-' + hoje.getDate();
+    if(DB.eventosAgenda && DB.eventosAgenda[kHoje]) {
+       DB.eventosAgenda[kHoje].forEach(function(ev) {
+         agendaPublica.push({
+           dia: DIA_F[hoje.getDay()],
+           hora: '📌',
+           label: ev
+         });
+       });
     }
-    var a=localStorage.getItem('pau');
-    if(a){var pa=JSON.parse(a);if(pa&&pa.user&&pa.pass)AUTH=pa;}
-  }catch(e){
-    DB=JSON.parse(JSON.stringify(DB_INICIAL));
-  }
+
+    agendaPublica.sort(function(a,b){ return a.hora.localeCompare(b.hora); });
+
+    await setDoc(doc(_db,'publico','agenda'),{
+      dados:JSON.stringify(agendaPublica),
+      updatedAt:new Date().toISOString()
+    });
+  }catch(e){console.log('Erro ao publicar agenda:',e);}
 }
 
-function load(){
+async function uploadParaFirebase(){
+  if(!_db||_syncing)return;
+  _syncing=true;
+  showSyncStatus(false,'Sincronizando...');
   try{
-    var a=localStorage.getItem('pau');
-    if(a){var pa=JSON.parse(a);if(pa&&pa.user&&pa.pass)AUTH=pa;}
-    var d=localStorage.getItem('pdb');
-    if(d){
-      var parsed=JSON.parse(d);
-      // Se ja tem turmas salvas pelo usuario, usa elas
-      // Mas se nao tem turmas ou esta vazio, usa o pre-cadastrado
-      if(parsed&&parsed.turmas&&parsed.turmas.length>0){
-        DB=parsed;
-        return;
-      }
-    }
-    // Sem dados ou turmas vazias: carrega pre-cadastrado
-    DB=JSON.parse(JSON.stringify(DB_INICIAL));
-    localStorage.setItem('pdb',JSON.stringify(DB));
+    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await setDoc(doc(_db,'professor','dados'),{
+      DB:JSON.stringify(DB),
+      updatedAt: DB._updatedAt || new Date().toISOString()
+    });
+    await setDoc(doc(_db,'professor','auth'),{AUTH:JSON.stringify(AUTH)});
+    showSyncStatus(true,'Nuvem OK');
+    publicarTurmasParaAlunos();
+    publicarAgendaParaAlunos();
   }catch(e){
-    DB=JSON.parse(JSON.stringify(DB_INICIAL));
-    localStorage.setItem('pdb',JSON.stringify(DB));
-  }
+    showSyncStatus(false,'Erro nuvem');
+  }finally{_syncing=false;}
 }
-
-async function initFirebase(){
-  return await initFirebaseOnly();
-}
-
-async function initFirebaseOnly(){
-  try{
-    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const firebaseConfig = {
-      apiKey: "AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
-      authDomain: "professor-digital-8f792.firebaseapp.com",
-      projectId: "professor-digital-8f792",
-      storageBucket: "professor-digital-8f792.firebasestorage.app",
-      messagingSenderId: "4515274923",
-      appId: "1:4515274923:web:25e9bc6d350a411972d7ee"
-    };
-    const apps = getApps();
-    const app = apps.length ? apps[0] : initializeApp(firebaseConfig);
-    _db = getFirestore(app);
-    showSyncStatus(true,'Conectado');
-    // Sobe dados locais para nuvem se nuvem estiver vazia
-    setTimeout(()=>sincronizarParaNuvem(),2000);
-    return true;
-  }catch(e){
-    showSyncStatus(false,'Offline');
-    return false;
-  }
-}
-
-async function sincronizarParaNuvem(){
-  if(!_db) return;
-  try{
-    const { doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const snap = await getDoc(doc(_db, 'professor', 'dados'));
-    if(!snap.exists() || (JSON.parse(snap.data().DB||'{}').turmas||[]).length === 0){
-      // Nuvem vazia - sobe dados locais
-      await setDoc(doc(_db,'professor','dados'),{DB:JSON.stringify(DB),updatedAt:new Date().toISOString()});
-      await setDoc(doc(_db,'professor','auth'),{AUTH:JSON.stringify(AUTH)});
-      showSyncStatus(true,'Dados enviados!');
-    } else {
-      showSyncStatus(true,'Nuvem ativa');
-    }
-  }catch(e){}
-}
-
-function uid(){return Math.random().toString(36).slice(2,10)}
-function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
-function media(notas){const v=Object.values(notas||{}).filter(x=>x!==null&&x!==undefined&&!isNaN(+x)&&x!=='');return v.length?+(v.reduce((a,b)=>a+ +b,0)/v.length).toFixed(1):null}
-function sit(m){if(m===null)return{t:'-',c:'s'};if(m>=6)return{t:'Aprovado',c:'g'};if(m>=5)return{t:'Recup.',c:'a'};return{t:'Reprovado',c:'r'}}
-function freqP(a){const ds=Object.keys(a.freq||{});if(!ds.length)return null;return Math.round(ds.filter(d=>a.freq[d]==='P').length/ds.length*100)}
-function mg(){let s=0,n=0;DB.turmas.forEach(t=>(t.alunos||[]).forEach(a=>{const m=media(a.notas);if(m!==null){s+=m;n++;}}));return n?(s/n).toFixed(1):'-'}
-function getTurma(){return DB.turmas.find(t=>t.id===turmaId)}
-function getAvs(){const t=getTurma();return t?.avaliacoes||['AV1','AV2','AV3']}
-function getAtivs(){return DB.atividades[turmaId]||[]}
 
 // ---
-// LOGIN
+// LOGIN E INTERFACE
 // ---
 function limparCacheLocal(){
   localStorage.removeItem('pdb');
   DB=JSON.parse(JSON.stringify(DB_INICIAL));
   localStorage.setItem('pdb',JSON.stringify(DB));
   var m=document.getElementById('cache-msg');
-  if(m){m.textContent='v Turmas recarregadas! Faca login agora.';setTimeout(function(){m.textContent='';},4000);}
+  if(m){m.textContent='v Turmas recarregadas! Faça login agora.';setTimeout(function(){m.textContent='';},4000);}
 }
 
 function login(){
@@ -703,105 +639,38 @@ function login(){
     init();
   }else{document.getElementById('lerr').textContent='Usuário ou senha incorretos.';}
 }
+
 function logout(){if(confirm('Sair?')){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('lp').value='';document.getElementById('lerr').textContent='';}}
 
-// ---
-// INIT
-// ---
 async function init(){
   load();
   updSb();updStats();
   if(DB.turmas.length){turmaId=DB.turmas[0].id;showTurma();}
   else{document.getElementById('nomsg').style.display='block';document.getElementById('trhdr').style.display='none';}
   renderAg();renderPl();
+  
   setTimeout(async()=>{
-    try{await initFirebaseOnly();}catch(e){showSyncStatus(false,'Offline');}
+    try{
+      const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+      const { getFirestore } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const cfg = {
+        apiKey: "AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
+        authDomain: "professor-digital-8f792.firebaseapp.com",
+        projectId: "professor-digital-8f792",
+        storageBucket: "professor-digital-8f792.firebasestorage.app",
+        messagingSenderId: "4515274923",
+        appId: "1:4515274923:web:25e9bc6d350a411972d7ee"
+      };
+      const apps = getApps();
+      const app = apps.length ? apps[0] : initializeApp(cfg);
+      _db = getFirestore(app);
+      showSyncStatus(false,'Conectando...');
+      await baixarDaNuvem();
+    }catch(e){
+      showSyncStatus(false,'Offline');
+    }
   },1000);
 }
-
-async function initFirebase(){
-  return await initFirebaseOnly();
-}
-
-async function initFirebaseOnly(){
-  try{
-    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const firebaseConfig = {
-      apiKey: "AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
-      authDomain: "professor-digital-8f792.firebaseapp.com",
-      projectId: "professor-digital-8f792",
-      storageBucket: "professor-digital-8f792.firebasestorage.app",
-      messagingSenderId: "4515274923",
-      appId: "1:4515274923:web:25e9bc6d350a411972d7ee"
-    };
-    const apps = getApps();
-    const app = apps.length ? apps[0] : initializeApp(firebaseConfig);
-    _db = getFirestore(app);
-    showSyncStatus(true,'Conectado');
-    // Sobe dados locais para nuvem se nuvem estiver vazia
-    setTimeout(()=>sincronizarParaNuvem(),2000);
-    return true;
-  }catch(e){
-    showSyncStatus(false,'Offline');
-    return false;
-  }
-}
-
-async function sincronizarParaNuvem(){
-  if(!_db) return;
-  try{
-    const { doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const snap = await getDoc(doc(_db, 'professor', 'dados'));
-    if(!snap.exists() || (JSON.parse(snap.data().DB||'{}').turmas||[]).length === 0){
-      // Nuvem vazia - sobe dados locais
-      await setDoc(doc(_db,'professor','dados'),{DB:JSON.stringify(DB),updatedAt:new Date().toISOString()});
-      await setDoc(doc(_db,'professor','auth'),{AUTH:JSON.stringify(AUTH)});
-      showSyncStatus(true,'Dados enviados!');
-    } else {
-      showSyncStatus(true,'Nuvem ativa');
-    }
-  }catch(e){}
-}
-
-function uid(){return Math.random().toString(36).slice(2,10)}
-function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
-function media(notas){const v=Object.values(notas||{}).filter(x=>x!==null&&x!==undefined&&!isNaN(+x)&&x!=='');return v.length?+(v.reduce((a,b)=>a+ +b,0)/v.length).toFixed(1):null}
-function sit(m){if(m===null)return{t:'-',c:'s'};if(m>=6)return{t:'Aprovado',c:'g'};if(m>=5)return{t:'Recup.',c:'a'};return{t:'Reprovado',c:'r'}}
-function freqP(a){const ds=Object.keys(a.freq||{});if(!ds.length)return null;return Math.round(ds.filter(d=>a.freq[d]==='P').length/ds.length*100)}
-function mg(){let s=0,n=0;DB.turmas.forEach(t=>(t.alunos||[]).forEach(a=>{const m=media(a.notas);if(m!==null){s+=m;n++;}}));return n?(s/n).toFixed(1):'-'}
-function getTurma(){return DB.turmas.find(t=>t.id===turmaId)}
-function getAvs(){const t=getTurma();return t?.avaliacoes||['AV1','AV2','AV3']}
-function getAtivs(){return DB.atividades[turmaId]||[]}
-
-// ---
-// LOGIN
-// ---
-function limparCacheLocal(){
-  localStorage.removeItem('pdb');
-  DB=JSON.parse(JSON.stringify(DB_INICIAL));
-  localStorage.setItem('pdb',JSON.stringify(DB));
-  var m=document.getElementById('cache-msg');
-  if(m){m.textContent='v Turmas recarregadas! Faca login agora.';setTimeout(function(){m.textContent='';},4000);}
-}
-
-function login(){
-  const u=document.getElementById('lu').value.trim();
-  const p=document.getElementById('lp').value;
-  if(u===AUTH.user&&p===AUTH.pass){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app').style.display='flex';
-    init();
-  }else{document.getElementById('lerr').textContent='Usuário ou senha incorretos.';}
-}
-function logout(){if(confirm('Sair?')){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('lp').value='';document.getElementById('lerr').textContent='';}}
-
-// ---
-// INIT
-// ---
-
-
-
 
 // ---
 // SIDEBAR / NAVEGACAO
@@ -837,7 +706,6 @@ function updStats(){
     el_m.textContent=n?(s/n).toFixed(1):'--';
   }
 }
-
 
 function toggleSb(){document.getElementById('sb').classList.toggle('open');document.getElementById('ov').classList.toggle('show');}
 function closeSb(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
@@ -1185,7 +1053,6 @@ function delAluno(id){
   save();fecharM('mperfil');updSb();updStats();renderMod();
 }
 
-
 // ---
 // DESEMPENHO
 // ---
@@ -1218,77 +1085,6 @@ function rDesemp(){
       <span class="bdg bg-${s.c}">${a.mc!==null?'Média '+a.mc:'Sem notas'}</span>
     </div>`;
   }).join('')}`;
-}
-
-// ---
-// PERFIL ALUNO
-// ---
-function abrirPerfil(aid){
-  const t=getTurma();if(!t)return;
-  const a=t.alunos.find(x=>x.id===aid);if(!a)return;
-  const m=media(a.notas);const s=sit(m);
-  const f=freqP(a);
-  const mc=m===null?'#94a3b8':m>=6?'#16a34a':m>=5?'#d97706':'#dc2626';
-  const fc=f===null?'#94a3b8':f>=75?'#16a34a':'#dc2626';
-  const avs=getAvs();const ativs=getAtivs();
-  const freqDs=Object.keys(a.freq||{}).sort();
-  const atFei=ativs.filter(av=>{const r=(a.atividades||{})[av.id];return av.tipo==='visto'?r?.visto:r?.nota!=null}).length;
-
-  document.getElementById('perfilcon').innerHTML=`
-    <div class="phdr">
-      <div class="pav">${avt(a.nome)}</div>
-      <div>
-        <div class="pname">${a.nome}</div>
-        ${a.mat?`<div class="pmat">${a.mat}</div>`:''}
-        <div style="margin-top:4px"><span class="bdg bg-${s.c}">${s.t}</span></div>
-      </div>
-    </div>
-    <div class="pgrid">
-      ${avs.map(av=>{const n=(a.notas||{})[av];const nc=n==null?'#94a3b8':n>=6?'#16a34a':'#dc2626';return`<div class="pitem"><div class="pl">${av}</div><div class="pv" style="color:${nc}">${n??'-'}</div></div>`;}).join('')}
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px">
-      <div class="pitem">
-        <div class="pl">Média Final</div><div class="pv" style="color:${mc}">${m??'-'}</div>
-      </div>
-      <div class="pitem">
-        <div class="pl">Frequência</div><div class="pv" style="color:${fc}">${f!==null?f+'%':'-'}</div>
-        ${f!==null?`<div class="prog"><div class="pf" style="width:${f}%;background:${fc}"></div></div>`:''}
-        <div style="font-size:9px;color:var(--muted);margin-top:3px">${freqDs.length} aulas</div>
-      </div>
-      <div class="pitem">
-        <div class="pl">Atividades</div><div class="pv cb">${ativs.length?`${atFei}/${ativs.length}`:'-'}</div>
-      </div>
-      <div class="pitem">
-        <div class="pl">Presenças</div><div class="pv cg">${freqDs.filter(d=>a.freq[d]==='P').length}</div>
-      </div>
-    </div>
-    ${freqDs.length?`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">Últimas Presenças</div>
-    <div>${freqDs.slice(-12).map(d=>`<span class="fc f${a.freq[d]}">${d.slice(5)} ${a.freq[d]}</span>`).join('')}</div>`:''}
-    ${ativs.length?`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin:10px 0 5px">Atividades</div>
-    ${ativs.map(av=>{
-      const reg=(a.atividades||{})[av.id];
-      let val='-';
-      if(av.tipo==='visto')val=reg?.visto?'v Sim':'✗ Não';
-      else val=reg?.nota!=null?reg.nota+'/10':'-';
-      const vc=av.tipo==='nota'&&reg?.nota!=null&&reg.nota<6?'#dc2626':'inherit';
-      return`<div class="atr">
-        <span style="flex:1;font-weight:600;font-size:12px">${av.nome}</span>
-        <span class="atag ${av.tipo==='visto'?'tvisto':'tnota'}" style="margin:0 6px">${av.tipo==='visto'?'Visto':'Nota'}</span>
-        <span style="font-weight:700;font-size:12px;color:${vc}">${val}</span>
-      </div>`;
-    }).join('')}`:''}
-    <div style="display:flex;gap:7px;margin-top:13px">
-      <button class="btn bs bfw" onclick="fecharM('mperfil')">Fechar</button>
-      <button class="btn bd bsm" onclick="delAluno('${a.id}')">🗑 Excluir</button>
-    </div>
-  `;
-  abrirM('mperfil');
-}
-
-function delAluno(id){
-  if(!confirm('Excluir este aluno?'))return;
-  const t=getTurma();t.alunos=t.alunos.filter(x=>x.id!==id);
-  save();fecharM('mperfil');updSb();updStats();renderMod();
 }
 
 // ---
@@ -1357,7 +1153,6 @@ function renderAg(){
     <button class="btn bp bsm" onclick="addEv()">+</button>
   </div>`;
 
-  // Grade legenda
   if(DB.turmas.length){
     h+=`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin:12px 0 6px">Grade Horária das Turmas</div>`;
     h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">`;
@@ -1525,6 +1320,18 @@ function importarBackup(inp){
 // ---
 var _resLoad=false, _resDados=[], _resFiltroTurma='', _resBusca='';
 
+function toggleResCard(idx) {
+  var body = document.getElementById('rbody-' + idx);
+  var chev = document.getElementById('rchev-' + idx);
+  if (body.style.display === 'none' || body.style.display === '') {
+    body.style.display = 'block';
+    if(chev) chev.textContent = 'ʌ';
+  } else {
+    body.style.display = 'none';
+    if(chev) chev.textContent = 'v';
+  }
+}
+
 async function renderResultados(){
   var el=document.getElementById('rescon');
   if(!el)return;
@@ -1671,19 +1478,7 @@ function abrirM(id){
 }
 function fecharM(id){document.getElementById(id).classList.remove('show');}
 document.querySelectorAll('.mbg').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');}));
-// --- FUNÇÃO PARA ABRIR CARTÃO DE RESPOSTAS ---
-function toggleResCard(idx) {
-  var body = document.getElementById('rbody-' + idx);
-  var chev = document.getElementById('rchev-' + idx);
-  
-  if (body.style.display === 'none' || body.style.display === '') {
-    body.style.display = 'block';
-    if(chev) chev.textContent = 'ʌ'; // Seta pra cima
-  } else {
-    body.style.display = 'none';
-    if(chev) chev.textContent = 'v'; // Seta pra baixo
-  }
-}
+
 // ---
 // INICIAR
 // ---
