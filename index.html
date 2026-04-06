@@ -104,9 +104,10 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
       <p style="font-size:11px;color:var(--muted)">Área do Professor</p>
     </div>
     <input type="text" id="lu" value="professor" style="margin-bottom:12px" placeholder="Usuário"/>
-    <input type="password" id="lp" placeholder="Senha" style="margin-bottom:16px" onkeydown="if(event.key==='Enter')login()"/>
+    <input type="password" id="lp" value="1234" placeholder="Senha" style="margin-bottom:16px" onkeydown="if(event.key==='Enter')login()"/>
     <button class="l-btn" onclick="login()">Acessar Painel</button>
     <div id="lerr" style="color:red;font-size:12px;margin-top:12px;text-align:center;font-weight:600"></div>
+    <div style="font-size:11px;color:var(--muted);margin-top:15px;text-align:center">Senha padrão: <b>1234</b></div>
   </div>
 </div>
 
@@ -256,4 +257,695 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
 
 <div class="mbg" id="mcfg"><div class="modal">
   <button class="mclose" onclick="fecharM('mcfg')">✕</button>
-  <h3 class="syne" style="
+  <h3 class="syne" style="margin-bottom:15px">Configurações do Sistema</h3>
+  
+  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">🔐 Alterar Credenciais</div>
+  <input type="text" id="cfu" placeholder="Novo usuário" style="margin-bottom:8px"/>
+  <input type="password" id="cfpc" placeholder="Senha atual" style="margin-bottom:8px"/>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+    <input type="password" id="cfpn" placeholder="Nova senha"/>
+    <input type="password" id="cfpc2" placeholder="Repetir nova senha"/>
+  </div>
+  <button class="btn bp bfw" style="margin-bottom:5px" onclick="salvarCfg()">Atualizar Acesso</button>
+  <div id="cfgmsg" style="font-size:11px;min-height:15px;color:var(--verde2);margin-bottom:15px;font-weight:bold"></div>
+
+  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">💾 Backup e Restauração</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.4">Exporte seus dados para um arquivo de segurança. Se perder o celular ou computador, basta importar este arquivo para recuperar tudo.</p>
+  <div style="display:flex;gap:8px;margin-bottom:5px">
+    <button class="btn bp" style="flex:1" onclick="exportarBackup()">📥 Exportar JSON</button>
+    <button class="btn bs" style="flex:1" onclick="document.getElementById('imp-file').click()">📤 Importar JSON</button>
+  </div>
+  <input type="file" id="imp-file" style="display:none" accept=".json" onchange="importarBackup(this)"/>
+  <div id="backup-msg" style="font-size:11px;min-height:15px;color:var(--verde2);margin-bottom:15px;font-weight:bold"></div>
+
+  <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)"/>
+  <button class="btn bd bfw" onclick="if(confirm('Tem certeza? Isso apagará todas as turmas, alunos e notas do seu navegador e nuvem de forma IRREVERSÍVEL.'))resetDB()">🗑 Resetar Sistema Completo</button>
+</div></div>
+
+<div class="mbg" id="mperfil"><div class="modal" id="perfilcon"></div></div>
+
+<script>
+const FB_CONFIG = {
+  apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
+  authDomain:"professor-digital-8f792.firebaseapp.com",
+  projectId:"professor-digital-8f792",
+  storageBucket:"professor-digital-8f792.firebasestorage.app",
+  messagingSenderId:"4515274923",
+  appId:"1:4515274923:web:25e9bc6d350a411972d7ee"
+};
+
+let AUTH = {user:'professor',pass:'1234'};
+let DB = {turmas:[], atividades:{}, eventosAgenda:{}};
+let turmaId=null, modAtual='diario', secAtual='turmas';
+let atTab='lista', atAtivSel=null;
+let calMes=new Date().getMonth(), calAno=new Date().getFullYear(), calDia=new Date().getDate();
+const DIA_N=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+let _db=null, _syncTimer=null;
+
+function uid(){return Math.random().toString(36).slice(2,10)}
+function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
+
+// --- FIREBASE E AUTENTICAÇÃO ---
+async function login(){
+  const lu = document.getElementById('lu').value.trim();
+  const lp = document.getElementById('lp').value.trim();
+  
+  if(lu === AUTH.user && lp === AUTH.pass){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    iniciarApp();
+  } else {
+    document.getElementById('lerr').textContent = 'Usuário ou senha incorretos.';
+  }
+}
+
+function iniciarApp() {
+  // Inicializa a interface imediatamente com dados locais
+  updSidebar();
+  document.getElementById('hst').textContent = DB.turmas.length;
+  document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
+  renderAg();
+
+  if(DB.turmas.length > 0){
+    turmaId = DB.turmas[0].id;
+    showTurma();
+  } else {
+    document.getElementById('empty-msg').style.display='block';
+    document.getElementById('trhdr').style.display='none';
+  }
+
+  // Conecta ao Firebase em segundo plano
+  conectarFirebase();
+}
+
+async function conectarFirebase(){
+  try {
+    document.getElementById('sync-status').style.display='block';
+    document.getElementById('sync-status').textContent='Conectando...';
+    const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    _db=getFirestore(initializeApp(FB_CONFIG));
+    baixarDaNuvem();
+  } catch(e) {
+    document.getElementById('sync-status').textContent='Offline';
+    document.getElementById('sync-status').style.background='rgba(239,68,68,0.1)';
+    document.getElementById('sync-status').style.color='#ef4444';
+  }
+}
+
+function logout() { location.reload(); }
+
+async function save(){
+  if(!_db)return;
+  document.getElementById('sync-status').style.display='block';
+  document.getElementById('sync-status').textContent='Sincronizando...';
+  localStorage.setItem('pdb',JSON.stringify(DB));
+  localStorage.setItem('pau',JSON.stringify(AUTH));
+  
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(async ()=>{
+    try {
+        const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        await setDoc(doc(_db,'professor','dados'), {DB:JSON.stringify(DB), updatedAt:new Date().toISOString()});
+        await setDoc(doc(_db,'professor','auth'), {AUTH:JSON.stringify(AUTH)});
+        
+        const pub = DB.turmas.map(t=>({id:t.id, nome:t.nome, disc:t.disc, alunos:t.alunos.map(a=>({id:a.id, nome:a.nome}))}));
+        await setDoc(doc(_db,'publico','turmas'), {turmas:JSON.stringify(pub)});
+        document.getElementById('sync-status').textContent='Sincronizado';
+        setTimeout(()=>document.getElementById('sync-status').style.display='none', 3000);
+    } catch(e) {
+        document.getElementById('sync-status').textContent='Erro Nuvem';
+        document.getElementById('sync-status').style.background='rgba(239, 68, 68, 0.1)';
+        document.getElementById('sync-status').style.color='#ef4444';
+    }
+  }, 1000);
+}
+
+async function baixarDaNuvem(){
+  const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const snapA=await getDoc(doc(_db,'professor','auth'));
+  if(snapA.exists()){ try{const rA=JSON.parse(snapA.data().AUTH); if(rA.user) AUTH=rA;}catch(e){} }
+  
+  const snap=await getDoc(doc(_db,'professor','dados'));
+  if(snap.exists()){ 
+    DB=JSON.parse(snap.data().DB); 
+    updSidebar(); 
+    document.getElementById('hst').textContent = DB.turmas.length;
+    document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
+    renderMod();
+    document.getElementById('sync-status').style.display='none';
+  }
+}
+
+// --- CONFIGURAÇÕES E BACKUP ---
+function salvarCfg(){
+  const pc=document.getElementById('cfpc').value;
+  const pn=document.getElementById('cfpn').value;
+  const pc2=document.getElementById('cfpc2').value;
+  const nu=document.getElementById('cfu').value.trim();
+  const m=document.getElementById('cfgmsg');
+  if(pc!==AUTH.pass){m.style.color='var(--danger)';m.textContent='Senha atual incorreta.';return;}
+  if(pn&&pn!==pc2){m.style.color='var(--danger)';m.textContent='Novas senhas não coincidem.';return;}
+  if(nu) AUTH.user=nu; if(pn) AUTH.pass=pn; save();
+  m.style.color='var(--verde2)';m.textContent='Credenciais atualizadas com sucesso!';
+  setTimeout(()=>m.textContent='',3000);
+  ['cfu','cfpc','cfpn','cfpc2'].forEach(id=>document.getElementById(id).value='');
+}
+
+function resetDB(){
+  DB={turmas:[],atividades:{},eventosAgenda:{}}; 
+  save(); turmaId=null; fecharM('mcfg'); updSidebar(); 
+  document.getElementById('trhdr').style.display='none'; 
+  document.getElementById('empty-msg').style.display='block';
+}
+
+function exportarBackup(){
+  const blob=new Blob([JSON.stringify({DB:DB, AUTH:AUTH},null,2)],{type:'application/json'}); 
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); 
+  a.download=`backup_dr_caio_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click();
+  const msg = document.getElementById('backup-msg');
+  if(msg) { msg.style.color='var(--verde2)'; msg.textContent='Backup baixado com sucesso!'; setTimeout(()=>msg.textContent='',4000); }
+}
+
+function importarBackup(inp){
+  const f=inp.files[0]; if(!f)return;
+  const m=document.getElementById('backup-msg');
+  if(!f.name.endsWith('.json')){m.style.color='var(--danger)';m.textContent='Selecione um arquivo .json válido.';return;}
+  if(!confirm('Importar backup? Todos os dados atuais da nuvem serão sobrepostos por este arquivo.')){inp.value='';return;}
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const backup=JSON.parse(e.target.result);
+      if(!backup.DB)throw new Error('invalido');
+      DB=backup.DB; if(backup.AUTH) AUTH=backup.AUTH; save();
+      m.style.color='var(--verde2)';m.textContent='Dados importados com sucesso!';
+      setTimeout(()=>{
+        fecharM('mcfg');
+        turmaId=DB.turmas.length?DB.turmas[0].id:null;
+        updSidebar(); document.getElementById('hst').textContent = DB.turmas.length; document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
+        if(turmaId) showTurma(); else {document.getElementById('empty-msg').style.display='block';document.getElementById('trhdr').style.display='none';}
+        if(secAtual==='agenda') renderAg();
+        m.textContent='';
+      },1500);
+    }catch(err){m.style.color='var(--danger)';m.textContent='Arquivo corrompido ou inválido.';}
+  };
+  r.readAsText(f,'UTF-8'); inp.value='';
+}
+
+// --- NAVEGAÇÃO E TURMAS ---
+function toggleSb(){
+  document.getElementById('sb').classList.toggle('open');
+  document.getElementById('ov').classList.toggle('show');
+}
+function fecharSb(){
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('ov').classList.remove('show');
+}
+
+function setSec(s){
+  secAtual=s;
+  document.getElementById('sec-turmas').style.display=s==='turmas'?'block':'none';
+  document.getElementById('sec-agenda').style.display=s==='agenda'?'block':'none';
+  document.getElementById('sec-resultados').style.display=s==='resultados'?'block':'none';
+  
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('act'));
+  if(s==='turmas') document.getElementById('b-turmas').classList.add('act');
+  if(s==='agenda'){ document.getElementById('b-agenda').classList.add('act'); renderAg(); }
+  if(s==='resultados'){ document.getElementById('b-res').classList.add('act'); buscarResultados(); }
+  
+  fecharSb(); // Fecha menu no mobile
+}
+
+function updSidebar(){
+  const l=document.getElementById('trlist'); l.innerHTML='';
+  DB.turmas.forEach(t=>{
+    const b=document.createElement('button'); 
+    b.className='sb-turma ' + (turmaId===t.id && secAtual==='turmas' ? 'act' : '');
+    b.textContent=t.nome; 
+    b.onclick=()=>{turmaId=t.id; showTurma(); fecharSb();}; 
+    l.appendChild(b);
+  });
+}
+
+function showTurma(){
+  const t=DB.turmas.find(x=>x.id===turmaId);
+  document.getElementById('thnom').textContent=t.nome;
+  document.getElementById('thdisc').textContent=t.disc;
+  document.getElementById('trhdr').style.display='block';
+  document.getElementById('empty-msg').style.display='none';
+  setSec('turmas');
+  updSidebar(); // Atualiza destaque na barra lateral
+  renderMod();
+}
+
+function setMod(m, btn){
+  modAtual=m; 
+  document.querySelectorAll('#sec-turmas .tab').forEach(b=>b.classList.remove('act'));
+  if(btn) btn.classList.add('act'); 
+  renderMod();
+}
+
+function renderMod(){
+  const t=DB.turmas.find(x=>x.id===turmaId);
+  if(!t) return;
+  const el=document.getElementById('modcon');
+  
+  if(modAtual==='diario'){ el.innerHTML = rDiario(t); }
+  else if(modAtual==='alunos'){ el.innerHTML = rAlunos(t); }
+  else if(modAtual==='ativ'){ el.innerHTML = rAtiv(t); }
+  else if(modAtual==='notas'){ el.innerHTML = rNotas(t); }
+}
+
+// --- 1. DIÁRIO DE AULA ---
+function rDiario(t){
+  const diarios = t.diario || [];
+  let h = `
+    <div style="background:var(--light);padding:16px;border-radius:12px;border:1px solid var(--border);margin-bottom:15px">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:10px">REGISTRAR AULA DE HOJE</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <input type="date" id="dia-d" value="${new Date().toISOString().split('T')[0]}" style="width:140px;flex-shrink:0"/>
+        <input type="text" id="dia-c" placeholder="Qual foi o conteúdo da aula?" style="flex:1;min-width:200px" onkeydown="if(event.key==='Enter')salvarDiario()"/>
+        <button class="btn bp" onclick="salvarDiario()">Salvar no Diário</button>
+      </div>
+    </div>`;
+    
+  if(!diarios.length){ h+='<p style="text-align:center;color:var(--muted);padding:30px">Nenhum registro no diário de classe.</p>'; return h; }
+  
+  h += diarios.sort((a,b)=>b.data.localeCompare(a.data)).map(d=>`
+    <div class="arow" style="align-items:flex-start">
+      <div style="flex:1">
+        <strong style="color:var(--verde);font-size:13px">${d.data.split('-').reverse().join('/')}</strong>
+        <div style="font-size:14px;color:var(--text);margin-top:4px;line-height:1.5">${d.conteudo}</div>
+      </div>
+      <button class="btn bd bsm" onclick="delDiario('${d.id}')">Excluir</button>
+    </div>
+  `).join('');
+  return h;
+}
+
+function salvarDiario(){
+  const data = document.getElementById('dia-d').value;
+  const cont = document.getElementById('dia-c').value.trim();
+  if(!data || !cont) return;
+  const t = DB.turmas.find(x=>x.id===turmaId);
+  if(!t.diario) t.diario = [];
+  t.diario.push({id:uid(), data:data, conteudo:cont});
+  save(); renderMod();
+}
+
+function delDiario(id){
+  const t = DB.turmas.find(x=>x.id===turmaId);
+  t.diario = t.diario.filter(d=>d.id !== id);
+  save(); renderMod();
+}
+
+// --- 2. LISTA DE ALUNOS ---
+function rAlunos(t){
+  let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px"><h3 class="syne" style="color:var(--verde)">Matriculados (${t.alunos.length})</h3></div>`;
+  h += t.alunos.map((a,i)=>`
+    <div class="arow">
+      <div class="aleft"><div class="av">${avt(a.nome)}</div><div style="font-size:14px;font-weight:600">${i+1}. ${a.nome}</div></div>
+      <button class="btn bs bsm" onclick="abrirPerfil('${a.id}')">Ficha Completa</button>
+    </div>`).join('');
+  return h;
+}
+
+// --- 3. ATIVIDADES E GRUPOS ---
+function rAtiv(t){
+  const ativs = DB.atividades[turmaId] || [];
+  
+  if(atTab==='lista'){
+    let h = `
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn bp" style="flex:1;min-width:200px" onclick="abrirModalAtiv()">+ Individual</button>
+        <button class="btn ba" style="flex:1;min-width:200px" onclick="abrirModalGrupo()">+ Em Grupo</button>
+      </div>`;
+    if(!ativs.length) return h + '<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma atividade lançada ainda.</div>';
+    
+    h += ativs.map(av=>`
+      <div class="arow" style="cursor:pointer" onclick="atAtivSel='${av.id}'; atTab='lanc'; renderMod()">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">${av.nome} ${av.linkDrive?`<a href="${av.linkDrive}" target="_blank" title="Pasta no Drive" style="text-decoration:none;font-size:16px;margin-left:5px">📁</a>`:''}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">${av.data?av.data.split('-').reverse().join('/'):'--'} • ${av.tipo==='visto'?'Somente Visto':'Vale Nota'}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:11px;font-weight:700;color:var(--verde);background:#e6f4ea;padding:4px 8px;border-radius:6px">Avaliar</span>
+          <button class="btn bd bsm" onclick="event.stopPropagation();delAtiv('${av.id}')">✕</button>
+        </div>
+      </div>`).join('');
+    return h;
+  }
+  
+  // MODO LANÇAMENTO
+  const av = ativs.find(x=>x.id===atAtivSel);
+  if(!av){ atTab='lista'; return renderMod(); }
+  
+  let h = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;background:var(--light);padding:15px;border-radius:12px;border:1px solid var(--border)">
+      <div>
+        <strong style="font-size:16px;color:var(--verde)">${av.nome}</strong><br>
+        <span style="font-size:12px;color:var(--muted);font-weight:600">Modo: ${av.tipo==='visto'?'Visto (✓)':'Nota (0-10)'}</span>
+      </div>
+      <button class="btn bs" onclick="atTab='lista';renderMod()">← Voltar</button>
+    </div>`;
+    
+  h += t.alunos.map((a,i)=>{
+    const reg = (a.atividades||{})[av.id] || {};
+    let controleHTML = '';
+    
+    if(av.tipo === 'visto'){
+      const isChecked = !!reg.visto;
+      controleHTML = `<button class="btn ${isChecked?'bp':'bs'}" style="min-width:100px" onclick="togVisto('${a.id}','${av.id}')">${isChecked?'✓ Concluído':'Pendente'}</button>`;
+    } else {
+      const notaVal = reg.nota!=null ? reg.nota : '';
+      controleHTML = `<input type="number" min="0" max="10" step="0.1" value="${notaVal}" style="width:80px;text-align:center;font-weight:700" placeholder="--" onchange="setAtivNota('${a.id}','${av.id}',this.value)"/>`;
+    }
+    
+    return `<div class="arow">
+      <div class="aleft"><div class="av">${avt(a.nome)}</div><div style="font-size:13px;font-weight:500">${i+1}. ${a.nome}</div></div>
+      <div>${controleHTML}</div>
+    </div>`;
+  }).join('');
+  
+  return h;
+}
+
+function abrirModalAtiv(){
+  document.getElementById('na-n').value='';
+  document.getElementById('na-d').value=new Date().toISOString().split('T')[0];
+  document.getElementById('mativ').classList.add('show');
+}
+
+function salvarAtiv(){
+  const n = document.getElementById('na-n').value.trim();
+  const t = document.getElementById('na-t').value;
+  const d = document.getElementById('na-d').value;
+  if(!n) return;
+  const id = 'at_'+Date.now();
+  if(!DB.atividades[turmaId]) DB.atividades[turmaId]=[];
+  DB.atividades[turmaId].push({id:id, nome:n, tipo:t, data:d});
+  save(); fecharM('mativ'); 
+  atAtivSel = id; atTab = 'lanc'; renderMod();
+}
+
+function abrirModalGrupo(){
+  const t=DB.turmas.find(x=>x.id===turmaId);
+  document.getElementById('ga-n').value='';
+  document.getElementById('ga-d').value=new Date().toISOString().split('T')[0];
+  document.getElementById('ga-nota').value='';
+  document.getElementById('ga-link').value='';
+  document.getElementById('ga-nota-box').style.display='none';
+  document.getElementById('ga-t').value='visto';
+  
+  document.getElementById('ga-alunos').innerHTML=t.alunos.map(a=>`
+    <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer;padding:5px;border-radius:6px;transition:.15s">
+      <input type="checkbox" class="chk-g" value="${a.id}" style="width:18px;height:18px;margin:0"> ${a.nome}
+    </label>`).join('');
+  document.getElementById('mgrupo').classList.add('show');
+}
+
+function salvarGrupo(){
+  const n = document.getElementById('ga-n').value.trim();
+  const d = document.getElementById('ga-d').value;
+  const tipo = document.getElementById('ga-t').value;
+  const nota = parseFloat(document.getElementById('ga-nota').value);
+  const link = document.getElementById('ga-link').value.trim();
+  const sel = Array.from(document.querySelectorAll('.chk-g:checked')).map(c=>c.value);
+
+  if(!n || !sel.length){alert('Título e alunos são obrigatórios.'); return;}
+  if(tipo==='nota' && isNaN(nota)){alert('Para avaliação por nota, digite o valor.'); return;}
+
+  const atid='at_'+Date.now(); 
+  if(!DB.atividades[turmaId]) DB.atividades[turmaId]=[];
+  DB.atividades[turmaId].push({id:atid, nome:n, tipo:tipo, data:d, linkDrive:link});
+
+  const t=DB.turmas.find(x=>x.id===turmaId);
+  sel.forEach(aid=>{ 
+    const a=t.alunos.find(x=>x.id===aid); 
+    if(!a.atividades) a.atividades={}; 
+    if(tipo==='nota') a.atividades[atid]={nota:nota, linkDrive:link}; 
+    else a.atividades[atid]={visto:true, linkDrive:link}; 
+  });
+
+  save(); fecharM('mgrupo'); atTab='lista'; renderMod(); alert('Registrado para os alunos do grupo!');
+}
+
+function delAtiv(id){
+  if(!confirm('Excluir atividade de todos os alunos?')) return;
+  DB.atividades[turmaId] = DB.atividades[turmaId].filter(x=>x.id!==id);
+  const t = DB.turmas.find(x=>x.id===turmaId);
+  t.alunos.forEach(a=>{ if(a.atividades) delete a.atividades[id]; });
+  save(); renderMod();
+}
+
+function togVisto(aid, atid){
+  const t=DB.turmas.find(x=>x.id===turmaId); const a=t.alunos.find(x=>x.id===aid);
+  if(!a.atividades) a.atividades={}; if(!a.atividades[atid]) a.atividades[atid]={};
+  a.atividades[atid].visto = !a.atividades[atid].visto; save(); renderMod();
+}
+
+function setAtivNota(aid, atid, val){
+  const t=DB.turmas.find(x=>x.id===turmaId); const a=t.alunos.find(x=>x.id===aid);
+  if(!a.atividades) a.atividades={}; if(!a.atividades[atid]) a.atividades[atid]={};
+  const n = val===''?null:parseFloat(val); a.atividades[atid].nota = isNaN(n)?null:n; save();
+}
+
+// --- 4. MÉDIAS ---
+function rNotas(t){
+  return `<div style="margin-bottom:15px;padding:10px;background:var(--light);border-radius:8px;font-size:12px;color:var(--muted)">A média consolidada é calculada automaticamente baseada nas atividades individuais e em grupo que "Valem Nota". Vistos não afetam o cálculo.</div>` + 
+  t.alunos.map((a,i)=>{
+    const ativsDaTurma = DB.atividades[turmaId]||[];
+    let soma=0, qtd=0;
+    ativsDaTurma.forEach(av=>{
+      if(av.tipo==='nota'){
+        const notaReg = a.atividades && a.atividades[av.id] ? a.atividades[av.id].nota : null;
+        if(notaReg != null){ soma+=notaReg; qtd++; }
+      }
+    });
+    const media = qtd>0 ? (soma/qtd).toFixed(1) : '--';
+    const cor = media==='--' ? 'var(--muted)' : (media>=6 ? 'var(--verde2)' : 'var(--danger)');
+    return `<div class="arow" onclick="abrirPerfil('${a.id}')" style="cursor:pointer">
+      <div class="aleft"><div class="av">${avt(a.nome)}</div><span style="font-size:14px;font-weight:600">${i+1}. ${a.nome}</span></div>
+      <strong style="color:${cor};font-size:18px;background:${media==='--'?'#f1f5f9':media>=6?'#dcfce7':'#fee2e2'};padding:4px 10px;border-radius:8px">${media}</strong>
+    </div>`;
+  }).join('');
+}
+
+// --- PERFIL DO ALUNO ---
+function abrirPerfil(aid){
+  const t=DB.turmas.find(x=>x.id===turmaId); const a=t.alunos.find(x=>x.id===aid);
+  const ativsDaTurma = DB.atividades[turmaId]||[];
+  let soma=0, qtd=0;
+  ativsDaTurma.forEach(av=>{ if(av.tipo==='nota'){ const n=a.atividades&&a.atividades[av.id]?a.atividades[av.id].nota:null; if(n!=null){soma+=n; qtd++;} } });
+  const media = qtd>0 ? (soma/qtd).toFixed(1) : '--';
+  
+  let h = `<div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:20px;position:relative">
+    <button class="mclose" onclick="fecharM('mperfil')" style="top:0;right:0">✕</button>
+    <div class="av" style="width:70px;height:70px;font-size:24px">${avt(a.nome)}</div>
+    <div style="flex:1;padding-right:30px">
+        <h3 style="margin:0;font-size:18px;color:var(--verde)">${a.nome}</h3>
+        <div style="display:inline-block;margin-top:8px;padding:6px 12px;border-radius:8px;font-weight:800;font-size:14px;background:${media>=6?'#dcfce7':media==='--'?'#f1f5f9':'#fee2e2'};color:${media>=6?'#16a34a':media==='--'?'var(--muted)':'#dc2626'}">
+            MÉDIA FINAL: ${media}
+        </div>
+    </div>
+  </div>
+  <h4 style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:10px;letter-spacing:0.5px">REGISTRO DE ATIVIDADES</h4>`;
+  
+  if(!ativsDaTurma.length) h+= '<p style="font-size:13px;color:var(--muted);text-align:center;padding:20px">Nenhuma atividade lançada no sistema.</p>';
+  else {
+    h+= ativsDaTurma.map(av=>{
+      const reg = a.atividades&&a.atividades[av.id] ? a.atividades[av.id] : null;
+      let val = '--';
+      if(av.tipo==='visto') val = (reg&&reg.visto) ? '<span style="color:#16a34a">✓ Concluído</span>' : '<span style="color:#dc2626">Pendente</span>';
+      else val = (reg&&reg.nota!=null) ? `<span style="font-size:15px">${reg.nota}</span><span style="font-size:10px;color:var(--muted)">/10</span>` : '--';
+      const linkBtn = (reg&&reg.linkDrive) ? ` <a href="${reg.linkDrive}" target="_blank" style="text-decoration:none;font-size:16px;margin-left:5px" title="Ver no Drive">📁</a>` : '';
+      
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #f1f5f9;font-size:13px;background:var(--light);border-radius:8px;margin-bottom:6px">
+        <div><strong>${av.nome}</strong>${linkBtn}<br><small style="color:var(--muted)">${av.data?av.data.split('-').reverse().join('/'):'--'}</small></div>
+        <strong style="text-align:right">${val}</strong>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('perfilcon').innerHTML = h;
+  document.getElementById('mperfil').classList.add('show');
+}
+
+// --- RESULTADOS DO QUIZ ---
+var _resDados=[], _resFiltroTurma='', _resBusca='';
+
+function toggleResCard(idx) {
+  var body = document.getElementById('rbody-' + idx);
+  if (body.style.display === 'none' || body.style.display === '') {
+    body.style.display = 'block';
+  } else { body.style.display = 'none'; }
+}
+
+function renderResultadosLista(){
+  const el=document.getElementById('res-lista');
+  
+  var fil=_resDados.filter(function(r){
+    var okT=!_resFiltroTurma||(r.turma||'')===_resFiltroTurma;
+    var okB=!_resBusca||(r.nome||'').toLowerCase().indexOf(_resBusca.toLowerCase())>=0;
+    return okT&&okB;
+  });
+  
+  var turmasUnicas=[];
+  _resDados.forEach(function(r){if(r.turma&&turmasUnicas.indexOf(r.turma)<0)turmasUnicas.push(r.turma);});
+  turmasUnicas.sort();
+
+  let h = `<div style="display:flex;gap:6px;margin-bottom:15px">
+            <select onchange="_resFiltroTurma=this.value;renderResultadosLista()" style="flex:1">
+              <option value="">Todas as turmas</option>
+              ${turmasUnicas.map(t=>`<option value="${t}" ${t===_resFiltroTurma?'selected':''}>${t}</option>`).join('')}
+            </select>
+            <input type="text" placeholder="Buscar aluno..." value="${_resBusca}" oninput="_resBusca=this.value;renderResultadosLista()" style="flex:1"/>
+          </div>`;
+
+  if(!fil.length){
+    h += _resDados.length===0 ? '<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum resultado recebido da nuvem ainda.</div>' : '<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum aluno encontrado no filtro.</div>';
+  } else {
+    fil.forEach((r,idx) => {
+      const pct = r.placar || 0;
+      const cor = pct >= 70 ? 'var(--verde2)' : 'var(--danger)';
+      const bg = pct >= 70 ? '#dcfce7' : '#fee2e2';
+      
+      h += `<div class="card" style="padding:0;overflow:hidden;margin-bottom:10px">
+              <div class="arow" style="border:none;margin:0;cursor:pointer;background:${bg}33" onclick="toggleResCard(${idx})">
+                <div style="flex:1">
+                  <strong style="font-size:14px;color:var(--text)">${r.nome||'Sem nome'}</strong><br>
+                  <small style="color:var(--muted)">${r.turma||'--'} | ${r.disciplina||'--'}</small>
+                </div>
+                <div style="text-align:right">
+                  <strong style="color:${cor};font-size:18px;background:${bg};padding:4px 10px;border-radius:8px">${pct}%</strong><br>
+                  <small style="color:var(--muted);display:block;margin-top:4px">${r.acertos||0}/${r.total||15} acertos ▼</small>
+                </div>
+              </div>
+              
+              <div id="rbody-${idx}" class="q-body">`;
+              
+      if(r.temasFragos&&r.temasFragos.length){
+        h+='<div style="font-size:10px;font-weight:800;color:var(--danger);text-transform:uppercase;margin-bottom:8px">⚠️ Temas Críticos (Erros)</div><div style="margin-bottom:15px">';
+        r.temasFragos.forEach(t=>{h+=`<span style="background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;margin:2px;display:inline-block">${t}</span>`;});
+        h+='</div>';
+      }
+      if(r.temasOk&&r.temasOk.length){
+        h+='<div style="font-size:10px;font-weight:800;color:var(--verde);text-transform:uppercase;margin-bottom:8px">✅ Domina bem</div><div style="margin-bottom:15px">';
+        r.temasOk.forEach(t=>{h+=`<span style="background:#dcfce7;color:#166534;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;margin:2px;display:inline-block">${t}</span>`;});
+        h+='</div>';
+      }
+      if(r.respostasMC&&r.respostasMC.length){
+        h+='<div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Gabarito Multipla Escolha</div><div style="max-height:150px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:5px;margin-bottom:15px;background:#fff">';
+        r.respostasMC.forEach(mc=>{
+          const isOk = mc.correto;
+          h+=`<div style="display:flex;gap:8px;padding:6px;border-bottom:1px solid #f8fafc;font-size:12px;color:${isOk?'var(--text)':'#991b1b'}">
+                <span style="font-weight:bold;color:${isOk?'#16a34a':'#dc2626'}">${isOk?'✓':'✕'}</span> ${mc.enunciado}
+              </div>`;
+        });
+        h+='</div>';
+      }
+      if(r.dissertativas&&r.dissertativas.length){
+        h+='<div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Respostas Dissertativas Escritas</div>';
+        r.dissertativas.forEach((d,di)=>{
+          h+=`<div style="background:#fff;border:1px solid var(--border);padding:10px;border-radius:8px;margin-bottom:8px">
+                <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--verde)">Q${di+1}: ${d.enunciado}</div>
+                <div style="font-size:13px;color:#374151;line-height:1.5;white-space:pre-wrap">${d.resposta&&d.resposta.trim()?d.resposta:'<i style="color:var(--muted)">Em branco</i>'}</div>
+              </div>`;
+        });
+      }
+      h+=`</div></div>`;
+    });
+  }
+  el.innerHTML = h;
+}
+
+async function buscarResultados(){
+  const el=document.getElementById('res-lista'); if(el) el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Buscando na nuvem...</div>';
+  try{
+    const {collection,getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDocs(collection(_db,'quiz_resultados'));
+    _resDados=[];
+    snap.forEach(doc=>{ _resDados.push(doc.data()); });
+    _resDados.sort((a,b)=>(b.dataHora||'').localeCompare(a.dataHora||''));
+    renderResultadosLista();
+  }catch(e){ if(el) el.innerHTML='<div style="color:red;text-align:center;padding:40px">Erro ao buscar resultados. Verifique a internet.</div>'; }
+}
+
+// --- AGENDA PRIVADA ---
+const DIA_SEMANA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+function renderAg(){
+  const el = document.getElementById('agcon');
+  const hojeD = new Date();
+  const hojeStr = hojeD.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+  const diasM = new Date(calAno,calMes+1,0).getDate();
+  const prim = new Date(calAno,calMes,1).getDay();
+  
+  let h=`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+    <h3 class="syne" style="color:var(--verde)">📅 Agenda Pessoal</h3>
+  </div>
+  <div style="padding:15px;background:var(--verde);color:#fff;border-radius:12px;margin-bottom:15px;box-shadow:0 4px 12px rgba(26,74,46,0.2)">
+      <div style="font-size:11px;opacity:0.8;text-transform:uppercase;font-weight:700;margin-bottom:2px">HOJE</div>
+      <div style="font-size:16px;font-weight:800;text-transform:capitalize">${hojeStr}</div>
+  </div>
+  
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;background:var(--light);padding:10px;border-radius:10px;border:1px solid var(--border)">
+    <button class="btn bs bsm" onclick="calMes--;if(calMes<0){calMes=11;calAno--}renderAg()">← Mês Ant.</button>
+    <div style="font-weight:800;font-size:14px;color:var(--text);text-transform:uppercase">${MESES[calMes]} ${calAno}</div>
+    <button class="btn bs bsm" onclick="calMes++;if(calMes>11){calMes=0;calAno++}renderAg()">Próx. Mês →</button>
+  </div>
+  
+  <div class="cgrid">
+    ${DIA_SEMANA.map(d=>`<div style="text-align:center;font-size:10px;font-weight:800;color:var(--muted);padding:5px 0">${d}</div>`).join('')}
+    ${Array.from({length:prim}).map(()=>'<div></div>').join('')}
+    ${Array.from({length:diasM},(_,i)=>{
+      const d=i+1; const k=`${calAno}-${calMes}-${d}`;
+      const te=(DB.eventosAgenda[k]||[]).length>0;
+      const eh=(d===hojeD.getDate()&&calMes===hojeD.getMonth()&&calAno===hojeD.getFullYear());
+      const sl=(d===calDia);
+      return`<div class="cday ${sl?'sel':''}" style="${eh&&!sl?'border:2px solid var(--verde);font-weight:900':''}" onclick="calDia=${d};renderAg()">
+        ${d} ${te?'<div style="width:5px;height:5px;border-radius:50%;background:#f59e0b;margin-top:2px"></div>':''}
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  const k=`${calAno}-${calMes}-${calDia}`;
+  const evs=DB.eventosAgenda[k]||[];
+  h+=`<div style="margin-top:25px;border-top:1px solid var(--border);padding-top:15px">
+        <h4 class="syne" style="color:var(--verde);margin-bottom:12px">Lembretes para ${calDia}/${calMes+1}/${calAno}</h4>`;
+  if(evs.length){
+    h+=evs.map((ev,i)=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px;background:#fffbeb;border-left:4px solid #f59e0b;border-radius:8px;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:600;color:#92400e;line-height:1.4">${ev}</span>
+      <button onclick="remEv(${i})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:16px;padding:0 5px">✕</button>
+    </div>`).join('');
+  } else {
+    h+=`<div style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:10px">Nenhum compromisso salvo para esta data.</div>`;
+  }
+  
+  h+=`<div style="display:flex;gap:8px;margin-top:15px">
+    <input type="text" id="ev-in" placeholder="Escreva um novo lembrete..." onkeydown="if(event.key==='Enter')addEv()"/>
+    <button class="btn bp" onclick="addEv()">Salvar</button>
+  </div></div>`;
+  
+  el.innerHTML=h;
+}
+
+function addEv(){
+  const v=document.getElementById('ev-in').value.trim(); if(!v)return;
+  const k=`${calAno}-${calMes}-${calDia}`; if(!DB.eventosAgenda[k])DB.eventosAgenda[k]=[];
+  DB.eventosAgenda[k].push(v); save(); renderAg();
+}
+function remEv(i){const k=`${calAno}-${calMes}-${calDia}`; DB.eventosAgenda[k].splice(i,1); save(); renderAg();}
+
+function fecharM(id){document.getElementById(id).classList.remove('show');}
+function abrirM(id){document.getElementById(id).classList.add('show');}
+
+// INICIALIZAR
+const local=localStorage.getItem('pdb'); 
+const lAuth=localStorage.getItem('pau');
+if(local) DB=JSON.parse(local);
+if(lAuth) AUTH=JSON.parse(lAuth);
+</script>
+</body>
+</html>
