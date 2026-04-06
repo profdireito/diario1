@@ -66,6 +66,7 @@ h1,h2,h3,.syne{font-family:'Syne',sans-serif}
 /* BOTÕES E INPUTS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700;border:none;cursor:pointer;border-radius:8px;font-size:13px;padding:10px 16px;font-family:inherit;transition:.15s}
 .btn:active{transform:scale(0.97)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
 .bp{background:var(--verde);color:#fff}.ba{background:var(--ouro);color:var(--verde)}.bs{background:#f1f5f9;color:#475569}.bd{background:var(--danger);color:#fff}
 .bfw{width:100%} .bsm{padding:6px 12px;font-size:11px}
 input, select, textarea{border:1.5px solid var(--border);border-radius:8px;padding:12px;background:var(--light);outline:none;width:100%;font-family:inherit;font-size:13px;transition:.2s}
@@ -146,13 +147,23 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
         
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <div style="font-size:10px;font-weight:800;color:var(--muted);letter-spacing:0.5px">LISTA DE TURMAS</div>
-            <button onclick="abrirM('mturma')" style="background:none;border:none;color:var(--verde);font-weight:900;cursor:pointer;font-size:16px" title="Adicionar Turma">➕</button>
+            <button onclick="abrirM('mturma')" style="background:none;border:none;color:var(--verde);font-weight:900;cursor:pointer;font-size:18px" title="Nova Turma">➕</button>
         </div>
         <div id="trlist"></div>
       </div>
     </aside>
 
     <main id="content">
+      <div id="empty-msg" style="text-align:center;padding:60px 20px;color:var(--muted);display:none;">
+        <div style="font-size:50px;margin-bottom:15px;opacity:0.8">👋</div>
+        <h2 class="syne" style="color:var(--verde);margin-bottom:10px;font-size:24px">Bem-vindo, Professor Caio!</h2>
+        <p style="font-size:14px;max-width:400px;margin:0 auto 25px auto">Este é o seu painel de controle. Selecione uma turma no menu lateral ou utilize os atalhos abaixo para começar.</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+           <button class="btn bp" onclick="abrirM('mturma')">➕ Nova Turma</button>
+           <button class="btn bs" onclick="setSec('agenda')">📅 Ver Agenda Privada</button>
+        </div>
+      </div>
+
       <div id="sec-turmas">
         <div id="trhdr" style="display:none">
           <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start">
@@ -160,20 +171,15 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
               <h2 id="thnom" class="syne" style="font-size:22px;color:var(--verde)"></h2>
               <p id="thdisc" style="font-size:13px;color:var(--muted);margin-top:2px;font-weight:500"></p>
             </div>
-            <button class="btn bd bsm" onclick="excluirTurma()" title="Excluir Turma Inteira">🗑️</button>
+            <button class="btn bd bsm" onclick="excluirTurma()" title="Excluir Turma Inteira">🗑️ Excluir Turma</button>
           </div>
           <div class="tabs">
             <button class="tab act" onclick="setMod('diario',this)">📖 Diário de Aula</button>
             <button class="tab" onclick="setMod('ativ',this)">✅ Atividades & Grupos</button>
             <button class="tab" onclick="setMod('alunos',this)">👥 Lista de Alunos</button>
-            <button class="tab" onclick="setMod('notas',this)">📈 Médias</button>
+            <button class="tab" onclick="setMod('notas',this)">📈 Médias Consolidadas</button>
           </div>
           <div id="modcon"></div>
-        </div>
-        <div id="empty-msg" style="text-align:center;padding:60px 20px;color:var(--muted)">
-          <div style="font-size:48px;margin-bottom:15px;opacity:0.5">🏫</div>
-          <h3 class="syne" style="color:var(--text);margin-bottom:5px">Bem-vindo, Professor Caio!</h3>
-          <p>Selecione uma turma no menu lateral para visualizar os dados.</p>
         </div>
       </div>
       
@@ -201,18 +207,24 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
 <div class="mbg" id="mturma"><div class="modal">
   <button class="mclose" onclick="fecharM('mturma')">✕</button>
   <h3 class="syne" style="margin-bottom:20px;font-size:18px;color:var(--verde)">Nova Turma</h3>
-  <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOME DA TURMA</label>
-  <input type="text" id="nt-n" placeholder="Ex: MAT T1 - 1 Período" style="margin-bottom:12px"/>
-  <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">DISCIPLINA / CURSO</label>
-  <input type="text" id="nt-d" placeholder="Ex: Técnico em Serviços Jurídicos" style="margin-bottom:20px"/>
+  <div style="margin-bottom:12px">
+    <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOME DA TURMA</label>
+    <input type="text" id="nt-n" placeholder="Ex: MAT T1 - 1 Período"/>
+  </div>
+  <div style="margin-bottom:20px">
+    <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">DISCIPLINA / CURSO</label>
+    <input type="text" id="nt-d" placeholder="Ex: Técnico em Serviços Jurídicos"/>
+  </div>
   <button class="btn bp bfw" onclick="salvarTurma()">Criar Turma</button>
 </div></div>
 
 <div class="mbg" id="maluno"><div class="modal">
   <button class="mclose" onclick="fecharM('maluno')">✕</button>
   <h3 class="syne" style="margin-bottom:20px;font-size:18px;color:var(--verde)">Matricular Aluno</h3>
-  <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOME COMPLETO</label>
-  <input type="text" id="nal-n" placeholder="Ex: Maria Silva" style="margin-bottom:20px" onkeydown="if(event.key==='Enter')salvarAluno()"/>
+  <div style="margin-bottom:20px">
+    <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOME COMPLETO</label>
+    <input type="text" id="nal-n" placeholder="Ex: Maria Silva" onkeydown="if(event.key==='Enter')salvarAluno()"/>
+  </div>
   <button class="btn bp bfw" onclick="salvarAluno()">Adicionar na Turma</button>
 </div></div>
 
@@ -304,6 +316,20 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
 <div class="mbg" id="mperfil"><div class="modal" id="perfilcon" style="padding-bottom:10px"></div></div>
 
 <script>
+// --- FUNÇÕES GERAIS E ABERTURA DE MODAIS ---
+function abrirM(id){ document.getElementById(id).classList.add('show'); }
+function fecharM(id){ document.getElementById(id).classList.remove('show'); }
+function uid(){return Math.random().toString(36).slice(2,10)}
+function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
+
+// FECHAR MODAL AO CLICAR FORA
+document.querySelectorAll('.mbg').forEach(m=>{
+  m.addEventListener('click', function(e){
+    if(e.target === this) this.classList.remove('show');
+  });
+});
+
+// --- FIREBASE E ESTADO ---
 const FB_CONFIG = {
   apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
   authDomain:"professor-digital-8f792.firebaseapp.com",
@@ -323,11 +349,9 @@ const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agos
 
 let _db=null, _syncTimer=null;
 
-function uid(){return Math.random().toString(36).slice(2,10)}
-function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
-function getTurma(){return DB.turmas.find(t=>t.id===turmaId)}
+function getTurma(){ return DB.turmas.find(t=>t.id===turmaId); }
 
-// --- FIREBASE E AUTENTICAÇÃO ---
+// --- LOGIN E INICIALIZAÇÃO ---
 async function login(){
   const lu = document.getElementById('lu').value.trim();
   const lp = document.getElementById('lp').value.trim();
@@ -347,13 +371,12 @@ function iniciarApp() {
   document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
   renderAg();
 
-  if(DB.turmas.length > 0){
-    turmaId = DB.turmas[0].id;
-    showTurma();
-  } else {
-    document.getElementById('empty-msg').style.display='block';
-    document.getElementById('trhdr').style.display='none';
-  }
+  // Força Tela de Boas-vindas Inicial
+  turmaId = null;
+  setSec('turmas');
+  document.getElementById('trhdr').style.display='none';
+  document.getElementById('empty-msg').style.display='block';
+
   conectarFirebase();
 }
 
@@ -374,6 +397,7 @@ async function conectarFirebase(){
 
 function logout() { location.reload(); }
 
+// --- SINCRONIZAÇÃO NUVEM E LOCAL ---
 async function save(){
   if(!_db)return;
   document.getElementById('sync-status').style.display='block';
@@ -445,6 +469,8 @@ function exportarBackup(){
   const blob=new Blob([JSON.stringify({DB:DB, AUTH:AUTH},null,2)],{type:'application/json'}); 
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); 
   a.download=`backup_dr_caio_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click();
+  const msg = document.getElementById('backup-msg');
+  if(msg) { msg.style.color='var(--verde2)'; msg.textContent='Backup baixado com sucesso!'; setTimeout(()=>msg.textContent='',4000); }
 }
 
 function importarBackup(inp){
@@ -461,10 +487,10 @@ function importarBackup(inp){
       m.style.color='var(--verde2)';m.textContent='Dados importados com sucesso!';
       setTimeout(()=>{
         fecharM('mcfg');
-        turmaId=DB.turmas.length?DB.turmas[0].id:null;
+        turmaId=null;
         updSidebar(); document.getElementById('hst').textContent = DB.turmas.length; document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
-        if(turmaId) showTurma(); else {document.getElementById('empty-msg').style.display='block';document.getElementById('trhdr').style.display='none';}
-        if(secAtual==='agenda') renderAg();
+        document.getElementById('empty-msg').style.display='block';document.getElementById('trhdr').style.display='none';
+        setSec('turmas');
         m.textContent='';
       },1500);
     }catch(err){m.style.color='var(--danger)';m.textContent='Arquivo corrompido ou inválido.';}
@@ -503,6 +529,7 @@ function updSidebar(){
 
 function showTurma(){
   const t=getTurma();
+  if(!t) return;
   document.getElementById('thnom').textContent=t.nome;
   document.getElementById('thdisc').textContent=t.disc;
   document.getElementById('trhdr').style.display='block';
@@ -548,13 +575,9 @@ function excluirTurma(){
   delete DB.atividades[turmaId];
   save(); updSidebar(); document.getElementById('hst').textContent = DB.turmas.length;
   
-  if(DB.turmas.length > 0){
-      turmaId = DB.turmas[0].id; showTurma();
-  } else {
-      turmaId = null;
-      document.getElementById('trhdr').style.display='none';
-      document.getElementById('empty-msg').style.display='block';
-  }
+  turmaId = null;
+  document.getElementById('trhdr').style.display='none';
+  document.getElementById('empty-msg').style.display='block';
 }
 
 // --- 1. DIÁRIO DE AULA ---
@@ -592,6 +615,7 @@ function salvarDiario(){
   if(!t.diario) t.diario = [];
   t.diario.push({id:uid(), data:data, conteudo:cont});
   save(); renderMod();
+  document.getElementById('dia-c').value='';
 }
 
 function delDiario(id){
@@ -604,7 +628,7 @@ function delDiario(id){
 function rAlunos(t){
   let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
              <h3 class="syne" style="color:var(--verde)">Matriculados (${t.alunos.length})</h3>
-             <button class="btn bp bsm" onclick="abrirM('maluno')">+ Novo Aluno</button>
+             <button class="btn bp bsm" onclick="abrirM('maluno');document.getElementById('nal-n').value='';">+ Novo Aluno</button>
            </div>`;
            
   if(!t.alunos.length) return h + '<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum aluno nesta turma.</div>';
@@ -632,7 +656,7 @@ function salvarAluno(){
   if(!t.alunos) t.alunos = [];
   t.alunos.push({id: 'al_'+Date.now(), nome: n, atividades: {}, ativo: true});
   save(); fecharM('maluno'); renderMod(); 
-  document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
+  document.getElementById('hsa').textContent = DB.turmas.reduce((s,tx)=>s+(tx.alunos?tx.alunos.length:0),0);
 }
 
 // --- GESTÃO INDIVIDUAL DE ALUNO ---
@@ -651,8 +675,8 @@ function excluirAluno(aid){
 }
 
 function transferirAluno(aid, destId){
-  if(!destId || destId === turmaId) return alert('Selecione uma turma de destino válida e diferente da atual.');
-  if(!confirm('Tem certeza que deseja transferir este aluno para a outra turma? Ele levará as notas atuais junto com ele.')) return;
+  if(!destId || destId === turmaId) {alert('Selecione uma turma de destino válida e diferente da atual.'); return;}
+  if(!confirm('Tem certeza que deseja transferir este aluno para a outra turma? Ele levará o histórico junto.')) return;
   
   const tOrigem = getTurma();
   const tDest = DB.turmas.find(x=>x.id===destId);
@@ -729,12 +753,6 @@ function rAtiv(t){
   return h;
 }
 
-function abrirModalAtiv(){
-  document.getElementById('na-n').value='';
-  document.getElementById('na-d').value=new Date().toISOString().split('T')[0];
-  document.getElementById('mativ').classList.add('show');
-}
-
 function salvarAtiv(){
   const n = document.getElementById('na-n').value.trim();
   const t = document.getElementById('na-t').value;
@@ -763,7 +781,7 @@ function abrirModalGrupo(){
     <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer;padding:5px;border-radius:6px;transition:.15s">
       <input type="checkbox" class="chk-g" value="${a.id}" style="width:18px;height:18px;margin:0"> ${a.nome}
     </label>`).join('');
-  document.getElementById('mgrupo').classList.add('show');
+  abrirM('mgrupo');
 }
 
 function salvarGrupo(){
