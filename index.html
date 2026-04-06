@@ -1,105 +1,142 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Painel do Professor Digital - Caio Filipe Duarte Araújo</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --verde:#1A4A2E;--verde2:#2E7D4A;--verde3:#5BAD6F;--ouro:#D4AF37;
   --bg:#F0F2F5;--card:#fff;--border:#E2E8F0;--text:#1E293B;--muted:#64748B;--light:#F8FAFC;
-  --danger:#EF4444;--radius:14px;
+  --danger:#EF4444;--radius:12px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;overflow-x:hidden}
 h1,h2,h3,.syne{font-family:'Syne',sans-serif}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-thumb{background:var(--verde);border-radius:4px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--verde3);border-radius:4px}
 
 /* LOGIN */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0d2416 0%,#1A4A2E 60%,#0d2416 100%);padding:20px}
-.lcard{background:#fff;border-radius:24px;padding:36px 28px;width:100%;max-width:360px;box-shadow:0 24px 64px #0007}
-.l-btn{width:100%;background:var(--verde);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s;margin-top:6px}
+.lcard{background:#fff;border-radius:24px;padding:36px 28px;width:100%;max-width:360px;box-shadow:0 24px 64px rgba(0,0,0,0.4)}
+.l-btn{width:100%;background:var(--verde);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s;margin-top:6px}
 
 /* APP LAYOUT */
 #app{display:none;flex-direction:column;min-height:100vh}
-#hdr{background:var(--verde);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px #0004}
-.hdr-l{display:flex;align-items:center;gap:8px}
-.hdr-ico{width:32px;height:32px;background:var(--ouro);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--verde);font-weight:900}
-#cwrap{display:flex;min-height:calc(100vh - 54px)}
-#sb{width:214px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);overflow-y:auto}
-#content{flex:1;padding:12px;overflow-y:auto;min-width:0}
+#hdr{background:var(--verde);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:400;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.hdr-l{display:flex;align-items:center;gap:12px}
+.hdr-ico{width:36px;height:36px;background:var(--ouro);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--verde);font-weight:900;flex-shrink:0}
+.hbtn{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;display:none;align-items:center;justify-content:center;padding:4px}
+@media(max-width:768px){ .hbtn{display:flex} .hdr-nome{display:none} }
+
+#cwrap{display:flex;flex:1;position:relative}
+
+/* SIDEBAR MODO APLICATIVO */
+#sb{width:260px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:300}
+.sb-btn{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border:none;background:transparent;border-radius:10px;text-align:left;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:.2s;margin-bottom:4px;font-family:inherit}
+.sb-btn:hover{background:var(--light);color:var(--verde)}
+.sb-btn.act{background:var(--verde);color:#fff}
+
+.sb-turma{display:block;width:100%;padding:10px 14px;border:none;background:transparent;border-radius:8px;text-align:left;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;margin-bottom:2px;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:4px solid transparent}
+.sb-turma:hover{background:var(--light);color:var(--verde)}
+.sb-turma.act{background:#e6f4ea;color:var(--verde);border-left-color:var(--verde);font-weight:800}
+
+/* OVERLAY PARA MOBILE */
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:250;backdrop-filter:blur(2px)}
+#ov.show{display:block}
+
+@media(max-width:768px){
+  #sb{position:fixed;top:60px;bottom:0;left:0;transform:translateX(-100%);transition:.3s cubic-bezier(0.4,0,0.2,1);box-shadow:4px 0 24px rgba(0,0,0,0.1);height:calc(100vh - 60px)}
+  #sb.open{transform:translateX(0)}
+}
+
+/* ÁREA DE CONTEÚDO */
+#content{flex:1;padding:20px;overflow-y:auto;min-width:0;background:var(--bg)}
+@media(max-width:768px){ #content{padding:12px} }
 
 /* CARDS E TABS */
-.card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:13px;margin-bottom:10px}
-.tabs{display:flex;gap:5px;overflow-x:auto;margin-bottom:10px;padding-bottom:5px}
-.tab{padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:.15s}
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:15px;padding-bottom:5px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 16px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit}
+.tab:hover{border-color:var(--verde3);color:var(--verde)}
 .tab.act{background:var(--verde);color:#fff;border-color:var(--verde)}
 
 /* BOTÕES E INPUTS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-weight:700;border:none;cursor:pointer;border-radius:9px;font-size:12px;padding:8px 12px;font-family:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700;border:none;cursor:pointer;border-radius:8px;font-size:13px;padding:10px 16px;font-family:inherit;transition:.15s}
+.btn:active{transform:scale(0.97)}
 .bp{background:var(--verde);color:#fff}.ba{background:var(--ouro);color:var(--verde)}.bs{background:#f1f5f9;color:#475569}.bd{background:var(--danger);color:#fff}
-.hbtn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px;border-radius:8px;transition:.15s;display:flex;align-items:center;justify-content:center}
-.hbtn:hover{background:rgba(255,255,255,0.1)}
-input, select, textarea{border:1.5px solid var(--border);border-radius:9px;padding:10px;background:var(--light);outline:none;width:100%;font-family:inherit;font-size:13px}
-input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:#fff}
+.bfw{width:100%} .bsm{padding:6px 12px;font-size:11px}
+input, select, textarea{border:1.5px solid var(--border);border-radius:8px;padding:12px;background:var(--light);outline:none;width:100%;font-family:inherit;font-size:13px;transition:.2s}
+input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:#fff;box-shadow:0 0 0 3px rgba(46,125,74,0.1)}
 
 /* ALUNOS E LISTAS */
-.arow{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;border:1px solid #f1f5f9;margin-bottom:5px;background:#fff}
-.aleft{display:flex;align-items:center;gap:10px}
-.av{width:32px;height:32px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.arow{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;border:1px solid #f1f5f9;margin-bottom:6px;background:#fff;transition:.2s}
+.arow:hover{border-color:var(--border)}
+.aleft{display:flex;align-items:center;gap:12px}
+.av{width:36px;height:36px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 
 /* MODAL */
-.mbg{display:none;position:fixed;inset:0;background:#0007;z-index:300;align-items:center;justify-content:center}
-.mbg.show{display:flex}
-.modal{background:#fff;border-radius:18px;width:90%;max-width:480px;padding:20px;max-height:85vh;overflow-y:auto;position:relative}
-.mclose{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:3px 7px;border-radius:7px;position:absolute;top:15px;right:15px}
-.mclose:hover{background:#f1f5f9}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center;padding:15px;backdrop-filter:blur(3px)}
+.mbg.show{display:flex;animation:fadeIn 0.2s ease}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:500px;padding:24px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 10px 40px rgba(0,0,0,0.2)}
+.mclose{position:absolute;top:16px;right:16px;background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;font-weight:bold;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
+@keyframes fadeIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
 
 /* AGENDA */
-.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:10px}
-.cday{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #eee;cursor:pointer}
-.cday.sel{background:var(--verde);color:#fff}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.cday{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:600;border:1px solid transparent;background:var(--light);cursor:pointer;transition:.15s}
+.cday:hover{background:#e2e8f0}
+.cday.sel{background:var(--verde);color:#fff;box-shadow:0 4px 10px rgba(26,74,46,0.3)}
 </style>
 </head>
 <body>
 
 <div id="login-screen">
   <div class="lcard">
-    <h2 class="syne" style="color:var(--verde);text-align:center;margin-bottom:15px">Acesso Restrito</h2>
-    <input type="text" id="lu" value="professor" style="margin-bottom:10px" placeholder="Usuário"/>
-    <input type="password" id="lp" placeholder="Senha" style="margin-bottom:15px" onkeydown="if(event.key==='Enter')login()"/>
-    <button class="l-btn" onclick="login()">Entrar no Painel</button>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:36px;margin-bottom:5px">⚖️</div>
+      <h2 class="syne" style="color:var(--verde)">Acesso Restrito</h2>
+      <p style="font-size:11px;color:var(--muted)">Área do Professor</p>
+    </div>
+    <input type="text" id="lu" value="professor" style="margin-bottom:12px" placeholder="Usuário"/>
+    <input type="password" id="lp" placeholder="Senha" style="margin-bottom:16px" onkeydown="if(event.key==='Enter')login()"/>
+    <button class="l-btn" onclick="login()">Acessar Painel</button>
     <div id="lerr" style="color:red;font-size:11px;margin-top:10px;text-align:center"></div>
   </div>
 </div>
 
+<div id="ov" onclick="fecharSb()"></div>
+
 <div id="app">
   <header id="hdr">
     <div class="hdr-l">
+      <button class="hbtn" onclick="toggleSb()">☰</button>
       <div class="hdr-ico">⚖</div>
       <div>
         <div class="hdr-ttl syne">Painel do Professor Digital</div>
-        <div class="hdr-s">Caio Filipe Duarte Araújo</div>
+        <div class="hdr-s hdr-nome">Caio Filipe Duarte Araújo</div>
       </div>
     </div>
-    <div style="display:flex;gap:10px;font-size:10px;align-items:center">
-        <div class="hs"><div class="v" id="hst" style="font-weight:800;color:var(--ouro)">0</div>Turmas</div>
-        <div class="hs"><div class="v" id="hsa" style="font-weight:800;color:var(--ouro)">0</div>Alunos</div>
-        <div id="sync-status" style="color:#86efac;background:rgba(255,255,255,0.1);padding:4px 8px;border-radius:6px;margin:0 5px">Sincronizado</div>
-        <button class="hbtn" onclick="abrirM('mcfg')" title="Configurações">⚙️</button>
-        <button class="hbtn" onclick="logout()" title="Sair do Sistema">⏻</button>
+    <div style="display:flex;gap:15px;font-size:10px;align-items:center">
+        <div class="hs"><div class="v" id="hst" style="color:var(--ouro)">0</div>Turmas</div>
+        <div class="hs"><div class="v" id="hsa" style="color:var(--ouro)">0</div>Alunos</div>
+        <div id="sync-status" style="color:#86efac;background:rgba(255,255,255,0.1);padding:5px 10px;border-radius:8px;font-weight:700">Sincronizado</div>
     </div>
   </header>
 
   <div id="cwrap">
     <aside id="sb">
-      <div style="padding:15px">
-        <button class="tab act" id="b-turmas" onclick="setSec('turmas')" style="width:100%;margin-bottom:5px;text-align:left">🏫 Turmas</button>
-        <button class="tab" id="b-agenda" onclick="setSec('agenda')" style="width:100%;margin-bottom:5px;text-align:left">📅 Agenda Privada</button>
-        <button class="tab" id="b-res" onclick="setSec('resultados')" style="width:100%;margin-bottom:5px;text-align:left">📊 Resultados Quiz</button>
-        <hr style="margin:10px 0;border:none;border-top:1px solid var(--border)"/>
-        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase">Minhas Turmas</div>
+      <div style="padding:20px 15px">
+        <div style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:12px;letter-spacing:0.5px">MENU PRINCIPAL</div>
+        <button class="sb-btn act" id="b-turmas" onclick="setSec('turmas')">🏫 Minhas Turmas</button>
+        <button class="sb-btn" id="b-agenda" onclick="setSec('agenda')">📅 Agenda Privada</button>
+        <button class="sb-btn" id="b-res" onclick="setSec('resultados')">📊 Resultados Quiz</button>
+        <button class="sb-btn" onclick="exportarBackup()">📥 Backup JSON</button>
+        
+        <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)"/>
+        
+        <div style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:12px;letter-spacing:0.5px">LISTA DE TURMAS</div>
         <div id="trlist"></div>
       </div>
     </aside>
@@ -107,18 +144,22 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     <main id="content">
       <div id="sec-turmas">
         <div id="trhdr" style="display:none">
-          <div class="card"><h2 id="thnom" class="syne"></h2><p id="thdisc" style="font-size:11px;color:var(--muted)"></p></div>
+          <div class="card">
+            <h2 id="thnom" class="syne" style="font-size:22px;color:var(--verde)"></h2>
+            <p id="thdisc" style="font-size:13px;color:var(--muted);margin-top:2px;font-weight:500"></p>
+          </div>
           <div class="tabs">
             <button class="tab act" onclick="setMod('diario',this)">📖 Diário de Aula</button>
-            <button class="tab" onclick="setMod('ativ',this)">✅ Atividades / Grupo</button>
+            <button class="tab" onclick="setMod('ativ',this)">✅ Atividades & Grupos</button>
             <button class="tab" onclick="setMod('alunos',this)">👥 Lista de Alunos</button>
-            <button class="tab" onclick="setMod('notas',this)">📈 Médias Consolidadas</button>
+            <button class="tab" onclick="setMod('notas',this)">📈 Médias</button>
           </div>
           <div id="modcon"></div>
         </div>
-        <div id="empty-msg" style="text-align:center;padding:50px;color:var(--muted)">
-          <div style="font-size:40px;margin-bottom:10px">🏫</div>
-          <p>Selecione uma turma na barra lateral para começar.</p>
+        <div id="empty-msg" style="text-align:center;padding:60px 20px;color:var(--muted)">
+          <div style="font-size:48px;margin-bottom:15px;opacity:0.5">🏫</div>
+          <h3 class="syne" style="color:var(--text);margin-bottom:5px">Bem-vindo, Professor Caio!</h3>
+          <p>Selecione uma turma no menu lateral para visualizar os dados.</p>
         </div>
       </div>
       
@@ -131,95 +172,68 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
 
 <div class="mbg" id="mativ"><div class="modal">
   <button class="mclose" onclick="fecharM('mativ')">✕</button>
-  <h3 class="syne" style="margin-bottom:15px">Nova Atividade Individual</h3>
-  <label style="font-size:10px;font-weight:700;color:var(--muted)">TÍTULO</label>
-  <input type="text" id="na-n" placeholder="Ex: Resenha Crítica" style="margin-bottom:10px"/>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+  <h3 class="syne" style="margin-bottom:20px;font-size:18px;color:var(--verde)">Nova Atividade Individual</h3>
+  <div style="margin-bottom:12px">
+    <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TÍTULO DA ATIVIDADE</label>
+    <input type="text" id="na-n" placeholder="Ex: Resenha Crítica"/>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
     <div>
-      <label style="font-size:10px;font-weight:700;color:var(--muted)">TIPO DE AVALIAÇÃO</label>
+      <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TIPO DE AVALIAÇÃO</label>
       <select id="na-t">
         <option value="visto">Somente Visto (✓)</option>
         <option value="nota">Vale Nota (0-10)</option>
       </select>
     </div>
     <div>
-      <label style="font-size:10px;font-weight:700;color:var(--muted)">DATA</label>
+      <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">DATA</label>
       <input type="date" id="na-d"/>
     </div>
   </div>
-  <button class="btn bp bfw" style="margin-top:15px" onclick="salvarAtiv()">Criar e Lançar</button>
+  <button class="btn bp bfw" onclick="salvarAtiv()">Criar e Avaliar Alunos</button>
 </div></div>
 
 <div class="mbg" id="mgrupo"><div class="modal">
   <button class="mclose" onclick="fecharM('mgrupo')">✕</button>
-  <h3 class="syne" style="margin-bottom:15px">Lançar Atividade em Grupo</h3>
-  <label style="font-size:10px;font-weight:700;color:var(--muted)">TÍTULO</label>
-  <input type="text" id="ga-n" placeholder="Ex: Seminário" style="margin-bottom:10px"/>
+  <h3 class="syne" style="margin-bottom:20px;font-size:18px;color:var(--verde)">Lançar em Grupo</h3>
+  <div style="margin-bottom:12px">
+    <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TÍTULO DO TRABALHO</label>
+    <input type="text" id="ga-n" placeholder="Ex: Seminário de IED"/>
+  </div>
   
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
     <div>
-      <label style="font-size:10px;font-weight:700;color:var(--muted)">TIPO DE AVALIAÇÃO</label>
+      <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TIPO DE AVALIAÇÃO</label>
       <select id="ga-t" onchange="document.getElementById('ga-nota-box').style.display=this.value==='nota'?'block':'none'">
         <option value="visto">Somente Visto (✓)</option>
         <option value="nota">Vale Nota (0-10)</option>
       </select>
     </div>
     <div>
-      <label style="font-size:10px;font-weight:700;color:var(--muted)">DATA</label>
+      <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">DATA</label>
       <input type="date" id="ga-d"/>
     </div>
   </div>
   
-  <div id="ga-nota-box" style="display:none;margin-bottom:10px">
-    <label style="font-size:10px;font-weight:700;color:var(--muted)">NOTA DO GRUPO</label>
+  <div id="ga-nota-box" style="display:none;margin-bottom:12px">
+    <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOTA DO GRUPO</label>
     <input type="number" id="ga-nota" placeholder="Ex: 8.5" step="0.1" min="0" max="10"/>
   </div>
   
-  <label style="font-size:10px;font-weight:700;color:var(--muted)">LINK DO DRIVE (Opcional)</label>
-  <input type="url" id="ga-link" placeholder="Link da foto ou pasta do grupo" style="margin-bottom:15px"/>
+  <div style="margin-bottom:15px">
+    <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">LINK DO DRIVE (Opcional)</label>
+    <input type="url" id="ga-link" placeholder="Link da foto ou pasta do grupo"/>
+  </div>
   
-  <label style="font-size:10px;font-weight:700;color:var(--muted)">SELECIONE OS ALUNOS DO GRUPO</label>
-  <div id="ga-alunos" style="border:1px solid #eee;padding:10px;border-radius:8px;max-height:130px;overflow-y:auto;background:var(--light);margin-bottom:15px"></div>
+  <div style="margin-bottom:20px">
+    <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:6px;display:block">SELECIONE OS ALUNOS DO GRUPO</label>
+    <div id="ga-alunos" style="border:1px solid var(--border);padding:12px;border-radius:10px;max-height:160px;overflow-y:auto;background:var(--light)"></div>
+  </div>
   
-  <button class="btn bp bfw" onclick="salvarGrupo()">Lançar para o Grupo</button>
+  <button class="btn bp bfw" onclick="salvarGrupo()">Salvar para todos do grupo</button>
 </div></div>
 
-<div class="mbg" id="mcfg"><div class="modal">
-  <button class="mclose" onclick="fecharM('mcfg')">✕</button>
-  <h3 class="syne" style="margin-bottom:15px">Configurações do Sistema</h3>
-  
-  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">🔐 Alterar Credenciais</div>
-  <input type="text" id="cfu" placeholder="Novo usuário" style="margin-bottom:5px"/>
-  <input type="password" id="cfpc" placeholder="Senha atual" style="margin-bottom:5px"/>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px">
-    <input type="password" id="cfpn" placeholder="Nova senha"/>
-    <input type="password" id="cfpc2" placeholder="Repetir nova senha"/>
-  </div>
-  <button class="btn bp bfw" style="margin-bottom:5px" onclick="salvarCfg()">Atualizar Acesso</button>
-  <div id="cfgmsg" style="font-size:11px;min-height:15px;color:var(--verde2);margin-bottom:15px"></div>
-
-  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">📅 Horários Fixos das Turmas</div>
-  <div style="display:flex;gap:5px;margin-bottom:5px">
-    <select id="cfts" style="flex:2"><option value="">Turma...</option></select>
-    <select id="cfdia" style="flex:1"><option value="1">Seg</option><option value="2">Ter</option><option value="3">Qua</option><option value="4">Qui</option><option value="5">Sex</option><option value="6">Sáb</option></select>
-    <input type="time" id="cfho" style="flex:1"/>
-    <button class="btn bp" onclick="addHorGlobal()">+</button>
-  </div>
-  <div id="cfhlist" style="max-height:120px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:5px;margin-bottom:15px;font-size:12px;background:var(--light)"></div>
-
-  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">💾 Backup e Restauração</div>
-  <div style="display:flex;gap:5px;margin-bottom:5px">
-    <button class="btn bp" style="flex:1" onclick="exportarBackup()">📥 Exportar JSON</button>
-    <button class="btn bs" style="flex:1" onclick="document.getElementById('imp-file').click()">📤 Importar JSON</button>
-  </div>
-  <input type="file" id="imp-file" style="display:none" accept=".json" onchange="importarBackup(this)"/>
-  <div id="backup-msg" style="font-size:11px;min-height:15px;color:var(--verde2);margin-bottom:15px"></div>
-
-  <hr style="margin:15px 0;border:none;border-top:1px solid var(--border)"/>
-  <button class="btn bd bfw" onclick="if(confirm('Tem certeza? Isso apagará todas as turmas, alunos e notas do seu navegador e nuvem.'))resetDB()">🗑 Resetar Sistema Completo</button>
-</div></div>
-
-<div class="mbg" id="mperfil"><div class="modal" id="perfilcon" style="position:relative"></div></div>
+<div class="mbg" id="mperfil"><div class="modal" id="perfilcon"></div></div>
 
 <script>
 const FB_CONFIG = {
@@ -231,14 +245,10 @@ const FB_CONFIG = {
   appId:"1:4515274923:web:25e9bc6d350a411972d7ee"
 };
 
-let AUTH = {user:'professor',pass:'1234'};
 let DB = {turmas:[], atividades:{}, eventosAgenda:{}};
 let turmaId=null, modAtual='diario', secAtual='turmas';
 let atTab='lista', atAtivSel=null;
 let calMes=new Date().getMonth(), calAno=new Date().getFullYear(), calDia=new Date().getDate();
-const DIA_N=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
 let _db=null, _syncTimer=null;
 
 function uid(){return Math.random().toString(36).slice(2,10)}
@@ -246,34 +256,23 @@ function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0]
 
 // --- FIREBASE E AUTENTICAÇÃO ---
 async function login(){
-  const lu = document.getElementById('lu').value;
-  const lp = document.getElementById('lp').value;
-  if(lu === AUTH.user && lp === AUTH.pass){
+  if(document.getElementById('lu').value==='professor'){
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
     const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const {getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     _db=getFirestore(initializeApp(FB_CONFIG));
     baixarDaNuvem();
-  } else {
-    document.getElementById('lerr').textContent = 'Usuário ou senha incorretos.';
-  }
+  } else { document.getElementById('lerr').textContent='Credenciais inválidas.'; }
 }
-
-function logout() { location.reload(); }
 
 async function save(){
   if(!_db)return;
   document.getElementById('sync-status').textContent='Sincronizando...';
-  localStorage.setItem('pdb',JSON.stringify(DB));
-  localStorage.setItem('pau',JSON.stringify(AUTH));
-  
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(async ()=>{
     const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await setDoc(doc(_db,'professor','dados'), {DB:JSON.stringify(DB), updatedAt:new Date().toISOString()});
-    await setDoc(doc(_db,'professor','auth'), {AUTH:JSON.stringify(AUTH)});
-    
     const pub = DB.turmas.map(t=>({id:t.id, nome:t.nome, disc:t.disc, alunos:t.alunos.map(a=>({id:a.id, nome:a.nome}))}));
     await setDoc(doc(_db,'publico','turmas'), {turmas:JSON.stringify(pub)});
     document.getElementById('sync-status').textContent='Sincronizado';
@@ -282,9 +281,6 @@ async function save(){
 
 async function baixarDaNuvem(){
   const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  const snapA=await getDoc(doc(_db,'professor','auth'));
-  if(snapA.exists()){ try{const rA=JSON.parse(snapA.data().AUTH); if(rA.user) AUTH=rA;}catch(e){} }
-  
   const snap=await getDoc(doc(_db,'professor','dados'));
   if(snap.exists()){ 
     DB=JSON.parse(snap.data().DB); 
@@ -294,109 +290,39 @@ async function baixarDaNuvem(){
   }
 }
 
-// --- CONFIGURAÇÕES ---
-function salvarCfg(){
-  const pc=document.getElementById('cfpc').value;
-  const pn=document.getElementById('cfpn').value;
-  const pc2=document.getElementById('cfpc2').value;
-  const nu=document.getElementById('cfu').value.trim();
-  const m=document.getElementById('cfgmsg');
-  if(pc!==AUTH.pass){m.style.color='var(--danger)';m.textContent='Senha atual incorreta.';return;}
-  if(pn&&pn!==pc2){m.style.color='var(--danger)';m.textContent='Novas senhas não coincidem.';return;}
-  if(nu) AUTH.user=nu; if(pn) AUTH.pass=pn; save();
-  m.style.color='var(--verde2)';m.textContent='Credenciais atualizadas com sucesso!';
-  setTimeout(()=>m.textContent='',3000);
-  ['cfu','cfpc','cfpn','cfpc2'].forEach(id=>document.getElementById(id).value='');
-}
-
-function resetDB(){
-  DB={turmas:[],atividades:{},eventosAgenda:{}}; 
-  save(); turmaId=null; fecharM('mcfg'); updSidebar(); 
-  document.getElementById('trhdr').style.display='none'; 
-  document.getElementById('empty-msg').style.display='block';
-}
-
-function addHorGlobal(){
-  const tid=document.getElementById('cfts').value;
-  const dia=+document.getElementById('cfdia').value;
-  const hora=document.getElementById('cfho').value;
-  if(!tid||!hora){alert('Selecione turma e preencha a hora.');return;}
-  const t=DB.turmas.find(x=>x.id===tid); if(!t.horarios) t.horarios=[];
-  if(!t.horarios.find(h=>h.dia===dia&&h.hora===hora)) t.horarios.push({dia,hora});
-  save(); renderCfgHors();
-}
-
-function renderCfgHors(){
-  const el=document.getElementById('cfhlist'); if(!el)return;
-  const rows=[];
-  DB.turmas.forEach(t=>{(t.horarios||[]).forEach((h,i)=>{rows.push(`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:5px;border-bottom:1px solid var(--border)">
-      <span><b>${t.nome}</b> - ${DIA_N[h.dia]} ${h.hora}</span>
-      <button onclick="remHor('${t.id}',${i})" style="background:none;border:none;cursor:pointer;color:var(--danger)">✕</button>
-    </div>`);
-  });});
-  el.innerHTML=rows.length ? rows.join('') : '<div style="color:var(--muted)">Nenhum horário cadastrado.</div>';
-}
-
-function remHor(tid,idx){ const t=DB.turmas.find(x=>x.id===tid); t.horarios.splice(idx,1); save(); renderCfgHors(); }
-
-function exportarBackup(){
-  const blob=new Blob([JSON.stringify({DB:DB, AUTH:AUTH},null,2)],{type:'application/json'}); 
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); 
-  a.download=`backup_caio_duarte_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click();
-}
-
-function importarBackup(inp){
-  const f=inp.files[0]; if(!f)return;
-  const m=document.getElementById('backup-msg');
-  if(!f.name.endsWith('.json')){m.style.color='var(--danger)';m.textContent='Selecione um arquivo .json válido.';return;}
-  if(!confirm('Importar backup? Os dados atuais serão apagados.')){inp.value='';return;}
-  const r=new FileReader();
-  r.onload=e=>{
-    try{
-      const backup=JSON.parse(e.target.result);
-      if(!backup.DB)throw new Error('invalido');
-      DB=backup.DB; if(backup.AUTH) AUTH=backup.AUTH; save();
-      m.style.color='var(--verde2)';m.textContent='Importado com sucesso!';
-      setTimeout(()=>{
-        fecharM('mcfg');
-        turmaId=DB.turmas.length?DB.turmas[0].id:null;
-        updSidebar(); updStats();
-        if(turmaId) showTurma(); else {document.getElementById('empty-msg').style.display='block';document.getElementById('trhdr').style.display='none';}
-        if(secAtual==='agenda') renderAg();
-        m.textContent='';
-      },1500);
-    }catch(err){m.style.color='var(--danger)';m.textContent='Arquivo corrompido.';}
-  };
-  r.readAsText(f,'UTF-8'); inp.value='';
-}
-
 // --- NAVEGAÇÃO E TURMAS ---
+function toggleSb(){
+  document.getElementById('sb').classList.toggle('open');
+  document.getElementById('ov').classList.toggle('show');
+}
+function fecharSb(){
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('ov').classList.remove('show');
+}
+
 function setSec(s){
   secAtual=s;
   document.getElementById('sec-turmas').style.display=s==='turmas'?'block':'none';
   document.getElementById('sec-agenda').style.display=s==='agenda'?'block':'none';
   document.getElementById('sec-resultados').style.display=s==='resultados'?'block':'none';
   
-  document.querySelectorAll('#sb .tab').forEach(b=>b.classList.remove('act'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('act'));
   if(s==='turmas') document.getElementById('b-turmas').classList.add('act');
   if(s==='agenda'){ document.getElementById('b-agenda').classList.add('act'); renderAg(); }
   if(s==='resultados'){ document.getElementById('b-res').classList.add('act'); buscarResultados(); }
+  
+  fecharSb(); // Fecha menu no mobile
 }
 
 function updSidebar(){
   const l=document.getElementById('trlist'); l.innerHTML='';
   DB.turmas.forEach(t=>{
-    const b=document.createElement('button'); b.className='tab'; b.style='width:100%;margin-bottom:4px;text-align:left;border-color:transparent;background:var(--light)';
-    b.textContent=t.nome; b.onclick=()=>{turmaId=t.id; showTurma();}; l.appendChild(b);
+    const b=document.createElement('button'); 
+    b.className='sb-turma ' + (turmaId===t.id && secAtual==='turmas' ? 'act' : '');
+    b.textContent=t.nome; 
+    b.onclick=()=>{turmaId=t.id; showTurma(); fecharSb();}; 
+    l.appendChild(b);
   });
-  
-  // Atualiza select de configurações
-  const cs=document.getElementById('cfts');
-  if(cs){
-    cs.innerHTML='<option value="">Turma...</option>';
-    DB.turmas.forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.nome;cs.appendChild(o);});
-  }
 }
 
 function showTurma(){
@@ -406,6 +332,7 @@ function showTurma(){
   document.getElementById('trhdr').style.display='block';
   document.getElementById('empty-msg').style.display='none';
   setSec('turmas');
+  updSidebar(); // Atualiza destaque na barra lateral
   renderMod();
 }
 
@@ -431,19 +358,23 @@ function renderMod(){
 function rDiario(t){
   const diarios = t.diario || [];
   let h = `
-    <div style="background:var(--light);padding:12px;border-radius:10px;border:1px solid var(--border);margin-bottom:15px">
-      <div style="display:flex;gap:8px">
-        <input type="date" id="dia-d" value="${new Date().toISOString().split('T')[0]}" style="width:140px;padding:8px"/>
-        <input type="text" id="dia-c" placeholder="Conteúdo lecionado na aula..." style="flex:1;padding:8px" onkeydown="if(event.key==='Enter')salvarDiario()"/>
-        <button class="btn bp" onclick="salvarDiario()">Salvar</button>
+    <div style="background:var(--light);padding:16px;border-radius:12px;border:1px solid var(--border);margin-bottom:15px">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:10px">REGISTRAR AULA DE HOJE</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <input type="date" id="dia-d" value="${new Date().toISOString().split('T')[0]}" style="width:140px;flex-shrink:0"/>
+        <input type="text" id="dia-c" placeholder="Qual foi o conteúdo da aula?" style="flex:1;min-width:200px" onkeydown="if(event.key==='Enter')salvarDiario()"/>
+        <button class="btn bp" onclick="salvarDiario()">Salvar no Diário</button>
       </div>
     </div>`;
     
-  if(!diarios.length){ h+='<p style="text-align:center;color:var(--muted);padding:20px">Nenhum registro de aula.</p>'; return h; }
+  if(!diarios.length){ h+='<p style="text-align:center;color:var(--muted);padding:30px">Nenhum registro no diário de classe.</p>'; return h; }
   
   h += diarios.sort((a,b)=>b.data.localeCompare(a.data)).map(d=>`
-    <div class="arow">
-      <div><strong style="color:var(--verde)">${d.data.split('-').reverse().join('/')}</strong><br><span style="font-size:13px;color:var(--text)">${d.conteudo}</span></div>
+    <div class="arow" style="align-items:flex-start">
+      <div style="flex:1">
+        <strong style="color:var(--verde);font-size:13px">${d.data.split('-').reverse().join('/')}</strong>
+        <div style="font-size:14px;color:var(--text);margin-top:4px;line-height:1.5">${d.conteudo}</div>
+      </div>
       <button class="btn bd bsm" onclick="delDiario('${d.id}')">Excluir</button>
     </div>
   `).join('');
@@ -468,11 +399,11 @@ function delDiario(id){
 
 // --- 2. LISTA DE ALUNOS ---
 function rAlunos(t){
-  let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 class="syne">Alunos Matriculados (${t.alunos.length})</h3></div>`;
+  let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px"><h3 class="syne" style="color:var(--verde)">Matriculados (${t.alunos.length})</h3></div>`;
   h += t.alunos.map((a,i)=>`
     <div class="arow">
-      <div class="aleft"><div class="av">${avt(a.nome)}</div><div style="font-size:13px;font-weight:600">${i+1}. ${a.nome}</div></div>
-      <button class="btn bs bsm" onclick="abrirPerfil('${a.id}')">Ver Perfil</button>
+      <div class="aleft"><div class="av">${avt(a.nome)}</div><div style="font-size:14px;font-weight:600">${i+1}. ${a.nome}</div></div>
+      <button class="btn bs bsm" onclick="abrirPerfil('${a.id}')">Ficha Completa</button>
     </div>`).join('');
   return h;
 }
@@ -483,47 +414,53 @@ function rAtiv(t){
   
   if(atTab==='lista'){
     let h = `
-      <div style="display:flex;gap:10px;margin-bottom:15px">
-        <button class="btn bp" style="flex:1" onclick="abrirModalAtiv()">+ Atividade Individual</button>
-        <button class="btn ba" style="flex:1" onclick="abrirModalGrupo()">+ Lançar em Grupo</button>
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn bp" style="flex:1;min-width:200px" onclick="abrirModalAtiv()">+ Individual</button>
+        <button class="btn ba" style="flex:1;min-width:200px" onclick="abrirModalGrupo()">+ Em Grupo</button>
       </div>`;
-    if(!ativs.length) return h + '<div style="text-align:center;padding:30px;color:var(--muted)">Nenhuma atividade lançada.</div>';
+    if(!ativs.length) return h + '<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma atividade lançada ainda.</div>';
     
     h += ativs.map(av=>`
       <div class="arow" style="cursor:pointer" onclick="atAtivSel='${av.id}'; atTab='lanc'; renderMod()">
-        <div>
-          <div style="font-weight:700;font-size:13px">${av.nome} ${av.linkDrive?`<a href="${av.linkDrive}" target="_blank" title="Ver no Drive" style="text-decoration:none">📁</a>`:''}</div>
-          <div style="font-size:11px;color:var(--muted)">${av.data||'--'} • ${av.tipo==='visto'?'Somente Visto':'Vale Nota'}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">${av.nome} ${av.linkDrive?`<a href="${av.linkDrive}" target="_blank" title="Pasta no Drive" style="text-decoration:none;font-size:16px;margin-left:5px">📁</a>`:''}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">${av.data?av.data.split('-').reverse().join('/'):'--'} • ${av.tipo==='visto'?'Somente Visto':'Vale Nota'}</div>
         </div>
-        <button class="btn bd bsm" onclick="event.stopPropagation();delAtiv('${av.id}')">X</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:11px;font-weight:700;color:var(--verde);background:#e6f4ea;padding:4px 8px;border-radius:6px">Avaliar</span>
+          <button class="btn bd bsm" onclick="event.stopPropagation();delAtiv('${av.id}')">✕</button>
+        </div>
       </div>`).join('');
     return h;
   }
   
-  // MODO LANÇAMENTO (Lista de alunos daquela atividade)
+  // MODO LANÇAMENTO
   const av = ativs.find(x=>x.id===atAtivSel);
   if(!av){ atTab='lista'; return renderMod(); }
   
   let h = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;background:var(--light);padding:10px;border-radius:8px">
-      <div><strong style="font-size:14px;color:var(--verde)">${av.nome}</strong><br><span style="font-size:11px;color:var(--muted)">Tipo: ${av.tipo==='visto'?'Visto':'Nota'}</span></div>
-      <button class="btn bs bsm" onclick="atTab='lista';renderMod()">Voltar para Lista</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;background:var(--light);padding:15px;border-radius:12px;border:1px solid var(--border)">
+      <div>
+        <strong style="font-size:16px;color:var(--verde)">${av.nome}</strong><br>
+        <span style="font-size:12px;color:var(--muted);font-weight:600">Modo: ${av.tipo==='visto'?'Visto (✓)':'Nota (0-10)'}</span>
+      </div>
+      <button class="btn bs" onclick="atTab='lista';renderMod()">← Voltar</button>
     </div>`;
     
-  h += t.alunos.map(a=>{
+  h += t.alunos.map((a,i)=>{
     const reg = (a.atividades||{})[av.id] || {};
     let controleHTML = '';
     
     if(av.tipo === 'visto'){
       const isChecked = !!reg.visto;
-      controleHTML = `<button class="btn ${isChecked?'bp':'bs'} bsm" style="width:80px" onclick="togVisto('${a.id}','${av.id}')">${isChecked?'✓ Visto':'Marcar'}</button>`;
+      controleHTML = `<button class="btn ${isChecked?'bp':'bs'}" style="min-width:100px" onclick="togVisto('${a.id}','${av.id}')">${isChecked?'✓ Concluído':'Pendente'}</button>`;
     } else {
       const notaVal = reg.nota!=null ? reg.nota : '';
-      controleHTML = `<input type="number" min="0" max="10" step="0.1" value="${notaVal}" style="width:70px;padding:6px;text-align:center" placeholder="--" onchange="setAtivNota('${a.id}','${av.id}',this.value)"/>`;
+      controleHTML = `<input type="number" min="0" max="10" step="0.1" value="${notaVal}" style="width:80px;text-align:center;font-weight:700" placeholder="--" onchange="setAtivNota('${a.id}','${av.id}',this.value)"/>`;
     }
     
     return `<div class="arow">
-      <div class="aleft"><div class="av">${avt(a.nome)}</div><div style="font-size:13px">${a.nome}</div></div>
+      <div class="aleft"><div class="av">${avt(a.nome)}</div><div style="font-size:13px;font-weight:500">${i+1}. ${a.nome}</div></div>
       <div>${controleHTML}</div>
     </div>`;
   }).join('');
@@ -531,16 +468,10 @@ function rAtiv(t){
   return h;
 }
 
-function abrirM(id){ 
-  document.getElementById(id).classList.add('show'); 
-  if(id==='mcfg'){ updSidebar(); renderCfgHors(); }
-}
-function fecharM(id){ document.getElementById(id).classList.remove('show'); }
-
 function abrirModalAtiv(){
   document.getElementById('na-n').value='';
   document.getElementById('na-d').value=new Date().toISOString().split('T')[0];
-  abrirM('mativ');
+  document.getElementById('mativ').classList.add('show');
 }
 
 function salvarAtiv(){
@@ -561,11 +492,14 @@ function abrirModalGrupo(){
   document.getElementById('ga-d').value=new Date().toISOString().split('T')[0];
   document.getElementById('ga-nota').value='';
   document.getElementById('ga-link').value='';
+  document.getElementById('ga-nota-box').style.display='none';
+  document.getElementById('ga-t').value='visto';
+  
   document.getElementById('ga-alunos').innerHTML=t.alunos.map(a=>`
-    <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;cursor:pointer">
-      <input type="checkbox" class="chk-g" value="${a.id}"> ${a.nome}
+    <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer;padding:5px;border-radius:6px;transition:.15s">
+      <input type="checkbox" class="chk-g" value="${a.id}" style="width:18px;height:18px;margin:0"> ${a.nome}
     </label>`).join('');
-  abrirM('mgrupo');
+  document.getElementById('mgrupo').classList.add('show');
 }
 
 function salvarGrupo(){
@@ -576,8 +510,8 @@ function salvarGrupo(){
   const link = document.getElementById('ga-link').value.trim();
   const sel = Array.from(document.querySelectorAll('.chk-g:checked')).map(c=>c.value);
 
-  if(!n || !sel.length){alert('Preencha título e selecione alunos.'); return;}
-  if(tipo==='nota' && isNaN(nota)){alert('Digite a nota do grupo.'); return;}
+  if(!n || !sel.length){alert('Título e alunos são obrigatórios.'); return;}
+  if(tipo==='nota' && isNaN(nota)){alert('Para avaliação por nota, digite o valor.'); return;}
 
   const atid='at_'+Date.now(); 
   if(!DB.atividades[turmaId]) DB.atividades[turmaId]=[];
@@ -591,11 +525,10 @@ function salvarGrupo(){
     else a.atividades[atid]={visto:true, linkDrive:link}; 
   });
 
-  save(); fecharM('mgrupo'); atTab='lista'; renderMod(); alert('Registrado para os alunos do grupo!');
+  save(); fecharM('mgrupo'); atTab='lista'; renderMod();
 }
 
 function delAtiv(id){
-  if(!confirm('Excluir atividade de todos os alunos?')) return;
   DB.atividades[turmaId] = DB.atividades[turmaId].filter(x=>x.id!==id);
   const t = DB.turmas.find(x=>x.id===turmaId);
   t.alunos.forEach(a=>{ if(a.atividades) delete a.atividades[id]; });
@@ -616,7 +549,8 @@ function setAtivNota(aid, atid, val){
 
 // --- 4. MÉDIAS ---
 function rNotas(t){
-  return t.alunos.map(a=>{
+  return `<div style="margin-bottom:15px;padding:10px;background:var(--light);border-radius:8px;font-size:12px;color:var(--muted)">A média consolidada é calculada automaticamente baseada nas atividades individuais e em grupo que "Valem Nota". Vistos não afetam o cálculo.</div>` + 
+  t.alunos.map((a,i)=>{
     const ativsDaTurma = DB.atividades[turmaId]||[];
     let soma=0, qtd=0;
     ativsDaTurma.forEach(av=>{
@@ -626,10 +560,10 @@ function rNotas(t){
       }
     });
     const media = qtd>0 ? (soma/qtd).toFixed(1) : '--';
-    const cor = media==='--' ? '#64748b' : (media>=6 ? '#16a34a' : '#dc2626');
+    const cor = media==='--' ? 'var(--muted)' : (media>=6 ? 'var(--verde2)' : 'var(--danger)');
     return `<div class="arow" onclick="abrirPerfil('${a.id}')" style="cursor:pointer">
-      <div class="aleft"><div class="av">${avt(a.nome)}</div><span style="font-size:13px">${a.nome}</span></div>
-      <strong style="color:${cor};font-size:15px">${media}</strong>
+      <div class="aleft"><div class="av">${avt(a.nome)}</div><span style="font-size:14px;font-weight:600">${i+1}. ${a.nome}</span></div>
+      <strong style="color:${cor};font-size:18px;background:${media==='--'?'#f1f5f9':media>=6?'#dcfce7':'#fee2e2'};padding:4px 10px;border-radius:8px">${media}</strong>
     </div>`;
   }).join('');
 }
@@ -642,69 +576,92 @@ function abrirPerfil(aid){
   ativsDaTurma.forEach(av=>{ if(av.tipo==='nota'){ const n=a.atividades&&a.atividades[av.id]?a.atividades[av.id].nota:null; if(n!=null){soma+=n; qtd++;} } });
   const media = qtd>0 ? (soma/qtd).toFixed(1) : '--';
   
-  let h = `<div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px;position:relative">
-    <button class="mclose" onclick="fecharM('mperfil')" style="top:0;right:0">✕</button>
-    <div class="av" style="width:60px;height:60px;font-size:20px">${avt(a.nome)}</div>
-    <div><h3 style="margin:0">${a.nome}</h3><p style="margin:5px 0 0 0;font-weight:700">Média: <span style="color:${media>=6?'#16a34a':'#dc2626'}">${media}</span></p></div>
+  let h = `<div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:20px;position:relative">
+    <button class="mclose" onclick="fecharM('mperfil')">✕</button>
+    <div class="av" style="width:70px;height:70px;font-size:24px">${avt(a.nome)}</div>
+    <div style="flex:1;padding-right:30px">
+        <h3 style="margin:0;font-size:18px;color:var(--verde)">${a.nome}</h3>
+        <div style="display:inline-block;margin-top:8px;padding:6px 12px;border-radius:8px;font-weight:800;font-size:14px;background:${media>=6?'#dcfce7':media==='--'?'#f1f5f9':'#fee2e2'};color:${media>=6?'#16a34a':media==='--'?'var(--muted)':'#dc2626'}">
+            MÉDIA FINAL: ${media}
+        </div>
+    </div>
   </div>
-  <h4 style="font-size:11px;color:var(--muted);margin-bottom:10px">HISTÓRICO DE ATIVIDADES</h4>`;
+  <h4 style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:10px;letter-spacing:0.5px">REGISTRO DE ATIVIDADES</h4>`;
   
-  if(!ativsDaTurma.length) h+= '<p style="font-size:12px">Nenhuma atividade registrada.</p>';
+  if(!ativsDaTurma.length) h+= '<p style="font-size:13px;color:var(--muted);text-align:center;padding:20px">Nenhuma atividade lançada no sistema.</p>';
   else {
     h+= ativsDaTurma.map(av=>{
       const reg = a.atividades&&a.atividades[av.id] ? a.atividades[av.id] : null;
       let val = '--';
-      if(av.tipo==='visto') val = (reg&&reg.visto) ? '✓ Visto' : 'Pendente';
-      else val = (reg&&reg.nota!=null) ? reg.nota : '--';
-      const linkBtn = (reg&&reg.linkDrive) ? ` <a href="${reg.linkDrive}" target="_blank" style="text-decoration:none">📁</a>` : '';
+      if(av.tipo==='visto') val = (reg&&reg.visto) ? '<span style="color:#16a34a">✓ Concluído</span>' : '<span style="color:#dc2626">Pendente</span>';
+      else val = (reg&&reg.nota!=null) ? `<span style="font-size:15px">${reg.nota}</span><span style="font-size:10px;color:var(--muted)">/10</span>` : '--';
+      const linkBtn = (reg&&reg.linkDrive) ? ` <a href="${reg.linkDrive}" target="_blank" style="text-decoration:none;font-size:16px;margin-left:5px" title="Ver no Drive">📁</a>` : '';
       
-      return `<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #eee;font-size:13px">
-        <span>${av.nome}${linkBtn}</span><strong>${val}</strong>
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #f1f5f9;font-size:13px;background:var(--light);border-radius:8px;margin-bottom:6px">
+        <div><strong>${av.nome}</strong>${linkBtn}<br><small style="color:var(--muted)">${av.data?av.data.split('-').reverse().join('/'):'--'}</small></div>
+        <strong style="text-align:right">${val}</strong>
       </div>`;
     }).join('');
   }
   document.getElementById('perfilcon').innerHTML = h;
-  abrirM('mperfil');
+  document.getElementById('mperfil').classList.add('show');
 }
 
 // --- RESULTADOS QUIZ ---
 async function buscarResultados(){
-  const el=document.getElementById('rescon'); el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">Buscando na nuvem...</div>';
+  const el=document.getElementById('rescon'); el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div class="spin" style="font-size:24px;margin-bottom:10px">⏳</div><br>Sincronizando com a Nuvem...</div>';
   try{
     const {collection,getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap=await getDocs(collection(_db,'quiz_resultados'));
-    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px"><h3 class="syne">Resultados Recebidos do App Aluno</h3><button class="btn bp bsm" onclick="buscarResultados()">Atualizar</button></div>';
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h3 class="syne" style="color:var(--verde)">Resultados do App Aluno</h3><button class="btn bp" onclick="buscarResultados()">Atualizar</button></div>';
+    
+    let count=0;
     snap.forEach(doc=>{ 
+      count++;
       const r=doc.data(); 
       const cor = r.placar >= 70 ? 'var(--verde2)' : 'var(--danger)';
-      h+=`<div class="arow" style="align-items:flex-start">
-            <div><strong>${r.nome}</strong><br><small style="color:var(--muted)">${r.turma} | ${r.disciplina}</small></div>
-            <div style="text-align:right"><strong style="color:${cor};font-size:16px">${r.placar}%</strong><br><small>${r.acertos}/${r.total}</small></div>
+      const bg = r.placar >= 70 ? '#dcfce7' : '#fee2e2';
+      h+=`<div class="arow" style="align-items:center;padding:15px">
+            <div style="flex:1">
+                <strong style="font-size:14px">${r.nome}</strong><br>
+                <small style="color:var(--muted);font-weight:600">${r.disciplina} • ${r.turma}</small>
+            </div>
+            <div style="text-align:right">
+                <strong style="color:${cor};font-size:18px;background:${bg};padding:4px 10px;border-radius:8px">${r.placar}%</strong><br>
+                <small style="color:var(--muted);margin-top:4px;display:block">${r.acertos}/${r.total} acertos</small>
+            </div>
           </div>`; 
     });
-    el.innerHTML=h || '<p style="padding:20px;color:var(--muted)">Nenhum resultado recebido.</p>';
-  }catch(e){ el.innerHTML='<p style="color:red">Erro de conexão ao buscar resultados.</p>'; }
+    el.innerHTML = count ? h : h+'<div class="empty" style="text-align:center;padding:40px;color:var(--muted)">Nenhum aluno enviou respostas ainda.</div>';
+  }catch(e){ el.innerHTML='<div class="empty" style="color:red;text-align:center;padding:40px">Erro ao conectar com a nuvem.</div>'; }
 }
 
 // --- AGENDA PRIVADA ---
+const DIA_SEMANA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 function renderAg(){
   const el = document.getElementById('agcon');
   const hojeD = new Date();
-  const hoje = hojeD.toLocaleDateString('pt-BR');
+  const hojeStr = hojeD.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
   const diasM = new Date(calAno,calMes+1,0).getDate();
   const prim = new Date(calAno,calMes,1).getDay();
   
   let h=`
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
-    <h3 class="syne">📅 Agenda Privada</h3>
+    <h3 class="syne" style="color:var(--verde)">📅 Agenda Pessoal</h3>
   </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;background:var(--light);padding:10px;border-radius:10px">
-    <button class="btn bs" onclick="calMes--;if(calMes<0){calMes=11;calAno--}renderAg()">←</button>
-    <div style="font-weight:700;font-size:13px">${MESES[calMes]} ${calAno}</div>
-    <button class="btn bs" onclick="calMes++;if(calMes>11){calMes=0;calAno++}renderAg()">→</button>
+  <div style="padding:15px;background:var(--verde);color:#fff;border-radius:12px;margin-bottom:15px;box-shadow:0 4px 12px rgba(26,74,46,0.2)">
+      <div style="font-size:11px;opacity:0.8;text-transform:uppercase;font-weight:700;margin-bottom:2px">HOJE</div>
+      <div style="font-size:16px;font-weight:800;text-transform:capitalize">${hojeStr}</div>
   </div>
+  
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;background:var(--light);padding:10px;border-radius:10px;border:1px solid var(--border)">
+    <button class="btn bs bsm" onclick="calMes--;if(calMes<0){calMes=11;calAno--}renderAg()">← Mês Ant.</button>
+    <div style="font-weight:800;font-size:14px;color:var(--text);text-transform:uppercase">${MESES[calMes]} ${calAno}</div>
+    <button class="btn bs bsm" onclick="calMes++;if(calMes>11){calMes=0;calAno++}renderAg()">Próx. Mês →</button>
+  </div>
+  
   <div class="cgrid">
-    ${DIA_N.map(d=>`<div style="text-align:center;font-size:10px;font-weight:700;color:var(--muted)">${d}</div>`).join('')}
+    ${DIA_SEMANA.map(d=>`<div style="text-align:center;font-size:10px;font-weight:800;color:var(--muted);padding:5px 0">${d}</div>`).join('')}
     ${Array.from({length:prim}).map(()=>'<div></div>').join('')}
     ${Array.from({length:diasM},(_,i)=>{
       const d=i+1; const k=`${calAno}-${calMes}-${d}`;
@@ -712,24 +669,29 @@ function renderAg(){
       const eh=(d===hojeD.getDate()&&calMes===hojeD.getMonth()&&calAno===hojeD.getFullYear());
       const sl=(d===calDia);
       return`<div class="cday ${sl?'sel':''}" style="${eh&&!sl?'border:2px solid var(--verde);font-weight:900':''}" onclick="calDia=${d};renderAg()">
-        ${d} ${te?'<div style="width:4px;height:4px;border-radius:50%;background:#f59e0b;margin-top:2px"></div>':''}
+        ${d} ${te?'<div style="width:5px;height:5px;border-radius:50%;background:#f59e0b;margin-top:2px"></div>':''}
       </div>`;
     }).join('')}
   </div>`;
 
   const k=`${calAno}-${calMes}-${calDia}`;
   const evs=DB.eventosAgenda[k]||[];
-  h+=`<div class="syne" style="font-size:14px;font-weight:800;margin:15px 0 10px">${calDia}/${calMes+1}/${calAno}</div>`;
+  h+=`<div style="margin-top:25px;border-top:1px solid var(--border);padding-top:15px">
+        <h4 class="syne" style="color:var(--verde);margin-bottom:12px">Lembretes para ${calDia}/${calMes+1}/${calAno}</h4>`;
   if(evs.length){
-    h+=evs.map((ev,i)=>`<div style="display:flex;justify-content:space-between;padding:10px;background:#fffbeb;border-radius:8px;margin-bottom:5px">
-      <span style="font-size:13px;font-weight:600">📌 ${ev}</span>
-      <button onclick="remEv(${i})" style="background:none;border:none;cursor:pointer;color:#f87171;font-size:16px">✕</button>
+    h+=evs.map((ev,i)=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px;background:#fffbeb;border-left:4px solid #f59e0b;border-radius:8px;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:600;color:#92400e;line-height:1.4">${ev}</span>
+      <button onclick="remEv(${i})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:16px;padding:0 5px">✕</button>
     </div>`).join('');
+  } else {
+    h+=`<div style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:10px">Nenhum compromisso salvo para esta data.</div>`;
   }
-  h+=`<div style="display:flex;gap:5px;margin-top:10px">
-    <input type="text" id="ev-in" placeholder="Novo compromisso/lembrete..." onkeydown="if(event.key==='Enter')addEv()"/>
+  
+  h+=`<div style="display:flex;gap:8px;margin-top:15px">
+    <input type="text" id="ev-in" placeholder="Escreva um novo lembrete..." onkeydown="if(event.key==='Enter')addEv()"/>
     <button class="btn bp" onclick="addEv()">Salvar</button>
-  </div>`;
+  </div></div>`;
+  
   el.innerHTML=h;
 }
 
@@ -740,7 +702,16 @@ function addEv(){
 }
 function remEv(i){const k=`${calAno}-${calMes}-${calDia}`; DB.eventosAgenda[k].splice(i,1); save(); renderAg();}
 
-// INICIALIZAÇÃO
+// --- BACKUP ---
+function exportarBackup(){
+  const blob=new Blob([JSON.stringify({DB:DB, AUTH:AUTH},null,2)],{type:'application/json'}); 
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); 
+  a.download=`backup_dr_caio_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click();
+}
+
+function fecharM(id){document.getElementById(id).classList.remove('show');}
+
+// INICIALIZAR
 const local=localStorage.getItem('pdb'); 
 const lAuth=localStorage.getItem('pau');
 if(local) DB=JSON.parse(local);
