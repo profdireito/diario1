@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Painel do Professor Digital - Caio Filipe Duarte Araújo</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
@@ -154,16 +155,6 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     </aside>
 
     <main id="content">
-      <div id="empty-msg" style="text-align:center;padding:60px 20px;color:var(--muted);display:none;">
-        <div style="font-size:50px;margin-bottom:15px;opacity:0.8">👋</div>
-        <h2 class="syne" style="color:var(--verde);margin-bottom:10px;font-size:24px">Bem-vindo, Professor Caio!</h2>
-        <p style="font-size:14px;max-width:400px;margin:0 auto 25px auto">Este é o seu painel de controle. Selecione uma turma no menu lateral ou utilize os atalhos abaixo para começar.</p>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-           <button class="btn bp" onclick="abrirM('mturma')">➕ Nova Turma</button>
-           <button class="btn bs" onclick="setSec('agenda')">📅 Ver Agenda Privada</button>
-        </div>
-      </div>
-
       <div id="sec-turmas">
         <div id="trhdr" style="display:none">
           <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start">
@@ -180,6 +171,11 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
             <button class="tab" onclick="setMod('notas',this)">📈 Médias Consolidadas</button>
           </div>
           <div id="modcon"></div>
+        </div>
+        <div id="empty-msg" style="text-align:center;padding:60px 20px;color:var(--muted)">
+          <div style="font-size:48px;margin-bottom:15px;opacity:0.5">🏫</div>
+          <h3 class="syne" style="color:var(--text);margin-bottom:5px">Bem-vindo, Professor Caio!</h3>
+          <p>Selecione uma turma no menu lateral para visualizar os dados.</p>
         </div>
       </div>
       
@@ -258,6 +254,7 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TÍTULO DO TRABALHO</label>
     <input type="text" id="ga-n" placeholder="Ex: Seminário de IED"/>
   </div>
+  
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
     <div>
       <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TIPO DE AVALIAÇÃO</label>
@@ -271,18 +268,25 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
       <input type="date" id="ga-d"/>
     </div>
   </div>
+  
   <div id="ga-nota-box" style="display:none;margin-bottom:12px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOTA DO GRUPO</label>
     <input type="number" id="ga-nota" placeholder="Ex: 8.5" step="0.1" min="0" max="10"/>
   </div>
+  
   <div style="margin-bottom:15px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">LINK DO DRIVE (Opcional)</label>
     <input type="url" id="ga-link" placeholder="Link da foto ou pasta do grupo"/>
   </div>
+  
   <div style="margin-bottom:20px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:6px;display:block">SELECIONE OS ALUNOS DO GRUPO</label>
+    
+    <input type="text" id="ga-busca-aluno" placeholder="🔎 Buscar aluno..." style="margin-bottom:8px;padding:8px 12px;font-size:13px;border-radius:8px;" oninput="filtrarAlunosGrupo()"/>
+    
     <div id="ga-alunos" style="border:1px solid var(--border);padding:12px;border-radius:10px;max-height:160px;overflow-y:auto;background:var(--light)"></div>
   </div>
+  
   <button class="btn bp bfw" onclick="salvarGrupo()">Salvar para todos do grupo</button>
 </div></div>
 
@@ -753,6 +757,12 @@ function rAtiv(t){
   return h;
 }
 
+function abrirModalAtiv(){
+  document.getElementById('na-n').value='';
+  document.getElementById('na-d').value=new Date().toISOString().split('T')[0];
+  document.getElementById('mativ').classList.add('show');
+}
+
 function salvarAtiv(){
   const n = document.getElementById('na-n').value.trim();
   const t = document.getElementById('na-t').value;
@@ -763,6 +773,19 @@ function salvarAtiv(){
   DB.atividades[turmaId].push({id:id, nome:n, tipo:t, data:d});
   save(); fecharM('mativ'); 
   atAtivSel = id; atTab = 'lanc'; renderMod();
+}
+
+function filtrarAlunosGrupo() {
+  const busca = document.getElementById('ga-busca-aluno').value.toLowerCase();
+  const labels = document.getElementById('ga-alunos').querySelectorAll('label');
+  labels.forEach(lbl => {
+    const nome = lbl.textContent.toLowerCase();
+    if(nome.includes(busca)){
+      lbl.style.display = 'flex';
+    } else {
+      lbl.style.display = 'none';
+    }
+  });
 }
 
 function abrirModalGrupo(){
@@ -777,9 +800,13 @@ function abrirModalGrupo(){
   document.getElementById('ga-nota-box').style.display='none';
   document.getElementById('ga-t').value='visto';
   
+  const inputBusca = document.getElementById('ga-busca-aluno');
+  if(inputBusca) inputBusca.value = '';
+  
   document.getElementById('ga-alunos').innerHTML = ativos.map(a=>`
-    <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer;padding:5px;border-radius:6px;transition:.15s">
-      <input type="checkbox" class="chk-g" value="${a.id}" style="width:18px;height:18px;margin:0"> ${a.nome}
+    <label class="lbl-ga-aluno" style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer;padding:5px;border-radius:6px;transition:.15s">
+      <input type="checkbox" class="chk-g" value="${a.id}" style="width:18px;height:18px;margin:0"> 
+      <span class="ga-aluno-nome">${a.nome}</span>
     </label>`).join('');
   abrirM('mgrupo');
 }
