@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>Professor Digital - Gestão Profissional</title>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Professor Digital - Dr. Caio Duarte</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -14,6 +13,8 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 h1,h2,h3,.syne{font-family:'Syne',sans-serif}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--verde);border-radius:4px}
 
 /* LOGIN */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0d2416 0%,#1A4A2E 60%,#0d2416 100%);padding:20px}
@@ -22,113 +23,106 @@ h1,h2,h3,.syne{font-family:'Syne',sans-serif}
 
 /* APP LAYOUT */
 #app{display:none;flex-direction:column;min-height:100vh}
-#hdr{background:var(--verde);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+#hdr{background:var(--verde);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px #0004}
+.hdr-l{display:flex;align-items:center;gap:8px}
+.hdr-ico{width:32px;height:32px;background:var(--ouro);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--verde);font-weight:900}
 #cwrap{display:flex;min-height:calc(100vh - 54px)}
-#sb{width:220px;background:#fff;border-right:1px solid var(--border);padding:15px;overflow-y:auto}
-#content{flex:1;padding:15px;overflow-y:auto}
+#sb{width:214px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);overflow-y:auto}
+#content{flex:1;padding:12px;overflow-y:auto;min-width:0}
 
-/* COMPONENTES */
-.card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:15px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.02)}
-.tabs{display:flex;gap:5px;margin-bottom:15px;overflow-x:auto}
-.tab{padding:8px 15px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:600;white-space:nowrap}
+/* CARDS E TABS */
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:13px;margin-bottom:10px}
+.tabs{display:flex;gap:5px;overflow-x:auto;margin-bottom:10px}
+.tab{padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
 .tab.act{background:var(--verde);color:#fff;border-color:var(--verde)}
-.btn{padding:10px 15px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
-.bp{background:var(--verde);color:#fff}
-.bs{background:#f1f5f9;color:#475569}
-.bd{background:var(--danger);color:#fff}
 
-/* FORMULÁRIOS */
-.field{margin-bottom:10px}
-.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
-input, select, textarea{width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--light);outline:none}
+/* BOTÕES E INPUTS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-weight:700;border:none;cursor:pointer;border-radius:9px;font-size:12px;padding:8px 12px}
+.bp{background:var(--verde);color:#fff}.ba{background:var(--ouro);color:var(--verde)}.bs{background:#f1f5f9;color:#475569}.bd{background:var(--danger);color:#fff}
+input, select{border:1.5px solid var(--border);border-radius:9px;padding:10px;background:var(--light);outline:none;width:100%;font-family:inherit}
 
-/* LISTAS */
-.arow{display:flex;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid var(--light)}
-.aleft{display:flex;align-items:center;gap:10px}
+/* ALUNOS */
+.arow{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;border:1px solid #f1f5f9;margin-bottom:5px;background:#fff}
 .av{width:32px;height:32px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 
 /* MODAL */
-.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center}
+.mbg{display:none;position:fixed;inset:0;background:#0007;z-index:300;align-items:center;justify-content:center}
 .mbg.show{display:flex}
-.modal{background:#fff;border-radius:18px;width:95%;max-width:500px;padding:20px;max-height:90vh;overflow-y:auto}
+.modal{background:#fff;border-radius:18px;width:90%;max-width:480px;padding:20px;max-height:85vh;overflow-y:auto}
 
-@media(max-width:768px){
-  #sb{display:none}
-}
+/* AGENDA */
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:10px}
+.cday{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #eee;cursor:pointer}
+.cday.sel{background:var(--verde);color:#fff}
 </style>
 </head>
 <body>
 
 <div id="login-screen">
   <div class="lcard">
-    <h2 style="color:var(--verde);margin-bottom:20px;text-align:center">Painel Professor</h2>
-    <input type="text" id="lu" value="professor" style="margin-bottom:10px" placeholder="Usuário"/>
-    <input type="password" id="lp" value="1234" style="margin-bottom:15px" placeholder="Senha"/>
-    <button class="l-btn" onclick="login()">Entrar →</button>
+    <h2 class="syne" style="color:var(--verde);text-align:center;margin-bottom:15px">Professor Digital</h2>
+    <input type="text" id="lu" value="professor" style="margin-bottom:10px"/>
+    <input type="password" id="lp" placeholder="Senha" style="margin-bottom:15px" onkeydown="if(event.key==='Enter')login()"/>
+    <button class="l-btn" onclick="login()">Entrar no Painel</button>
+    <div id="lerr" style="color:red;font-size:11px;margin-top:10px;text-align:center"></div>
   </div>
 </div>
 
 <div id="app">
   <header id="hdr">
-    <div style="font-weight:800;font-family:'Syne'">DR. CAIO DUARTE</div>
-    <div id="sync-status" style="font-size:10px;color:#86efac">Conectado</div>
+    <div class="hdr-l"><div class="hdr-ico">⚖</div><div class="syne" style="font-weight:800">DR. CAIO DUARTE</div></div>
+    <div style="display:flex;gap:15px;font-size:10px">
+        <div class="hs"><div class="v" id="hst" style="font-weight:800;color:var(--ouro)">0</div>Turmas</div>
+        <div class="hs"><div class="v" id="hsa" style="font-weight:800;color:var(--ouro)">0</div>Alunos</div>
+        <div id="sync-status" style="color:#86efac">Sincronizado</div>
+    </div>
   </header>
 
   <div id="cwrap">
     <aside id="sb">
-      <div id="trlist"></div>
-      <button class="btn bp" style="width:100%;margin-top:15px" onclick="abrirModalTurma()">+ Nova Turma</button>
+      <div style="padding:15px">
+        <button class="tab act" id="b-turmas" onclick="setSec('turmas')">🏫 Turmas</button>
+        <button class="tab" id="b-agenda" onclick="setSec('agenda')">📅 Agenda</button>
+        <button class="tab" id="b-res" onclick="setSec('resultados')">📊 Resultados Quiz</button>
+        <button class="tab" onclick="exportarBackup()">📥 Backup JSON</button>
+        <hr style="margin:10px 0;opacity:0.1"/>
+        <div id="trlist"></div>
+      </div>
     </aside>
 
     <main id="content">
-      <div id="trhdr" style="display:none">
-        <h2 id="thnom" class="syne" style="margin-bottom:5px">Turma</h2>
-        <p id="thdisc" style="color:var(--muted);font-size:12px;margin-bottom:15px">Disciplina</p>
-        
-        <div class="tabs">
-          <button class="tab act" onclick="setMod('chamada',this)">📋 Chamada</button>
-          <button class="tab" onclick="setMod('ativ',this)">👥 Atividades/Grupo</button>
-          <button class="tab" onclick="setMod('notas',this)">📊 Notas Finais</button>
+      <div id="sec-turmas">
+        <div id="trhdr" style="display:none">
+          <div class="card"><h2 id="thnom" class="syne"></h2><p id="thdisc" style="font-size:11px;color:var(--muted)"></p></div>
+          <div class="tabs">
+            <button class="tab act" onclick="setMod('ativ',this)">✅ Atividades Individuais / Grupo</button>
+            <button class="tab" onclick="setMod('notas',this)">📈 Desempenho/Médias</button>
+          </div>
+          <div id="modcon"></div>
         </div>
-        <div class="card" id="modcon"></div>
       </div>
+      <div id="sec-agenda" style="display:none"><div class="card" id="agcon"></div></div>
+      <div id="sec-resultados" style="display:none"><div class="card" id="rescon"></div></div>
     </main>
   </div>
 </div>
 
-<div class="mbg" id="m-grupo">
-  <div class="modal">
-    <h3 class="syne" style="margin-bottom:15px">Lançar Atividade em Grupo</h3>
-    <div class="field">
-      <label>Título da Atividade</label>
-      <input type="text" id="g-titulo" placeholder="Ex: Trabalho IED - Grupo 01"/>
-    </div>
-    <div class="field">
-      <label>Nota do Grupo (0 a 10)</label>
-      <input type="number" id="g-nota" step="0.1" min="0" max="10"/>
-    </div>
-    <div class="field">
-      <label>Link da Pasta (Google Drive)</label>
-      <input type="url" id="g-link" placeholder="Cole o link do Drive aqui"/>
-    </div>
-    <div class="field">
-      <label>Selecione os Membros do Grupo</label>
-      <div id="g-alunos-lista" style="border:1px solid var(--border);border-radius:8px;max-height:200px;overflow-y:auto;padding:10px"></div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:20px">
-      <button class="btn bs" style="flex:1" onclick="fecharM('m-grupo')">Cancelar</button>
-      <button class="btn bp" style="flex:1" onclick="salvarGrupo()">Salvar para todos</button>
-    </div>
+<div class="mbg" id="mgrupo"><div class="modal">
+  <h3 class="syne" style="margin-bottom:15px">Lançar Atividade em Grupo</h3>
+  <input type="text" id="ga-n" placeholder="Nome da Atividade" style="margin-bottom:10px"/>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <input type="number" id="ga-nota" placeholder="Nota (0-10)" step="0.1"/>
+    <input type="date" id="ga-d"/>
   </div>
-</div>
+  <input type="url" id="ga-link" placeholder="Link do Google Drive (Pasta ou Foto)" style="margin-bottom:10px"/>
+  <p style="font-size:10px;font-weight:700;margin-bottom:5px">SELECIONE OS ALUNOS DO GRUPO:</p>
+  <div id="ga-alunos" style="border:1px solid #eee;padding:10px;border-radius:8px;max-height:150px;overflow-y:auto;background:var(--light)"></div>
+  <button class="btn bp bfw" style="width:100%;margin-top:15px" onclick="salvarGrupo()">Lançar para todos do grupo</button>
+  <button class="btn bs bfw" style="width:100%;margin-top:5px" onclick="fecharM('mgrupo')">Cancelar</button>
+</div></div>
 
 <script>
 // --- CONFIG E ESTADO ---
-let DB = {turmas:[]};
-let turmaId = null;
-let modAtual = 'chamada';
-let _db = null;
-
 const FB_CONFIG = {
   apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
   authDomain:"professor-digital-8f792.firebaseapp.com",
@@ -138,193 +132,167 @@ const FB_CONFIG = {
   appId:"1:4515274923:web:25e9bc6d350a411972d7ee"
 };
 
+let DB = {turmas:[], atividades:{}, eventosAgenda:{}};
+let turmaId=null, modAtual='ativ', _db=null;
+
 // --- FIREBASE ---
-async function initFirebase(){
-  const {initializeApp} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-  const {getFirestore} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  const app = initializeApp(FB_CONFIG);
-  _db = getFirestore(app);
-  baixarDaNuvem();
+async function login(){
+  if(document.getElementById('lu').value==='professor'){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    _db=getFirestore(initializeApp(FB_CONFIG));
+    baixarDaNuvem();
+  }
 }
 
-async function salvarNaNuvem(){
-  if(!_db) return;
-  const {doc, setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  await setDoc(doc(_db, 'professor', 'dados'), {
-    DB: JSON.stringify(DB),
-    updatedAt: new Date().toISOString()
-  });
-  // Publica turmas para os alunos
-  const tPublicas = DB.turmas.map(t => ({
-    id: t.id, nome: t.nome, disc: t.disc, 
-    alunos: (t.alunos||[]).map(a => ({id:a.id, nome:a.nome}))
-  }));
-  await setDoc(doc(_db, 'publico', 'turmas'), {turmas: JSON.stringify(tPublicas)});
+async function save(){
+  if(!_db)return;
+  document.getElementById('sync-status').textContent='Sincronizando...';
+  const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  await setDoc(doc(_db,'professor','dados'), {DB:JSON.stringify(DB), updatedAt:new Date().toISOString()});
+  
+  const pub = DB.turmas.map(t=>({id:t.id, nome:t.nome, disc:t.disc, alunos:t.alunos.map(a=>({id:a.id, nome:a.nome}))}));
+  await setDoc(doc(_db,'publico','turmas'), {turmas:JSON.stringify(pub)});
+  document.getElementById('sync-status').textContent='Sincronizado';
 }
 
 async function baixarDaNuvem(){
-  const {doc, getDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  const snap = await getDoc(doc(_db, 'professor', 'dados'));
-  if(snap.exists()){
-    DB = JSON.parse(snap.data().DB);
-    renderSidebar();
+  const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const snap=await getDoc(doc(_db,'professor','dados'));
+  if(snap.exists()){ 
+    DB=JSON.parse(snap.data().DB); 
+    updSidebar(); 
+    document.getElementById('hst').textContent = DB.turmas.length;
+    document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
   }
 }
 
-// --- LOGIN ---
-function login(){
-  if(document.getElementById('lu').value === 'professor'){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app').style.display='flex';
-    initFirebase();
-  }
-}
-
-// --- TURMAS ---
-function renderSidebar(){
-  const list = document.getElementById('trlist');
-  list.innerHTML = '';
-  DB.turmas.forEach(t => {
-    const b = document.createElement('button');
-    b.className = 'tab';
-    b.style = 'width:100%; text-align:left; margin-bottom:5px;';
-    b.textContent = t.nome;
-    b.onclick = () => carregarTurma(t.id);
-    list.appendChild(b);
+// --- INTERFACE ---
+function updSidebar(){
+  const l=document.getElementById('trlist'); l.innerHTML='';
+  DB.turmas.forEach(t=>{
+    const b=document.createElement('button'); b.className='tab'; b.style='width:100%;margin-bottom:3px;text-align:left;font-size:11px';
+    b.textContent=t.nome; b.onclick=()=>{turmaId=t.id; showTurma();}; l.appendChild(b);
   });
 }
 
-function carregarTurma(id){
-  turmaId = id;
-  const t = DB.turmas.find(x => x.id === id);
-  document.getElementById('thnom').textContent = t.nome;
-  document.getElementById('thdisc').textContent = t.disc;
-  document.getElementById('trhdr').style.display = 'block';
+function showTurma(){
+  const t=DB.turmas.find(x=>x.id===turmaId);
+  document.getElementById('thnom').textContent=t.nome;
+  document.getElementById('thdisc').textContent=t.disc;
+  document.getElementById('trhdr').style.display='block';
   renderMod();
 }
 
-// --- NAVEGAÇÃO MODULOS ---
 function setMod(m, btn){
-  modAtual = m;
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('act'));
-  btn.classList.add('act');
-  renderMod();
+  modAtual=m; document.querySelectorAll('#sec-turmas .tab').forEach(b=>b.classList.remove('act'));
+  btn.classList.add('act'); renderMod();
 }
 
 function renderMod(){
-  const el = document.getElementById('modcon');
-  const t = DB.turmas.find(x => x.id === turmaId);
-  
-  if(modAtual === 'chamada'){
-    el.innerHTML = '<h3>Chamada do Dia</h3>' + t.alunos.map(a => `
-      <div class="arow">
-        <span>${a.nome}</span>
-        <button class="btn bs" onclick="alert('Funcionalidade mantida')">P / F</button>
-      </div>
-    `).join('');
-  } 
-  
-  else if(modAtual === 'ativ'){
-    el.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
-        <h3 class="syne">Atividades e Grupos</h3>
-        <button class="btn bp" onclick="abrirM('m-grupo')">+ Lançar em Grupo</button>
-      </div>
-      <div id="lista-atividades-salvas">
-        <p style="font-size:12px;color:var(--muted)">Use o botão acima para dar notas coletivas e salvar links do Drive.</p>
-      </div>
-    `;
-    renderAtivSalvas();
-  }
+  const t=DB.turmas.find(x=>x.id===turmaId);
+  const el=document.getElementById('modcon');
+  if(!t) return;
 
-  else if(modAtual === 'notas'){
-    el.innerHTML = '<h3>Médias Finais</h3>' + t.alunos.map(a => {
-      const m = calcularMediaAluno(a);
-      return `<div class="arow"><span>${a.nome}</span><strong>${m}</strong></div>`;
+  if(modAtual==='ativ'){
+    el.innerHTML = `
+      <div style="display:flex;gap:10px;margin-bottom:15px">
+         <button class="btn ba" style="flex:1" onclick="abrirModalGrupo()">+ Lançar em Grupo</button>
+      </div>
+      <div id="lista-atividades">
+         ${(DB.atividades[turmaId]||[]).map(av=>`
+            <div class="arow">
+               <div><strong>${av.nome}</strong><br><small>${av.data||''}</small></div>
+               <div>${av.linkDrive ? `<a href="${av.linkDrive}" target="_blank" title="Ver no Drive" style="text-decoration:none;font-size:18px">📁</a>`:''}</div>
+            </div>
+         `).join('')}
+      </div>`;
+  } else if(modAtual==='notas'){
+    el.innerHTML = t.alunos.map(a=>{
+      const nts=Object.values(a.atividades||{}).map(v=>v.nota).filter(n=>n!=null);
+      const m=nts.length?(nts.reduce((a,b)=>a+b,0)/nts.length).toFixed(1):'--';
+      return `<div class="arow"><span>${a.nome}</span><strong>Média: ${m}</strong></div>`;
     }).join('');
   }
 }
 
-// --- LÓGICA DE GRUPOS E ATIVIDADES ---
-function abrirM(id){
-  const m = document.getElementById(id);
-  m.classList.add('show');
-  if(id === 'm-grupo'){
-    const t = DB.turmas.find(x => x.id === turmaId);
-    document.getElementById('g-alunos-lista').innerHTML = t.alunos.map(a => `
-      <div style="margin-bottom:5px">
-        <input type="checkbox" class="g-chk" value="${a.id}" id="chk-${a.id}">
-        <label for="chk-${a.id}" style="font-size:13px;margin-left:5px">${a.nome}</label>
-      </div>
-    `).join('');
-  }
+// --- LOGICA DE GRUPO ---
+function abrirModalGrupo(){
+  const t=DB.turmas.find(x=>x.id===turmaId);
+  document.getElementById('ga-alunos').innerHTML=t.alunos.map(a=>`
+    <label style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px;cursor:pointer">
+      <input type="checkbox" class="chk-g" value="${a.id}"> ${a.nome}
+    </label>`).join('');
+  document.getElementById('mgrupo').classList.add('show');
 }
-
-function fecharM(id){ document.getElementById(id).classList.remove('show'); }
 
 function salvarGrupo(){
-  const t = DB.turmas.find(x => x.id === turmaId);
-  const titulo = document.getElementById('g-titulo').value;
-  const nota = parseFloat(document.getElementById('g-nota').value);
-  const link = document.getElementById('g-link').value;
-  const selecionados = Array.from(document.querySelectorAll('.g-chk:checked')).map(c => c.value);
+  const nome=document.getElementById('ga-n').value; 
+  const nota=parseFloat(document.getElementById('ga-nota').value);
+  const link=document.getElementById('ga-link').value; 
+  const sel=Array.from(document.querySelectorAll('.chk-g:checked')).map(c=>c.value);
 
-  if(!titulo || isNaN(nota) || selecionados.length === 0){
-    alert("Preencha título, nota e selecione ao menos um aluno.");
-    return;
-  }
+  if(!nome||isNaN(nota)||!sel.length){alert('Preencha nome, nota e selecione os alunos.'); return;}
 
-  // Aplica a atividade para cada aluno selecionado
-  selecionados.forEach(aid => {
-    const aluno = t.alunos.find(a => a.id === aid);
-    if(!aluno.atividades) aluno.atividades = [];
-    aluno.atividades.push({
-      id: Date.now(),
-      titulo: titulo,
-      nota: nota,
-      linkDrive: link,
-      tipo: 'GRUPO',
-      data: new Date().toLocaleDateString()
-    });
+  const atid='at_'+Date.now(); 
+  if(!DB.atividades[turmaId]) DB.atividades[turmaId]=[];
+  DB.atividades[turmaId].push({id:atid, nome:nome, linkDrive:link, data: document.getElementById('ga-d').value});
+
+  const t=DB.turmas.find(x=>x.id===turmaId);
+  sel.forEach(aid=>{ 
+    const a=t.alunos.find(x=>x.id===aid); 
+    if(!a.atividades) a.atividades={}; 
+    a.atividades[atid]={nota:nota, linkDrive:link}; 
   });
 
-  salvarNaNuvem();
-  fecharM('m-grupo');
-  renderMod();
-  alert(`Sucesso! Nota ${nota} lançada para ${selecionados.length} alunos.`);
+  save(); fecharM('mgrupo'); renderMod(); alert('Lançado com sucesso!');
 }
 
-function calcularMediaAluno(aluno){
-  if(!aluno.atividades || aluno.atividades.length === 0) return "--";
-  const notas = aluno.atividades.map(at => at.nota);
-  const soma = notas.reduce((a, b) => a + b, 0);
-  return (soma / notas.length).toFixed(1);
+// --- RESULTADOS QUIZ ---
+function setSec(s){
+  document.getElementById('sec-turmas').style.display=s==='turmas'?'block':'none';
+  document.getElementById('sec-agenda').style.display=s==='agenda'?'block':'none';
+  document.getElementById('sec-resultados').style.display=s==='resultados'?'block':'none';
+  document.querySelectorAll('#sb .tab').forEach(b=>b.classList.remove('act'));
+  if(s==='resultados') buscarResultados();
 }
 
-function renderAtivSalvas(){
-  // Exibe as últimas atividades de grupo lançadas para consulta rápida
-  const t = DB.turmas.find(x => x.id === turmaId);
-  // (Lógica simples para mostrar o histórico no painel)
-}
-
-function abrirModalTurma(){
-  const nome = prompt("Nome da Turma:");
-  const disc = prompt("Disciplina:");
-  if(nome && disc){
-    DB.turmas.push({
-      id: 'tr-' + Date.now(),
-      nome: nome,
-      disc: disc,
-      alunos: [],
-      atividades: []
+async function buscarResultados(){
+  const el=document.getElementById('rescon'); el.innerHTML='<p>Buscando na nuvem...</p>';
+  try{
+    const {collection,getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDocs(collection(_db,'quiz_resultados'));
+    let h='<h3 class="syne" style="margin-bottom:15px">📊 Resultados do Quiz (Alunos)</h3>';
+    snap.forEach(doc=>{ 
+      const r=doc.data(); 
+      const cor = r.placar >= 70 ? 'var(--verde2)' : 'var(--danger)';
+      h+=`<div class="arow">
+            <div><strong>${r.nome}</strong><br><small>${r.turma} | ${r.disciplina}</small></div>
+            <div style="text-align:right"><strong style="color:${cor};font-size:16px">${r.placar}%</strong><br><small>${r.acertos}/${r.total}</small></div>
+          </div>`; 
     });
-    // Adicionar alunos exemplo ou lógica de importação
-    const t = DB.turmas[DB.turmas.length-1];
-    for(let i=1; i<=5; i++) t.alunos.push({id: 'al-'+Date.now()+i, nome: 'Aluno Exemplo '+i, atividades: []});
-    salvarNaNuvem();
-    renderSidebar();
-  }
+    el.innerHTML=h || '<p>Nenhum resultado de quiz encontrado.</p>';
+  }catch(e){ el.innerHTML='Erro ao carregar dados do quiz.'; }
 }
+
+// --- AGENDA E BACKUP ---
+function renderAg(){
+  const el = document.getElementById('agcon');
+  el.innerHTML = `<h3 class="syne">📅 Minha Agenda Privada</h3><div class="cgrid">${Array.from({length:31},(_,i)=>`<div class="cday">${i+1}</div>`).join('')}</div>`;
+}
+
+function exportarBackup(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'}); 
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); 
+  a.download=`backup_professor_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click();
+}
+
+function fecharM(id){document.getElementById(id).classList.remove('show');}
+function abrirM(id){document.getElementById(id).classList.add('show');}
+
+const local=localStorage.getItem('pdb'); if(local) DB=JSON.parse(local);
 </script>
 </body>
 </html>
