@@ -33,12 +33,14 @@ h1,h2,h3,.syne{font-family:'Syne',sans-serif}
 /* CARDS E TABS */
 .card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:13px;margin-bottom:10px}
 .tabs{display:flex;gap:5px;overflow-x:auto;margin-bottom:10px;padding-bottom:5px}
-.tab{padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tab{padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:.15s}
 .tab.act{background:var(--verde);color:#fff;border-color:var(--verde)}
 
 /* BOTÕES E INPUTS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-weight:700;border:none;cursor:pointer;border-radius:9px;font-size:12px;padding:8px 12px;font-family:inherit}
 .bp{background:var(--verde);color:#fff}.ba{background:var(--ouro);color:var(--verde)}.bs{background:#f1f5f9;color:#475569}.bd{background:var(--danger);color:#fff}
+.hbtn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px;border-radius:8px;transition:.15s;display:flex;align-items:center;justify-content:center}
+.hbtn:hover{background:rgba(255,255,255,0.1)}
 input, select, textarea{border:1.5px solid var(--border);border-radius:9px;padding:10px;background:var(--light);outline:none;width:100%;font-family:inherit;font-size:13px}
 input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:#fff}
 
@@ -50,7 +52,9 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
 /* MODAL */
 .mbg{display:none;position:fixed;inset:0;background:#0007;z-index:300;align-items:center;justify-content:center}
 .mbg.show{display:flex}
-.modal{background:#fff;border-radius:18px;width:90%;max-width:480px;padding:20px;max-height:85vh;overflow-y:auto}
+.modal{background:#fff;border-radius:18px;width:90%;max-width:480px;padding:20px;max-height:85vh;overflow-y:auto;position:relative}
+.mclose{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:3px 7px;border-radius:7px;position:absolute;top:15px;right:15px}
+.mclose:hover{background:#f1f5f9}
 
 /* AGENDA */
 .cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:10px}
@@ -79,10 +83,12 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
         <div class="hdr-s">Caio Filipe Duarte Araújo</div>
       </div>
     </div>
-    <div style="display:flex;gap:15px;font-size:10px;align-items:center">
+    <div style="display:flex;gap:10px;font-size:10px;align-items:center">
         <div class="hs"><div class="v" id="hst" style="font-weight:800;color:var(--ouro)">0</div>Turmas</div>
         <div class="hs"><div class="v" id="hsa" style="font-weight:800;color:var(--ouro)">0</div>Alunos</div>
-        <div id="sync-status" style="color:#86efac;background:rgba(255,255,255,0.1);padding:4px 8px;border-radius:6px">Sincronizado</div>
+        <div id="sync-status" style="color:#86efac;background:rgba(255,255,255,0.1);padding:4px 8px;border-radius:6px;margin:0 5px">Sincronizado</div>
+        <button class="hbtn" onclick="abrirM('mcfg')" title="Configurações">⚙️</button>
+        <button class="hbtn" onclick="logout()" title="Sair do Sistema">⏻</button>
     </div>
   </header>
 
@@ -90,11 +96,10 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     <aside id="sb">
       <div style="padding:15px">
         <button class="tab act" id="b-turmas" onclick="setSec('turmas')" style="width:100%;margin-bottom:5px;text-align:left">🏫 Turmas</button>
-        <button class="tab" id="b-agenda" onclick="setSec('agenda')" style="width:100%;margin-bottom:5px;text-align:left">📅 Agenda</button>
+        <button class="tab" id="b-agenda" onclick="setSec('agenda')" style="width:100%;margin-bottom:5px;text-align:left">📅 Agenda Privada</button>
         <button class="tab" id="b-res" onclick="setSec('resultados')" style="width:100%;margin-bottom:5px;text-align:left">📊 Resultados Quiz</button>
-        <button class="tab" onclick="exportarBackup()" style="width:100%;margin-bottom:5px;text-align:left">📥 Backup JSON</button>
-        <hr style="margin:10px 0;opacity:0.1"/>
-        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:10px">MINHAS TURMAS</div>
+        <hr style="margin:10px 0;border:none;border-top:1px solid var(--border)"/>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase">Minhas Turmas</div>
         <div id="trlist"></div>
       </div>
     </aside>
@@ -105,9 +110,9 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
           <div class="card"><h2 id="thnom" class="syne"></h2><p id="thdisc" style="font-size:11px;color:var(--muted)"></p></div>
           <div class="tabs">
             <button class="tab act" onclick="setMod('diario',this)">📖 Diário de Aula</button>
-            <button class="tab" onclick="setMod('ativ',this)">✅ Atividades/Grupo</button>
+            <button class="tab" onclick="setMod('ativ',this)">✅ Atividades / Grupo</button>
             <button class="tab" onclick="setMod('alunos',this)">👥 Lista de Alunos</button>
-            <button class="tab" onclick="setMod('notas',this)">📈 Médias</button>
+            <button class="tab" onclick="setMod('notas',this)">📈 Médias Consolidadas</button>
           </div>
           <div id="modcon"></div>
         </div>
@@ -125,6 +130,7 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
 </div>
 
 <div class="mbg" id="mativ"><div class="modal">
+  <button class="mclose" onclick="fecharM('mativ')">✕</button>
   <h3 class="syne" style="margin-bottom:15px">Nova Atividade Individual</h3>
   <label style="font-size:10px;font-weight:700;color:var(--muted)">TÍTULO</label>
   <input type="text" id="na-n" placeholder="Ex: Resenha Crítica" style="margin-bottom:10px"/>
@@ -141,13 +147,11 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
       <input type="date" id="na-d"/>
     </div>
   </div>
-  <div style="display:flex;gap:10px;margin-top:15px">
-    <button class="btn bs bfw" onclick="fecharM('mativ')">Cancelar</button>
-    <button class="btn bp bfw" onclick="salvarAtiv()">Criar e Lançar</button>
-  </div>
+  <button class="btn bp bfw" style="margin-top:15px" onclick="salvarAtiv()">Criar e Lançar</button>
 </div></div>
 
 <div class="mbg" id="mgrupo"><div class="modal">
+  <button class="mclose" onclick="fecharM('mgrupo')">✕</button>
   <h3 class="syne" style="margin-bottom:15px">Lançar Atividade em Grupo</h3>
   <label style="font-size:10px;font-weight:700;color:var(--muted)">TÍTULO</label>
   <input type="text" id="ga-n" placeholder="Ex: Seminário" style="margin-bottom:10px"/>
@@ -177,13 +181,45 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
   <label style="font-size:10px;font-weight:700;color:var(--muted)">SELECIONE OS ALUNOS DO GRUPO</label>
   <div id="ga-alunos" style="border:1px solid #eee;padding:10px;border-radius:8px;max-height:130px;overflow-y:auto;background:var(--light);margin-bottom:15px"></div>
   
-  <div style="display:flex;gap:10px">
-    <button class="btn bs bfw" onclick="fecharM('mgrupo')">Cancelar</button>
-    <button class="btn bp bfw" onclick="salvarGrupo()">Lançar para o Grupo</button>
-  </div>
+  <button class="btn bp bfw" onclick="salvarGrupo()">Lançar para o Grupo</button>
 </div></div>
 
-<div class="mbg" id="mperfil"><div class="modal" id="perfilcon"></div></div>
+<div class="mbg" id="mcfg"><div class="modal">
+  <button class="mclose" onclick="fecharM('mcfg')">✕</button>
+  <h3 class="syne" style="margin-bottom:15px">Configurações do Sistema</h3>
+  
+  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">🔐 Alterar Credenciais</div>
+  <input type="text" id="cfu" placeholder="Novo usuário" style="margin-bottom:5px"/>
+  <input type="password" id="cfpc" placeholder="Senha atual" style="margin-bottom:5px"/>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px">
+    <input type="password" id="cfpn" placeholder="Nova senha"/>
+    <input type="password" id="cfpc2" placeholder="Repetir nova senha"/>
+  </div>
+  <button class="btn bp bfw" style="margin-bottom:5px" onclick="salvarCfg()">Atualizar Acesso</button>
+  <div id="cfgmsg" style="font-size:11px;min-height:15px;color:var(--verde2);margin-bottom:15px"></div>
+
+  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">📅 Horários Fixos das Turmas</div>
+  <div style="display:flex;gap:5px;margin-bottom:5px">
+    <select id="cfts" style="flex:2"><option value="">Turma...</option></select>
+    <select id="cfdia" style="flex:1"><option value="1">Seg</option><option value="2">Ter</option><option value="3">Qua</option><option value="4">Qui</option><option value="5">Sex</option><option value="6">Sáb</option></select>
+    <input type="time" id="cfho" style="flex:1"/>
+    <button class="btn bp" onclick="addHorGlobal()">+</button>
+  </div>
+  <div id="cfhlist" style="max-height:120px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:5px;margin-bottom:15px;font-size:12px;background:var(--light)"></div>
+
+  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">💾 Backup e Restauração</div>
+  <div style="display:flex;gap:5px;margin-bottom:5px">
+    <button class="btn bp" style="flex:1" onclick="exportarBackup()">📥 Exportar JSON</button>
+    <button class="btn bs" style="flex:1" onclick="document.getElementById('imp-file').click()">📤 Importar JSON</button>
+  </div>
+  <input type="file" id="imp-file" style="display:none" accept=".json" onchange="importarBackup(this)"/>
+  <div id="backup-msg" style="font-size:11px;min-height:15px;color:var(--verde2);margin-bottom:15px"></div>
+
+  <hr style="margin:15px 0;border:none;border-top:1px solid var(--border)"/>
+  <button class="btn bd bfw" onclick="if(confirm('Tem certeza? Isso apagará todas as turmas, alunos e notas do seu navegador e nuvem.'))resetDB()">🗑 Resetar Sistema Completo</button>
+</div></div>
+
+<div class="mbg" id="mperfil"><div class="modal" id="perfilcon" style="position:relative"></div></div>
 
 <script>
 const FB_CONFIG = {
@@ -195,10 +231,14 @@ const FB_CONFIG = {
   appId:"1:4515274923:web:25e9bc6d350a411972d7ee"
 };
 
+let AUTH = {user:'professor',pass:'1234'};
 let DB = {turmas:[], atividades:{}, eventosAgenda:{}};
 let turmaId=null, modAtual='diario', secAtual='turmas';
 let atTab='lista', atAtivSel=null;
 let calMes=new Date().getMonth(), calAno=new Date().getFullYear(), calDia=new Date().getDate();
+const DIA_N=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
 let _db=null, _syncTimer=null;
 
 function uid(){return Math.random().toString(36).slice(2,10)}
@@ -206,23 +246,34 @@ function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0]
 
 // --- FIREBASE E AUTENTICAÇÃO ---
 async function login(){
-  if(document.getElementById('lu').value==='professor'){
+  const lu = document.getElementById('lu').value;
+  const lp = document.getElementById('lp').value;
+  if(lu === AUTH.user && lp === AUTH.pass){
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
     const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const {getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     _db=getFirestore(initializeApp(FB_CONFIG));
     baixarDaNuvem();
+  } else {
+    document.getElementById('lerr').textContent = 'Usuário ou senha incorretos.';
   }
 }
+
+function logout() { location.reload(); }
 
 async function save(){
   if(!_db)return;
   document.getElementById('sync-status').textContent='Sincronizando...';
+  localStorage.setItem('pdb',JSON.stringify(DB));
+  localStorage.setItem('pau',JSON.stringify(AUTH));
+  
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(async ()=>{
     const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await setDoc(doc(_db,'professor','dados'), {DB:JSON.stringify(DB), updatedAt:new Date().toISOString()});
+    await setDoc(doc(_db,'professor','auth'), {AUTH:JSON.stringify(AUTH)});
+    
     const pub = DB.turmas.map(t=>({id:t.id, nome:t.nome, disc:t.disc, alunos:t.alunos.map(a=>({id:a.id, nome:a.nome}))}));
     await setDoc(doc(_db,'publico','turmas'), {turmas:JSON.stringify(pub)});
     document.getElementById('sync-status').textContent='Sincronizado';
@@ -231,6 +282,9 @@ async function save(){
 
 async function baixarDaNuvem(){
   const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const snapA=await getDoc(doc(_db,'professor','auth'));
+  if(snapA.exists()){ try{const rA=JSON.parse(snapA.data().AUTH); if(rA.user) AUTH=rA;}catch(e){} }
+  
   const snap=await getDoc(doc(_db,'professor','dados'));
   if(snap.exists()){ 
     DB=JSON.parse(snap.data().DB); 
@@ -238,6 +292,83 @@ async function baixarDaNuvem(){
     document.getElementById('hst').textContent = DB.turmas.length;
     document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
   }
+}
+
+// --- CONFIGURAÇÕES ---
+function salvarCfg(){
+  const pc=document.getElementById('cfpc').value;
+  const pn=document.getElementById('cfpn').value;
+  const pc2=document.getElementById('cfpc2').value;
+  const nu=document.getElementById('cfu').value.trim();
+  const m=document.getElementById('cfgmsg');
+  if(pc!==AUTH.pass){m.style.color='var(--danger)';m.textContent='Senha atual incorreta.';return;}
+  if(pn&&pn!==pc2){m.style.color='var(--danger)';m.textContent='Novas senhas não coincidem.';return;}
+  if(nu) AUTH.user=nu; if(pn) AUTH.pass=pn; save();
+  m.style.color='var(--verde2)';m.textContent='Credenciais atualizadas com sucesso!';
+  setTimeout(()=>m.textContent='',3000);
+  ['cfu','cfpc','cfpn','cfpc2'].forEach(id=>document.getElementById(id).value='');
+}
+
+function resetDB(){
+  DB={turmas:[],atividades:{},eventosAgenda:{}}; 
+  save(); turmaId=null; fecharM('mcfg'); updSidebar(); 
+  document.getElementById('trhdr').style.display='none'; 
+  document.getElementById('empty-msg').style.display='block';
+}
+
+function addHorGlobal(){
+  const tid=document.getElementById('cfts').value;
+  const dia=+document.getElementById('cfdia').value;
+  const hora=document.getElementById('cfho').value;
+  if(!tid||!hora){alert('Selecione turma e preencha a hora.');return;}
+  const t=DB.turmas.find(x=>x.id===tid); if(!t.horarios) t.horarios=[];
+  if(!t.horarios.find(h=>h.dia===dia&&h.hora===hora)) t.horarios.push({dia,hora});
+  save(); renderCfgHors();
+}
+
+function renderCfgHors(){
+  const el=document.getElementById('cfhlist'); if(!el)return;
+  const rows=[];
+  DB.turmas.forEach(t=>{(t.horarios||[]).forEach((h,i)=>{rows.push(`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:5px;border-bottom:1px solid var(--border)">
+      <span><b>${t.nome}</b> - ${DIA_N[h.dia]} ${h.hora}</span>
+      <button onclick="remHor('${t.id}',${i})" style="background:none;border:none;cursor:pointer;color:var(--danger)">✕</button>
+    </div>`);
+  });});
+  el.innerHTML=rows.length ? rows.join('') : '<div style="color:var(--muted)">Nenhum horário cadastrado.</div>';
+}
+
+function remHor(tid,idx){ const t=DB.turmas.find(x=>x.id===tid); t.horarios.splice(idx,1); save(); renderCfgHors(); }
+
+function exportarBackup(){
+  const blob=new Blob([JSON.stringify({DB:DB, AUTH:AUTH},null,2)],{type:'application/json'}); 
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); 
+  a.download=`backup_caio_duarte_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click();
+}
+
+function importarBackup(inp){
+  const f=inp.files[0]; if(!f)return;
+  const m=document.getElementById('backup-msg');
+  if(!f.name.endsWith('.json')){m.style.color='var(--danger)';m.textContent='Selecione um arquivo .json válido.';return;}
+  if(!confirm('Importar backup? Os dados atuais serão apagados.')){inp.value='';return;}
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const backup=JSON.parse(e.target.result);
+      if(!backup.DB)throw new Error('invalido');
+      DB=backup.DB; if(backup.AUTH) AUTH=backup.AUTH; save();
+      m.style.color='var(--verde2)';m.textContent='Importado com sucesso!';
+      setTimeout(()=>{
+        fecharM('mcfg');
+        turmaId=DB.turmas.length?DB.turmas[0].id:null;
+        updSidebar(); updStats();
+        if(turmaId) showTurma(); else {document.getElementById('empty-msg').style.display='block';document.getElementById('trhdr').style.display='none';}
+        if(secAtual==='agenda') renderAg();
+        m.textContent='';
+      },1500);
+    }catch(err){m.style.color='var(--danger)';m.textContent='Arquivo corrompido.';}
+  };
+  r.readAsText(f,'UTF-8'); inp.value='';
 }
 
 // --- NAVEGAÇÃO E TURMAS ---
@@ -259,6 +390,13 @@ function updSidebar(){
     const b=document.createElement('button'); b.className='tab'; b.style='width:100%;margin-bottom:4px;text-align:left;border-color:transparent;background:var(--light)';
     b.textContent=t.nome; b.onclick=()=>{turmaId=t.id; showTurma();}; l.appendChild(b);
   });
+  
+  // Atualiza select de configurações
+  const cs=document.getElementById('cfts');
+  if(cs){
+    cs.innerHTML='<option value="">Turma...</option>';
+    DB.turmas.forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.nome;cs.appendChild(o);});
+  }
 }
 
 function showTurma(){
@@ -393,10 +531,16 @@ function rAtiv(t){
   return h;
 }
 
+function abrirM(id){ 
+  document.getElementById(id).classList.add('show'); 
+  if(id==='mcfg'){ updSidebar(); renderCfgHors(); }
+}
+function fecharM(id){ document.getElementById(id).classList.remove('show'); }
+
 function abrirModalAtiv(){
   document.getElementById('na-n').value='';
   document.getElementById('na-d').value=new Date().toISOString().split('T')[0];
-  document.getElementById('mativ').classList.add('show');
+  abrirM('mativ');
 }
 
 function salvarAtiv(){
@@ -408,7 +552,6 @@ function salvarAtiv(){
   if(!DB.atividades[turmaId]) DB.atividades[turmaId]=[];
   DB.atividades[turmaId].push({id:id, nome:n, tipo:t, data:d});
   save(); fecharM('mativ'); 
-  // Redireciona direto pra tela de dar vistos/notas
   atAtivSel = id; atTab = 'lanc'; renderMod();
 }
 
@@ -422,7 +565,7 @@ function abrirModalGrupo(){
     <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;cursor:pointer">
       <input type="checkbox" class="chk-g" value="${a.id}"> ${a.nome}
     </label>`).join('');
-  document.getElementById('mgrupo').classList.add('show');
+  abrirM('mgrupo');
 }
 
 function salvarGrupo(){
@@ -474,7 +617,6 @@ function setAtivNota(aid, atid, val){
 // --- 4. MÉDIAS ---
 function rNotas(t){
   return t.alunos.map(a=>{
-    // Calcula média apenas das atividades tipo "nota"
     const ativsDaTurma = DB.atividades[turmaId]||[];
     let soma=0, qtd=0;
     ativsDaTurma.forEach(av=>{
@@ -500,7 +642,8 @@ function abrirPerfil(aid){
   ativsDaTurma.forEach(av=>{ if(av.tipo==='nota'){ const n=a.atividades&&a.atividades[av.id]?a.atividades[av.id].nota:null; if(n!=null){soma+=n; qtd++;} } });
   const media = qtd>0 ? (soma/qtd).toFixed(1) : '--';
   
-  let h = `<div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px">
+  let h = `<div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px;position:relative">
+    <button class="mclose" onclick="fecharM('mperfil')" style="top:0;right:0">✕</button>
     <div class="av" style="width:60px;height:60px;font-size:20px">${avt(a.nome)}</div>
     <div><h3 style="margin:0">${a.nome}</h3><p style="margin:5px 0 0 0;font-weight:700">Média: <span style="color:${media>=6?'#16a34a':'#dc2626'}">${media}</span></p></div>
   </div>
@@ -520,10 +663,8 @@ function abrirPerfil(aid){
       </div>`;
     }).join('');
   }
-  
-  h += `<button class="btn bs" style="width:100%;margin-top:20px" onclick="fecharM('mperfil')">Fechar Perfil</button>`;
   document.getElementById('perfilcon').innerHTML = h;
-  document.getElementById('mperfil').classList.add('show');
+  abrirM('mperfil');
 }
 
 // --- RESULTADOS QUIZ ---
@@ -541,31 +682,69 @@ async function buscarResultados(){
             <div style="text-align:right"><strong style="color:${cor};font-size:16px">${r.placar}%</strong><br><small>${r.acertos}/${r.total}</small></div>
           </div>`; 
     });
-    el.innerHTML=h;
+    el.innerHTML=h || '<p style="padding:20px;color:var(--muted)">Nenhum resultado recebido.</p>';
   }catch(e){ el.innerHTML='<p style="color:red">Erro de conexão ao buscar resultados.</p>'; }
 }
 
-// --- AGENDA E BACKUP ---
+// --- AGENDA PRIVADA ---
 function renderAg(){
   const el = document.getElementById('agcon');
-  const hoje = new Date().toLocaleDateString('pt-BR');
-  el.innerHTML = `<h3 class="syne">📅 Agenda Pessoal</h3><p style="font-size:12px;color:var(--muted);margin-bottom:15px">Anotações sincronizadas apenas para Caio Araújo.</p>
-  <div style="padding:15px;background:var(--light);border-radius:10px;border:1px solid var(--border)">
-      <strong>Hoje é ${hoje}</strong>
+  const hojeD = new Date();
+  const hoje = hojeD.toLocaleDateString('pt-BR');
+  const diasM = new Date(calAno,calMes+1,0).getDate();
+  const prim = new Date(calAno,calMes,1).getDay();
+  
+  let h=`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+    <h3 class="syne">📅 Agenda Privada</h3>
   </div>
-  <div class="cgrid" style="margin-top:15px">${Array.from({length:31},(_,i)=>`<div class="cday">${i+1}</div>`).join('')}</div>`;
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;background:var(--light);padding:10px;border-radius:10px">
+    <button class="btn bs" onclick="calMes--;if(calMes<0){calMes=11;calAno--}renderAg()">←</button>
+    <div style="font-weight:700;font-size:13px">${MESES[calMes]} ${calAno}</div>
+    <button class="btn bs" onclick="calMes++;if(calMes>11){calMes=0;calAno++}renderAg()">→</button>
+  </div>
+  <div class="cgrid">
+    ${DIA_N.map(d=>`<div style="text-align:center;font-size:10px;font-weight:700;color:var(--muted)">${d}</div>`).join('')}
+    ${Array.from({length:prim}).map(()=>'<div></div>').join('')}
+    ${Array.from({length:diasM},(_,i)=>{
+      const d=i+1; const k=`${calAno}-${calMes}-${d}`;
+      const te=(DB.eventosAgenda[k]||[]).length>0;
+      const eh=(d===hojeD.getDate()&&calMes===hojeD.getMonth()&&calAno===hojeD.getFullYear());
+      const sl=(d===calDia);
+      return`<div class="cday ${sl?'sel':''}" style="${eh&&!sl?'border:2px solid var(--verde);font-weight:900':''}" onclick="calDia=${d};renderAg()">
+        ${d} ${te?'<div style="width:4px;height:4px;border-radius:50%;background:#f59e0b;margin-top:2px"></div>':''}
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  const k=`${calAno}-${calMes}-${calDia}`;
+  const evs=DB.eventosAgenda[k]||[];
+  h+=`<div class="syne" style="font-size:14px;font-weight:800;margin:15px 0 10px">${calDia}/${calMes+1}/${calAno}</div>`;
+  if(evs.length){
+    h+=evs.map((ev,i)=>`<div style="display:flex;justify-content:space-between;padding:10px;background:#fffbeb;border-radius:8px;margin-bottom:5px">
+      <span style="font-size:13px;font-weight:600">📌 ${ev}</span>
+      <button onclick="remEv(${i})" style="background:none;border:none;cursor:pointer;color:#f87171;font-size:16px">✕</button>
+    </div>`).join('');
+  }
+  h+=`<div style="display:flex;gap:5px;margin-top:10px">
+    <input type="text" id="ev-in" placeholder="Novo compromisso/lembrete..." onkeydown="if(event.key==='Enter')addEv()"/>
+    <button class="btn bp" onclick="addEv()">Salvar</button>
+  </div>`;
+  el.innerHTML=h;
 }
 
-function exportarBackup(){
-  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'}); 
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); 
-  a.download=`backup_professor_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click();
+function addEv(){
+  const v=document.getElementById('ev-in').value.trim(); if(!v)return;
+  const k=`${calAno}-${calMes}-${calDia}`; if(!DB.eventosAgenda[k])DB.eventosAgenda[k]=[];
+  DB.eventosAgenda[k].push(v); save(); renderAg();
 }
+function remEv(i){const k=`${calAno}-${calMes}-${calDia}`; DB.eventosAgenda[k].splice(i,1); save(); renderAg();}
 
-function fecharM(id){document.getElementById(id).classList.remove('show');}
-
-// INICIAR
-const local=localStorage.getItem('pdb'); if(local) DB=JSON.parse(local);
+// INICIALIZAÇÃO
+const local=localStorage.getItem('pdb'); 
+const lAuth=localStorage.getItem('pau');
+if(local) DB=JSON.parse(local);
+if(lAuth) AUTH=JSON.parse(lAuth);
 </script>
 </body>
 </html>
