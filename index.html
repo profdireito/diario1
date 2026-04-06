@@ -144,7 +144,10 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
         
         <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)"/>
         
-        <div style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:12px;letter-spacing:0.5px">LISTA DE TURMAS</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-size:10px;font-weight:800;color:var(--muted);letter-spacing:0.5px">LISTA DE TURMAS</div>
+            <button onclick="abrirM('mturma')" style="background:none;border:none;color:var(--verde);font-weight:900;cursor:pointer;font-size:16px" title="Adicionar Turma">➕</button>
+        </div>
         <div id="trlist"></div>
       </div>
     </aside>
@@ -152,9 +155,12 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     <main id="content">
       <div id="sec-turmas">
         <div id="trhdr" style="display:none">
-          <div class="card">
-            <h2 id="thnom" class="syne" style="font-size:22px;color:var(--verde)"></h2>
-            <p id="thdisc" style="font-size:13px;color:var(--muted);margin-top:2px;font-weight:500"></p>
+          <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <h2 id="thnom" class="syne" style="font-size:22px;color:var(--verde)"></h2>
+              <p id="thdisc" style="font-size:13px;color:var(--muted);margin-top:2px;font-weight:500"></p>
+            </div>
+            <button class="btn bd bsm" onclick="excluirTurma()" title="Excluir Turma Inteira">🗑️</button>
           </div>
           <div class="tabs">
             <button class="tab act" onclick="setMod('diario',this)">📖 Diário de Aula</button>
@@ -192,6 +198,24 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
   </div>
 </div>
 
+<div class="mbg" id="mturma"><div class="modal">
+  <button class="mclose" onclick="fecharM('mturma')">✕</button>
+  <h3 class="syne" style="margin-bottom:20px;font-size:18px;color:var(--verde)">Nova Turma</h3>
+  <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOME DA TURMA</label>
+  <input type="text" id="nt-n" placeholder="Ex: MAT T1 - 1 Período" style="margin-bottom:12px"/>
+  <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">DISCIPLINA / CURSO</label>
+  <input type="text" id="nt-d" placeholder="Ex: Técnico em Serviços Jurídicos" style="margin-bottom:20px"/>
+  <button class="btn bp bfw" onclick="salvarTurma()">Criar Turma</button>
+</div></div>
+
+<div class="mbg" id="maluno"><div class="modal">
+  <button class="mclose" onclick="fecharM('maluno')">✕</button>
+  <h3 class="syne" style="margin-bottom:20px;font-size:18px;color:var(--verde)">Matricular Aluno</h3>
+  <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOME COMPLETO</label>
+  <input type="text" id="nal-n" placeholder="Ex: Maria Silva" style="margin-bottom:20px" onkeydown="if(event.key==='Enter')salvarAluno()"/>
+  <button class="btn bp bfw" onclick="salvarAluno()">Adicionar na Turma</button>
+</div></div>
+
 <div class="mbg" id="mativ"><div class="modal">
   <button class="mclose" onclick="fecharM('mativ')">✕</button>
   <h3 class="syne" style="margin-bottom:20px;font-size:18px;color:var(--verde)">Nova Atividade Individual</h3>
@@ -222,7 +246,6 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TÍTULO DO TRABALHO</label>
     <input type="text" id="ga-n" placeholder="Ex: Seminário de IED"/>
   </div>
-  
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
     <div>
       <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TIPO DE AVALIAÇÃO</label>
@@ -236,22 +259,18 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
       <input type="date" id="ga-d"/>
     </div>
   </div>
-  
   <div id="ga-nota-box" style="display:none;margin-bottom:12px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOTA DO GRUPO</label>
     <input type="number" id="ga-nota" placeholder="Ex: 8.5" step="0.1" min="0" max="10"/>
   </div>
-  
   <div style="margin-bottom:15px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">LINK DO DRIVE (Opcional)</label>
     <input type="url" id="ga-link" placeholder="Link da foto ou pasta do grupo"/>
   </div>
-  
   <div style="margin-bottom:20px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:6px;display:block">SELECIONE OS ALUNOS DO GRUPO</label>
     <div id="ga-alunos" style="border:1px solid var(--border);padding:12px;border-radius:10px;max-height:160px;overflow-y:auto;background:var(--light)"></div>
   </div>
-  
   <button class="btn bp bfw" onclick="salvarGrupo()">Salvar para todos do grupo</button>
 </div></div>
 
@@ -282,7 +301,7 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
   <button class="btn bd bfw" onclick="if(confirm('Tem certeza? Isso apagará todas as turmas, alunos e notas do seu navegador e nuvem de forma IRREVERSÍVEL.'))resetDB()">🗑 Resetar Sistema Completo</button>
 </div></div>
 
-<div class="mbg" id="mperfil"><div class="modal" id="perfilcon"></div></div>
+<div class="mbg" id="mperfil"><div class="modal" id="perfilcon" style="padding-bottom:10px"></div></div>
 
 <script>
 const FB_CONFIG = {
@@ -306,6 +325,7 @@ let _db=null, _syncTimer=null;
 
 function uid(){return Math.random().toString(36).slice(2,10)}
 function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
+function getTurma(){return DB.turmas.find(t=>t.id===turmaId)}
 
 // --- FIREBASE E AUTENTICAÇÃO ---
 async function login(){
@@ -322,7 +342,6 @@ async function login(){
 }
 
 function iniciarApp() {
-  // Inicializa a interface imediatamente com dados locais
   updSidebar();
   document.getElementById('hst').textContent = DB.turmas.length;
   document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
@@ -335,8 +354,6 @@ function iniciarApp() {
     document.getElementById('empty-msg').style.display='block';
     document.getElementById('trhdr').style.display='none';
   }
-
-  // Conecta ao Firebase em segundo plano
   conectarFirebase();
 }
 
@@ -371,9 +388,12 @@ async function save(){
         await setDoc(doc(_db,'professor','dados'), {DB:JSON.stringify(DB), updatedAt:new Date().toISOString()});
         await setDoc(doc(_db,'professor','auth'), {AUTH:JSON.stringify(AUTH)});
         
-        const pub = DB.turmas.map(t=>({id:t.id, nome:t.nome, disc:t.disc, alunos:t.alunos.map(a=>({id:a.id, nome:a.nome}))}));
+        const pub = DB.turmas.map(t=>({id:t.id, nome:t.nome, disc:t.disc, alunos:t.alunos.filter(a=>a.ativo!==false).map(a=>({id:a.id, nome:a.nome}))}));
         await setDoc(doc(_db,'publico','turmas'), {turmas:JSON.stringify(pub)});
+        
         document.getElementById('sync-status').textContent='Sincronizado';
+        document.getElementById('sync-status').style.background='rgba(255,255,255,0.1)';
+        document.getElementById('sync-status').style.color='#86efac';
         setTimeout(()=>document.getElementById('sync-status').style.display='none', 3000);
     } catch(e) {
         document.getElementById('sync-status').textContent='Erro Nuvem';
@@ -394,7 +414,7 @@ async function baixarDaNuvem(){
     updSidebar(); 
     document.getElementById('hst').textContent = DB.turmas.length;
     document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
-    renderMod();
+    if(secAtual==='turmas' && turmaId) renderMod();
     document.getElementById('sync-status').style.display='none';
   }
 }
@@ -425,8 +445,6 @@ function exportarBackup(){
   const blob=new Blob([JSON.stringify({DB:DB, AUTH:AUTH},null,2)],{type:'application/json'}); 
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); 
   a.download=`backup_dr_caio_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click();
-  const msg = document.getElementById('backup-msg');
-  if(msg) { msg.style.color='var(--verde2)'; msg.textContent='Backup baixado com sucesso!'; setTimeout(()=>msg.textContent='',4000); }
 }
 
 function importarBackup(inp){
@@ -455,14 +473,8 @@ function importarBackup(inp){
 }
 
 // --- NAVEGAÇÃO E TURMAS ---
-function toggleSb(){
-  document.getElementById('sb').classList.toggle('open');
-  document.getElementById('ov').classList.toggle('show');
-}
-function fecharSb(){
-  document.getElementById('sb').classList.remove('open');
-  document.getElementById('ov').classList.remove('show');
-}
+function toggleSb(){ document.getElementById('sb').classList.toggle('open'); document.getElementById('ov').classList.toggle('show'); }
+function fecharSb(){ document.getElementById('sb').classList.remove('open'); document.getElementById('ov').classList.remove('show'); }
 
 function setSec(s){
   secAtual=s;
@@ -475,7 +487,7 @@ function setSec(s){
   if(s==='agenda'){ document.getElementById('b-agenda').classList.add('act'); renderAg(); }
   if(s==='resultados'){ document.getElementById('b-res').classList.add('act'); buscarResultados(); }
   
-  fecharSb(); // Fecha menu no mobile
+  fecharSb();
 }
 
 function updSidebar(){
@@ -490,13 +502,13 @@ function updSidebar(){
 }
 
 function showTurma(){
-  const t=DB.turmas.find(x=>x.id===turmaId);
+  const t=getTurma();
   document.getElementById('thnom').textContent=t.nome;
   document.getElementById('thdisc').textContent=t.disc;
   document.getElementById('trhdr').style.display='block';
   document.getElementById('empty-msg').style.display='none';
   setSec('turmas');
-  updSidebar(); // Atualiza destaque na barra lateral
+  updSidebar();
   renderMod();
 }
 
@@ -508,7 +520,7 @@ function setMod(m, btn){
 }
 
 function renderMod(){
-  const t=DB.turmas.find(x=>x.id===turmaId);
+  const t=getTurma();
   if(!t) return;
   const el=document.getElementById('modcon');
   
@@ -516,6 +528,33 @@ function renderMod(){
   else if(modAtual==='alunos'){ el.innerHTML = rAlunos(t); }
   else if(modAtual==='ativ'){ el.innerHTML = rAtiv(t); }
   else if(modAtual==='notas'){ el.innerHTML = rNotas(t); }
+}
+
+// --- GESTÃO DE TURMAS ---
+function salvarTurma(){
+  const n = document.getElementById('nt-n').value.trim();
+  const d = document.getElementById('nt-d').value.trim();
+  if(!n) { alert('O nome da turma é obrigatório.'); return; }
+  const id = 'tr_'+Date.now();
+  DB.turmas.push({id:id, nome:n, disc:d, alunos:[], diario:[]});
+  save(); fecharM('mturma'); updSidebar(); document.getElementById('hst').textContent = DB.turmas.length;
+  turmaId = id; showTurma();
+}
+
+function excluirTurma(){
+  const t=getTurma();
+  if(!confirm(`Tem certeza que deseja excluir a turma "${t.nome}" e todos os seus alunos e notas?`)) return;
+  DB.turmas = DB.turmas.filter(x=>x.id!==turmaId);
+  delete DB.atividades[turmaId];
+  save(); updSidebar(); document.getElementById('hst').textContent = DB.turmas.length;
+  
+  if(DB.turmas.length > 0){
+      turmaId = DB.turmas[0].id; showTurma();
+  } else {
+      turmaId = null;
+      document.getElementById('trhdr').style.display='none';
+      document.getElementById('empty-msg').style.display='block';
+  }
 }
 
 // --- 1. DIÁRIO DE AULA ---
@@ -549,27 +588,81 @@ function salvarDiario(){
   const data = document.getElementById('dia-d').value;
   const cont = document.getElementById('dia-c').value.trim();
   if(!data || !cont) return;
-  const t = DB.turmas.find(x=>x.id===turmaId);
+  const t = getTurma();
   if(!t.diario) t.diario = [];
   t.diario.push({id:uid(), data:data, conteudo:cont});
   save(); renderMod();
 }
 
 function delDiario(id){
-  const t = DB.turmas.find(x=>x.id===turmaId);
+  const t = getTurma();
   t.diario = t.diario.filter(d=>d.id !== id);
   save(); renderMod();
 }
 
 // --- 2. LISTA DE ALUNOS ---
 function rAlunos(t){
-  let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px"><h3 class="syne" style="color:var(--verde)">Matriculados (${t.alunos.length})</h3></div>`;
-  h += t.alunos.map((a,i)=>`
-    <div class="arow">
-      <div class="aleft"><div class="av">${avt(a.nome)}</div><div style="font-size:14px;font-weight:600">${i+1}. ${a.nome}</div></div>
+  let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+             <h3 class="syne" style="color:var(--verde)">Matriculados (${t.alunos.length})</h3>
+             <button class="btn bp bsm" onclick="abrirM('maluno')">+ Novo Aluno</button>
+           </div>`;
+           
+  if(!t.alunos.length) return h + '<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum aluno nesta turma.</div>';
+  
+  h += t.alunos.map((a,i)=>{
+    const isAtivo = a.ativo !== false;
+    const opacity = isAtivo ? '' : 'opacity:0.5;';
+    const tag = isAtivo ? '' : '<span style="background:var(--danger);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:8px;font-weight:bold">INATIVO</span>';
+    
+    return `<div class="arow" style="${opacity}">
+      <div class="aleft">
+        <div class="av" style="background:${isAtivo?'var(--verde)':'#94a3b8'}">${avt(a.nome)}</div>
+        <div style="font-size:14px;font-weight:600">${i+1}. ${a.nome} ${tag}</div>
+      </div>
       <button class="btn bs bsm" onclick="abrirPerfil('${a.id}')">Ficha Completa</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   return h;
+}
+
+function salvarAluno(){
+  const n = document.getElementById('nal-n').value.trim();
+  if(!n) { alert('O nome do aluno é obrigatório.'); return; }
+  const t = getTurma();
+  if(!t.alunos) t.alunos = [];
+  t.alunos.push({id: 'al_'+Date.now(), nome: n, atividades: {}, ativo: true});
+  save(); fecharM('maluno'); renderMod(); 
+  document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
+}
+
+// --- GESTÃO INDIVIDUAL DE ALUNO ---
+function togStatusAluno(aid){
+  const t = getTurma(); const a = t.alunos.find(x=>x.id===aid);
+  a.ativo = a.ativo === false ? true : false;
+  save(); fecharM('mperfil'); renderMod();
+}
+
+function excluirAluno(aid){
+  if(!confirm('ATENÇÃO: Deseja apagar permanentemente este aluno e TODAS as suas notas?')) return;
+  const t = getTurma();
+  t.alunos = t.alunos.filter(x=>x.id!==aid);
+  save(); fecharM('mperfil'); renderMod();
+  document.getElementById('hsa').textContent = DB.turmas.reduce((s,tx)=>s+(tx.alunos?tx.alunos.length:0),0);
+}
+
+function transferirAluno(aid, destId){
+  if(!destId || destId === turmaId) return alert('Selecione uma turma de destino válida e diferente da atual.');
+  if(!confirm('Tem certeza que deseja transferir este aluno para a outra turma? Ele levará as notas atuais junto com ele.')) return;
+  
+  const tOrigem = getTurma();
+  const tDest = DB.turmas.find(x=>x.id===destId);
+  const aIdx = tOrigem.alunos.findIndex(x=>x.id===aid);
+  
+  const alunoMovido = tOrigem.alunos.splice(aIdx, 1)[0];
+  if(!tDest.alunos) tDest.alunos = [];
+  tDest.alunos.push(alunoMovido);
+  
+  save(); fecharM('mperfil'); renderMod(); alert('Aluno transferido com sucesso!');
 }
 
 // --- 3. ATIVIDADES E GRUPOS ---
@@ -612,19 +705,23 @@ function rAtiv(t){
     </div>`;
     
   h += t.alunos.map((a,i)=>{
+    const isAtivo = a.ativo !== false;
+    const opac = isAtivo ? '' : 'opacity:0.5;';
+    const tag = isAtivo ? '' : '<span style="background:var(--danger);color:#fff;font-size:8px;padding:2px 4px;border-radius:4px;margin-left:4px">INATIVO</span>';
+    
     const reg = (a.atividades||{})[av.id] || {};
     let controleHTML = '';
     
     if(av.tipo === 'visto'){
       const isChecked = !!reg.visto;
-      controleHTML = `<button class="btn ${isChecked?'bp':'bs'}" style="min-width:100px" onclick="togVisto('${a.id}','${av.id}')">${isChecked?'✓ Concluído':'Pendente'}</button>`;
+      controleHTML = `<button class="btn ${isChecked?'bp':'bs'}" style="min-width:100px" onclick="togVisto('${a.id}','${av.id}')" ${!isAtivo?'disabled':''}>${isChecked?'✓ Concluído':'Pendente'}</button>`;
     } else {
       const notaVal = reg.nota!=null ? reg.nota : '';
-      controleHTML = `<input type="number" min="0" max="10" step="0.1" value="${notaVal}" style="width:80px;text-align:center;font-weight:700" placeholder="--" onchange="setAtivNota('${a.id}','${av.id}',this.value)"/>`;
+      controleHTML = `<input type="number" min="0" max="10" step="0.1" value="${notaVal}" style="width:80px;text-align:center;font-weight:700" placeholder="--" onchange="setAtivNota('${a.id}','${av.id}',this.value)" ${!isAtivo?'disabled':''}/>`;
     }
     
-    return `<div class="arow">
-      <div class="aleft"><div class="av">${avt(a.nome)}</div><div style="font-size:13px;font-weight:500">${i+1}. ${a.nome}</div></div>
+    return `<div class="arow" style="${opac}">
+      <div class="aleft"><div class="av" style="background:${isAtivo?'var(--verde)':'#94a3b8'}">${avt(a.nome)}</div><div style="font-size:13px;font-weight:500">${i+1}. ${a.nome} ${tag}</div></div>
       <div>${controleHTML}</div>
     </div>`;
   }).join('');
@@ -651,7 +748,10 @@ function salvarAtiv(){
 }
 
 function abrirModalGrupo(){
-  const t=DB.turmas.find(x=>x.id===turmaId);
+  const t=getTurma();
+  const ativos = t.alunos.filter(a=>a.ativo!==false);
+  if(!ativos.length){alert('A turma não tem alunos ativos para formar grupos.');return;}
+  
   document.getElementById('ga-n').value='';
   document.getElementById('ga-d').value=new Date().toISOString().split('T')[0];
   document.getElementById('ga-nota').value='';
@@ -659,7 +759,7 @@ function abrirModalGrupo(){
   document.getElementById('ga-nota-box').style.display='none';
   document.getElementById('ga-t').value='visto';
   
-  document.getElementById('ga-alunos').innerHTML=t.alunos.map(a=>`
+  document.getElementById('ga-alunos').innerHTML = ativos.map(a=>`
     <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer;padding:5px;border-radius:6px;transition:.15s">
       <input type="checkbox" class="chk-g" value="${a.id}" style="width:18px;height:18px;margin:0"> ${a.nome}
     </label>`).join('');
@@ -681,7 +781,7 @@ function salvarGrupo(){
   if(!DB.atividades[turmaId]) DB.atividades[turmaId]=[];
   DB.atividades[turmaId].push({id:atid, nome:n, tipo:tipo, data:d, linkDrive:link});
 
-  const t=DB.turmas.find(x=>x.id===turmaId);
+  const t=getTurma();
   sel.forEach(aid=>{ 
     const a=t.alunos.find(x=>x.id===aid); 
     if(!a.atividades) a.atividades={}; 
@@ -695,27 +795,31 @@ function salvarGrupo(){
 function delAtiv(id){
   if(!confirm('Excluir atividade de todos os alunos?')) return;
   DB.atividades[turmaId] = DB.atividades[turmaId].filter(x=>x.id!==id);
-  const t = DB.turmas.find(x=>x.id===turmaId);
+  const t = getTurma();
   t.alunos.forEach(a=>{ if(a.atividades) delete a.atividades[id]; });
   save(); renderMod();
 }
 
 function togVisto(aid, atid){
-  const t=DB.turmas.find(x=>x.id===turmaId); const a=t.alunos.find(x=>x.id===aid);
+  const t=getTurma(); const a=t.alunos.find(x=>x.id===aid);
   if(!a.atividades) a.atividades={}; if(!a.atividades[atid]) a.atividades[atid]={};
   a.atividades[atid].visto = !a.atividades[atid].visto; save(); renderMod();
 }
 
 function setAtivNota(aid, atid, val){
-  const t=DB.turmas.find(x=>x.id===turmaId); const a=t.alunos.find(x=>x.id===aid);
+  const t=getTurma(); const a=t.alunos.find(x=>x.id===aid);
   if(!a.atividades) a.atividades={}; if(!a.atividades[atid]) a.atividades[atid]={};
   const n = val===''?null:parseFloat(val); a.atividades[atid].nota = isNaN(n)?null:n; save();
 }
 
 // --- 4. MÉDIAS ---
 function rNotas(t){
-  return `<div style="margin-bottom:15px;padding:10px;background:var(--light);border-radius:8px;font-size:12px;color:var(--muted)">A média consolidada é calculada automaticamente baseada nas atividades individuais e em grupo que "Valem Nota". Vistos não afetam o cálculo.</div>` + 
+  return `<div style="margin-bottom:15px;padding:10px;background:var(--light);border-radius:8px;font-size:12px;color:var(--muted)">A média consolidada é calculada automaticamente baseada nas atividades que "Valem Nota". Alunos Inativos estão ocultos no cálculo de turma.</div>` + 
   t.alunos.map((a,i)=>{
+    const isAtivo = a.ativo !== false;
+    const opac = isAtivo ? '' : 'opacity:0.5;';
+    const tag = isAtivo ? '' : '<span style="background:var(--danger);color:#fff;font-size:8px;padding:2px 4px;border-radius:4px;margin-left:4px">INATIVO</span>';
+
     const ativsDaTurma = DB.atividades[turmaId]||[];
     let soma=0, qtd=0;
     ativsDaTurma.forEach(av=>{
@@ -726,26 +830,29 @@ function rNotas(t){
     });
     const media = qtd>0 ? (soma/qtd).toFixed(1) : '--';
     const cor = media==='--' ? 'var(--muted)' : (media>=6 ? 'var(--verde2)' : 'var(--danger)');
-    return `<div class="arow" onclick="abrirPerfil('${a.id}')" style="cursor:pointer">
-      <div class="aleft"><div class="av">${avt(a.nome)}</div><span style="font-size:14px;font-weight:600">${i+1}. ${a.nome}</span></div>
+    
+    return `<div class="arow" style="${opac} cursor:pointer" onclick="abrirPerfil('${a.id}')">
+      <div class="aleft"><div class="av" style="background:${isAtivo?'var(--verde)':'#94a3b8'}">${avt(a.nome)}</div><span style="font-size:14px;font-weight:600">${i+1}. ${a.nome} ${tag}</span></div>
       <strong style="color:${cor};font-size:18px;background:${media==='--'?'#f1f5f9':media>=6?'#dcfce7':'#fee2e2'};padding:4px 10px;border-radius:8px">${media}</strong>
     </div>`;
   }).join('');
 }
 
-// --- PERFIL DO ALUNO ---
+// --- PERFIL DO ALUNO COM ZONA DE GESTÃO ---
 function abrirPerfil(aid){
-  const t=DB.turmas.find(x=>x.id===turmaId); const a=t.alunos.find(x=>x.id===aid);
+  const t=getTurma(); const a=t.alunos.find(x=>x.id===aid);
   const ativsDaTurma = DB.atividades[turmaId]||[];
   let soma=0, qtd=0;
   ativsDaTurma.forEach(av=>{ if(av.tipo==='nota'){ const n=a.atividades&&a.atividades[av.id]?a.atividades[av.id].nota:null; if(n!=null){soma+=n; qtd++;} } });
   const media = qtd>0 ? (soma/qtd).toFixed(1) : '--';
+  const isAtivo = a.ativo !== false;
   
   let h = `<div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:20px;position:relative">
     <button class="mclose" onclick="fecharM('mperfil')" style="top:0;right:0">✕</button>
-    <div class="av" style="width:70px;height:70px;font-size:24px">${avt(a.nome)}</div>
+    <div class="av" style="width:70px;height:70px;font-size:24px;background:${isAtivo?'var(--verde)':'#94a3b8'}">${avt(a.nome)}</div>
     <div style="flex:1;padding-right:30px">
-        <h3 style="margin:0;font-size:18px;color:var(--verde)">${a.nome}</h3>
+        <h3 style="margin:0;font-size:18px;color:${isAtivo?'var(--verde)':'var(--muted)'}">${a.nome}</h3>
+        ${!isAtivo ? '<div style="font-size:10px;color:var(--danger);font-weight:800;margin-top:2px">ALUNO INATIVO (TRANCADO)</div>' : ''}
         <div style="display:inline-block;margin-top:8px;padding:6px 12px;border-radius:8px;font-weight:800;font-size:14px;background:${media>=6?'#dcfce7':media==='--'?'#f1f5f9':'#fee2e2'};color:${media>=6?'#16a34a':media==='--'?'var(--muted)':'#dc2626'}">
             MÉDIA FINAL: ${media}
         </div>
@@ -768,6 +875,26 @@ function abrirPerfil(aid){
       </div>`;
     }).join('');
   }
+
+  // ZONA DE GESTÃO DO ALUNO
+  let trOpts = DB.turmas.filter(x=>x.id!==turmaId).map(x=>`<option value="${x.id}">${x.nome}</option>`).join('');
+  let txtAtivo = isAtivo ? 'Desativar / Trancar' : 'Reativar Aluno';
+  
+  h += `
+  <hr style="margin:25px 0 15px 0;border:none;border-top:1px solid var(--border)"/>
+  <h4 style="font-size:11px;font-weight:800;color:var(--danger);margin-bottom:10px;letter-spacing:0.5px">GESTÃO DO ALUNO</h4>
+  <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="btn bs" style="flex:1;min-width:130px" onclick="togStatusAluno('${a.id}')">${txtAtivo}</button>
+      <button class="btn bd" style="flex:1;min-width:130px" onclick="excluirAluno('${a.id}')">Excluir Definitivo</button>
+  </div>
+  ${trOpts ? `
+  <div style="display:flex;gap:8px;align-items:center;background:var(--light);padding:10px;border-radius:8px">
+      <select id="sel-transf-${a.id}" style="flex:1"><option value="">Transferir para turma...</option>${trOpts}</select>
+      <button class="btn bp" onclick="transferirAluno('${a.id}', document.getElementById('sel-transf-${a.id}').value)">OK</button>
+  </div>
+  ` : '<div style="font-size:11px;color:var(--muted)">Crie outra turma para habilitar a transferência de alunos.</div>'}
+  `;
+
   document.getElementById('perfilcon').innerHTML = h;
   document.getElementById('mperfil').classList.add('show');
 }
@@ -937,9 +1064,6 @@ function addEv(){
   DB.eventosAgenda[k].push(v); save(); renderAg();
 }
 function remEv(i){const k=`${calAno}-${calMes}-${calDia}`; DB.eventosAgenda[k].splice(i,1); save(); renderAg();}
-
-function fecharM(id){document.getElementById(id).classList.remove('show');}
-function abrirM(id){document.getElementById(id).classList.add('show');}
 
 // INICIALIZAR
 const local=localStorage.getItem('pdb'); 
