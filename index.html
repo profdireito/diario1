@@ -109,7 +109,6 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     <input type="password" id="lp" value="1234" placeholder="Senha" style="margin-bottom:16px" onkeydown="if(event.key==='Enter')login()"/>
     <button class="l-btn" onclick="login()">Acessar Painel</button>
     <div id="lerr" style="color:red;font-size:12px;margin-top:12px;text-align:center;font-weight:600"></div>
-    <div style="font-size:11px;color:var(--muted);margin-top:15px;text-align:center">Senha padrão: <b>1234</b></div>
   </div>
 </div>
 
@@ -155,7 +154,20 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     </aside>
 
     <main id="content">
-      <div id="sec-turmas">
+      <div id="empty-msg" style="text-align:center;padding:30px 20px;color:var(--muted);display:none;">
+        <div style="font-size:48px;margin-bottom:10px;opacity:0.8">👋</div>
+        <h2 class="syne" style="color:var(--verde);margin-bottom:5px;font-size:26px">Bem-vindo, Dr. Caio!</h2>
+        <p style="font-size:14px;max-width:500px;margin:0 auto 20px auto">Resumo automático das suas atividades e alertas pedagógicos.</p>
+        
+        <div id="dash-resumo"></div>
+
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:25px">
+           <button class="btn bp" onclick="abrirM('mturma')">➕ Nova Turma</button>
+           <button class="btn bs" onclick="setSec('agenda')">📅 Ver Agenda Privada</button>
+        </div>
+      </div>
+
+      <div id="sec-turmas" style="display:none">
         <div id="trhdr" style="display:none">
           <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start">
             <div>
@@ -171,11 +183,6 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
             <button class="tab" onclick="setMod('notas',this)">📈 Médias Consolidadas</button>
           </div>
           <div id="modcon"></div>
-        </div>
-        <div id="empty-msg" style="text-align:center;padding:60px 20px;color:var(--muted)">
-          <div style="font-size:48px;margin-bottom:15px;opacity:0.5">🏫</div>
-          <h3 class="syne" style="color:var(--text);margin-bottom:5px">Bem-vindo, Professor Caio!</h3>
-          <p>Selecione uma turma no menu lateral para visualizar os dados.</p>
         </div>
       </div>
       
@@ -254,7 +261,6 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TÍTULO DO TRABALHO</label>
     <input type="text" id="ga-n" placeholder="Ex: Seminário de IED"/>
   </div>
-  
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
     <div>
       <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">TIPO DE AVALIAÇÃO</label>
@@ -268,32 +274,24 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
       <input type="date" id="ga-d"/>
     </div>
   </div>
-  
   <div id="ga-nota-box" style="display:none;margin-bottom:12px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">NOTA DO GRUPO</label>
     <input type="number" id="ga-nota" placeholder="Ex: 8.5" step="0.1" min="0" max="10"/>
   </div>
-  
   <div style="margin-bottom:15px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;display:block">LINK DO DRIVE (Opcional)</label>
     <input type="url" id="ga-link" placeholder="Link da foto ou pasta do grupo"/>
   </div>
-  
   <div style="margin-bottom:20px">
     <label style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:6px;display:block">SELECIONE OS ALUNOS DO GRUPO</label>
-    
-    <input type="text" id="ga-busca-aluno" placeholder="🔎 Buscar aluno..." style="margin-bottom:8px;padding:8px 12px;font-size:13px;border-radius:8px;" oninput="filtrarAlunosGrupo()"/>
-    
     <div id="ga-alunos" style="border:1px solid var(--border);padding:12px;border-radius:10px;max-height:160px;overflow-y:auto;background:var(--light)"></div>
   </div>
-  
   <button class="btn bp bfw" onclick="salvarGrupo()">Salvar para todos do grupo</button>
 </div></div>
 
 <div class="mbg" id="mcfg"><div class="modal">
   <button class="mclose" onclick="fecharM('mcfg')">✕</button>
   <h3 class="syne" style="margin-bottom:15px">Configurações do Sistema</h3>
-  
   <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">🔐 Alterar Credenciais</div>
   <input type="text" id="cfu" placeholder="Novo usuário" style="margin-bottom:8px"/>
   <input type="password" id="cfpc" placeholder="Senha atual" style="margin-bottom:8px"/>
@@ -312,7 +310,6 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
   </div>
   <input type="file" id="imp-file" style="display:none" accept=".json" onchange="importarBackup(this)"/>
   <div id="backup-msg" style="font-size:11px;min-height:15px;color:var(--verde2);margin-bottom:15px;font-weight:bold"></div>
-
   <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)"/>
   <button class="btn bd bfw" onclick="if(confirm('Tem certeza? Isso apagará todas as turmas, alunos e notas do seu navegador e nuvem de forma IRREVERSÍVEL.'))resetDB()">🗑 Resetar Sistema Completo</button>
 </div></div>
@@ -320,20 +317,6 @@ input:focus, select:focus, textarea:focus{border-color:var(--verde2);background:
 <div class="mbg" id="mperfil"><div class="modal" id="perfilcon" style="padding-bottom:10px"></div></div>
 
 <script>
-// --- FUNÇÕES GERAIS E ABERTURA DE MODAIS ---
-function abrirM(id){ document.getElementById(id).classList.add('show'); }
-function fecharM(id){ document.getElementById(id).classList.remove('show'); }
-function uid(){return Math.random().toString(36).slice(2,10)}
-function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
-
-// FECHAR MODAL AO CLICAR FORA
-document.querySelectorAll('.mbg').forEach(m=>{
-  m.addEventListener('click', function(e){
-    if(e.target === this) this.classList.remove('show');
-  });
-});
-
-// --- FIREBASE E ESTADO ---
 const FB_CONFIG = {
   apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
   authDomain:"professor-digital-8f792.firebaseapp.com",
@@ -353,20 +336,123 @@ const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agos
 
 let _db=null, _syncTimer=null;
 
+function uid(){return Math.random().toString(36).slice(2,10)}
+function avt(n){return(n||'?').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')}
 function getTurma(){ return DB.turmas.find(t=>t.id===turmaId); }
 
-// --- LOGIN E INICIALIZAÇÃO ---
+// --- DASHBOARD (RESUMO INICIAL) ---
+function renderDashboard() {
+    const el = document.getElementById('dash-resumo');
+    if(!el) return;
+
+    let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:15px;margin-top:10px;text-align:left">';
+
+    // 1. Última Aula / Diário
+    let todosDiarios = [];
+    DB.turmas.forEach(t => {
+        (t.diario || []).forEach(d => {
+            todosDiarios.push({ turma: t.nome, sala: t.sala || 'Sem Sala', data: d.data, conteudo: d.conteudo });
+        });
+    });
+    todosDiarios.sort((a,b) => b.data.localeCompare(a.data));
+    const ultimoDiario = todosDiarios.length > 0 ? todosDiarios[0] : null;
+
+    html += `<div style="background:var(--light);padding:18px;border-radius:14px;border:1px solid var(--border)">
+        <h4 style="font-size:11px;color:var(--verde);margin-bottom:10px;text-transform:uppercase;font-weight:800">📖 Onde parei (Última Aula)</h4>`;
+    if(ultimoDiario) {
+        html += `<strong style="font-size:14px;color:var(--text)">${ultimoDiario.turma}</strong> 
+                 <span style="font-size:11px;color:var(--muted)">(${ultimoDiario.sala})</span><br>
+                 <small style="color:var(--muted)">Data: ${ultimoDiario.data.split('-').reverse().join('/')}</small>
+                 <div style="margin-top:10px;font-size:13px;line-height:1.5;color:var(--text)">${ultimoDiario.conteudo}</div>`;
+    } else {
+        html += `<div style="font-size:13px;color:var(--muted)">Nenhum registro de diário encontrado.</div>`;
+    }
+    html += `</div>`;
+
+    // 2. Última Atividade Lançada
+    let todasAtivs = [];
+    DB.turmas.forEach(t => {
+        (DB.atividades[t.id] || []).forEach(a => {
+            todasAtivs.push({ turma: t.nome, nome: a.nome, data: a.data || '', tipo: a.tipo, id: a.id });
+        });
+    });
+    todasAtivs.sort((a,b) => {
+       let tA = parseInt(a.id.split('_')[1] || 0);
+       let tB = parseInt(b.id.split('_')[1] || 0);
+       return tB - tA;
+    });
+    const ultimaAtiv = todasAtivs.length > 0 ? todasAtivs[0] : null;
+
+    html += `<div style="background:var(--light);padding:18px;border-radius:14px;border:1px solid var(--border)">
+        <h4 style="font-size:11px;color:var(--ouro);margin-bottom:10px;text-transform:uppercase;font-weight:800">✅ Último Lançamento</h4>`;
+    if(ultimaAtiv) {
+        html += `<strong style="font-size:14px;color:var(--text)">${ultimaAtiv.nome}</strong><br>
+                 <small style="color:var(--muted)">Turma: ${ultimaAtiv.turma}</small>
+                 <div style="margin-top:10px;font-size:12px;font-weight:700;display:inline-block;padding:4px 8px;border-radius:6px;background:#fff;border:1px solid var(--border)">
+                    Tipo: ${ultimaAtiv.tipo === 'nota' ? 'Vale Nota' : 'Somente Visto'}
+                 </div>`;
+    } else {
+        html += `<div style="font-size:13px;color:var(--muted)">Nenhuma atividade lançada ainda.</div>`;
+    }
+    html += `</div>`;
+
+    // 3. Alunos Precisando de Atenção (Média < 6)
+    let alunosRisco = [];
+    DB.turmas.forEach(t => {
+        (t.alunos || []).forEach(a => {
+            if(a.ativo === false) return;
+            let soma=0, qtd=0;
+            (DB.atividades[t.id] || []).forEach(av => {
+                if(av.tipo === 'nota' && a.atividades && a.atividades[av.id] && a.atividades[av.id].nota != null){
+                    soma += a.atividades[av.id].nota; qtd++;
+                }
+            });
+            if(qtd > 0) {
+                let media = soma / qtd;
+                if(media < 6.0) alunosRisco.push({ nome: a.nome, turma: t.nome, media: media.toFixed(1) });
+            }
+        });
+    });
+    alunosRisco.sort((a,b) => a.media - b.media);
+    alunosRisco = alunosRisco.slice(0, 4);
+
+    html += `<div style="background:#fff1f2;padding:18px;border-radius:14px;border:1px solid #fecdd3;grid-column: 1 / -1;">
+        <h4 style="font-size:11px;color:#e11d48;margin-bottom:10px;text-transform:uppercase;font-weight:800">⚠️ Alunos Sem Desenvolvimento (Atenção)</h4>`;
+    if(alunosRisco.length > 0) {
+        html += `<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px">`;
+        alunosRisco.forEach(al => {
+            html += `<div style="background:#fff;padding:10px;border-radius:8px;border:1px solid #ffe4e6;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <strong style="font-size:13px;color:#881337">${al.nome}</strong><br>
+                    <small style="color:#f43f5e;font-size:11px">${al.turma}</small>
+                </div>
+                <strong style="color:#e11d48;font-size:16px;background:#ffe4e6;padding:4px 8px;border-radius:6px">${al.media}</strong>
+            </div>`;
+        });
+        html += `</div>`;
+    } else {
+        html += `<div style="font-size:13px;color:#f43f5e">Nenhum aluno com média abaixo de 6.0! Ótimo trabalho. 🎉</div>`;
+    }
+    html += `</div>`;
+
+    html += `</div>`;
+    el.innerHTML = html;
+}
+
+// --- FUNÇÕES GERAIS E ABERTURA DE MODAIS ---
+function abrirM(id){ document.getElementById(id).classList.add('show'); }
+function fecharM(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.mbg').forEach(m=>{ m.addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });});
+
+// --- FIREBASE E AUTENTICAÇÃO ---
 async function login(){
   const lu = document.getElementById('lu').value.trim();
   const lp = document.getElementById('lp').value.trim();
-  
   if(lu === AUTH.user && lp === AUTH.pass){
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
     iniciarApp();
-  } else {
-    document.getElementById('lerr').textContent = 'Usuário ou senha incorretos.';
-  }
+  } else { document.getElementById('lerr').textContent = 'Usuário ou senha incorretos.'; }
 }
 
 function iniciarApp() {
@@ -375,11 +461,11 @@ function iniciarApp() {
   document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
   renderAg();
 
-  // Força Tela de Boas-vindas Inicial
   turmaId = null;
   setSec('turmas');
   document.getElementById('trhdr').style.display='none';
   document.getElementById('empty-msg').style.display='block';
+  renderDashboard();
 
   conectarFirebase();
 }
@@ -401,7 +487,6 @@ async function conectarFirebase(){
 
 function logout() { location.reload(); }
 
-// --- SINCRONIZAÇÃO NUVEM E LOCAL ---
 async function save(){
   if(!_db)return;
   document.getElementById('sync-status').style.display='block';
@@ -442,7 +527,12 @@ async function baixarDaNuvem(){
     updSidebar(); 
     document.getElementById('hst').textContent = DB.turmas.length;
     document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
-    if(secAtual==='turmas' && turmaId) renderMod();
+    
+    if(secAtual==='turmas'){
+        if(turmaId) renderMod();
+        else renderDashboard();
+    }
+    
     document.getElementById('sync-status').style.display='none';
   }
 }
@@ -467,6 +557,7 @@ function resetDB(){
   save(); turmaId=null; fecharM('mcfg'); updSidebar(); 
   document.getElementById('trhdr').style.display='none'; 
   document.getElementById('empty-msg').style.display='block';
+  renderDashboard();
 }
 
 function exportarBackup(){
@@ -495,6 +586,7 @@ function importarBackup(inp){
         updSidebar(); document.getElementById('hst').textContent = DB.turmas.length; document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
         document.getElementById('empty-msg').style.display='block';document.getElementById('trhdr').style.display='none';
         setSec('turmas');
+        renderDashboard();
         m.textContent='';
       },1500);
     }catch(err){m.style.color='var(--danger)';m.textContent='Arquivo corrompido ou inválido.';}
@@ -513,7 +605,14 @@ function setSec(s){
   document.getElementById('sec-resultados').style.display=s==='resultados'?'block':'none';
   
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('act'));
-  if(s==='turmas') document.getElementById('b-turmas').classList.add('act');
+  if(s==='turmas') {
+      document.getElementById('b-turmas').classList.add('act');
+      if(!turmaId) { 
+          document.getElementById('empty-msg').style.display='block'; 
+          document.getElementById('trhdr').style.display='none'; 
+          renderDashboard();
+      }
+  }
   if(s==='agenda'){ document.getElementById('b-agenda').classList.add('act'); renderAg(); }
   if(s==='resultados'){ document.getElementById('b-res').classList.add('act'); buscarResultados(); }
   
@@ -579,9 +678,14 @@ function excluirTurma(){
   delete DB.atividades[turmaId];
   save(); updSidebar(); document.getElementById('hst').textContent = DB.turmas.length;
   
-  turmaId = null;
-  document.getElementById('trhdr').style.display='none';
-  document.getElementById('empty-msg').style.display='block';
+  if(DB.turmas.length > 0){
+      turmaId = DB.turmas[0].id; showTurma();
+  } else {
+      turmaId = null;
+      document.getElementById('trhdr').style.display='none';
+      document.getElementById('empty-msg').style.display='block';
+      renderDashboard();
+  }
 }
 
 // --- 1. DIÁRIO DE AULA ---
@@ -775,19 +879,6 @@ function salvarAtiv(){
   atAtivSel = id; atTab = 'lanc'; renderMod();
 }
 
-function filtrarAlunosGrupo() {
-  const busca = document.getElementById('ga-busca-aluno').value.toLowerCase();
-  const labels = document.getElementById('ga-alunos').querySelectorAll('label');
-  labels.forEach(lbl => {
-    const nome = lbl.textContent.toLowerCase();
-    if(nome.includes(busca)){
-      lbl.style.display = 'flex';
-    } else {
-      lbl.style.display = 'none';
-    }
-  });
-}
-
 function abrirModalGrupo(){
   const t=getTurma();
   const ativos = t.alunos.filter(a=>a.ativo!==false);
@@ -800,15 +891,11 @@ function abrirModalGrupo(){
   document.getElementById('ga-nota-box').style.display='none';
   document.getElementById('ga-t').value='visto';
   
-  const inputBusca = document.getElementById('ga-busca-aluno');
-  if(inputBusca) inputBusca.value = '';
-  
   document.getElementById('ga-alunos').innerHTML = ativos.map(a=>`
-    <label class="lbl-ga-aluno" style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer;padding:5px;border-radius:6px;transition:.15s">
-      <input type="checkbox" class="chk-g" value="${a.id}" style="width:18px;height:18px;margin:0"> 
-      <span class="ga-aluno-nome">${a.nome}</span>
+    <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer;padding:5px;border-radius:6px;transition:.15s">
+      <input type="checkbox" class="chk-g" value="${a.id}" style="width:18px;height:18px;margin:0"> ${a.nome}
     </label>`).join('');
-  abrirM('mgrupo');
+  document.getElementById('mgrupo').classList.add('show');
 }
 
 function salvarGrupo(){
