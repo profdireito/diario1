@@ -6,10 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --verde:#1A4A2E; 
-  --verde2:#143d23; 
-  --verde3:#5BAD6F; 
-  --ouro:#D4AF37; 
+  --verde:#1A4A2E; --verde2:#143d23; --verde3:#5BAD6F; --ouro:#D4AF37; 
   --bg:#F0F2F5;--card:#fff;--border:#E2E8F0;--text:#1E293B;--muted:#64748B;--light:#F8FAFC;
   --danger:#EF4444;--radius:12px;
 }
@@ -64,6 +61,7 @@ h1,h2,h3,.syne{font-family:'Syne',sans-serif}
 .bfw{width:100%} .bsm{padding:6px 12px;font-size:11px}
 input, select, textarea{border:1.5px solid var(--border);border-radius:8px;padding:12px;background:var(--light);outline:none;width:100%;font-family:inherit;font-size:13px;transition:.2s}
 input:focus, select:focus, textarea:focus{border-color:var(--verde);background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,0.05)}
+input[type="color"]{padding:2px;cursor:pointer}
 
 .arow{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;border:1px solid #f1f5f9;margin-bottom:6px;background:#fff;transition:.2s}
 .arow:hover{border-color:var(--border)}
@@ -344,7 +342,7 @@ async function baixarDaNuvem(){
 function salvarCfgLogin(){ const pc=document.getElementById('cfpc').value, pn=document.getElementById('cfpn').value, pc2=document.getElementById('cfpc2').value, nu=document.getElementById('cfu').value.trim(), m=document.getElementById('cfgmsg'); if(pc!==AUTH.pass){m.style.color='var(--danger)';m.textContent='Senha atual incorreta.';return;} if(pn&&pn!==pc2){m.style.color='var(--danger)';m.textContent='Novas senhas não coincidem.';return;} if(nu) AUTH.user=nu; if(pn) AUTH.pass=pn; save(); m.style.color='var(--verde)';m.textContent='Atualizado!'; setTimeout(()=>m.textContent='',3000); ['cfu','cfpc','cfpn','cfpc2'].forEach(id=>document.getElementById(id).value='');}
 function resetDB(){ DB={turmas:[],atividades:{},eventosAgenda:{},provas:[],config:DB.config}; save(); turmaId=null; fecharM('mcfg'); updSidebar(); document.getElementById('trhdr').style.display='none'; document.getElementById('empty-msg').style.display='block'; renderDashboard(); }
 function exportarBackup(){ const blob=new Blob([JSON.stringify({DB:DB, AUTH:AUTH},null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`backup_dr_caio_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click(); }
-function importarBackup(inp){ const f=inp.files[0]; if(!f)return; if(!f.name.endsWith('.json')){alert('Selecione um .json');return;} if(!confirm('Importar backup? Todos os dados atuais da nuvem serão substituídos.')){inp.value='';return;} const r=new FileReader(); r.onload=e=>{ try{ const backup=JSON.parse(e.target.result); if(!backup.DB)throw new Error('invalido'); DB=backup.DB; if(backup.AUTH) AUTH=backup.AUTH; save(); fecharM('mcfg'); turmaId=null; updSidebar(); document.getElementById('hst').textContent = DB.turmas.length; document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0); document.getElementById('empty-msg').style.display='block';document.getElementById('trhdr').style.display='none'; setSec('turmas'); }catch(err){alert('Arquivo corrompido.');} }; r.readAsText(f,'UTF-8'); inp.value=''; }
+function importarBackup(inp){ const f=inp.files[0]; if(!f)return; if(!f.name.endsWith('.json')){alert('Selecione um arquivo .json válido');return;} if(!confirm('Importar backup? Todos os dados atuais da nuvem serão substituídos.')){inp.value='';return;} const r=new FileReader(); r.onload=e=>{ try{ const backup=JSON.parse(e.target.result); if(!backup.DB)throw new Error('invalido'); DB=backup.DB; if(backup.AUTH) AUTH=backup.AUTH; save(); fecharM('mcfg'); turmaId=null; updSidebar(); document.getElementById('hst').textContent = DB.turmas.length; document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0); document.getElementById('empty-msg').style.display='block';document.getElementById('trhdr').style.display='none'; setSec('turmas'); }catch(err){alert('Arquivo corrompido.');} }; r.readAsText(f,'UTF-8'); inp.value=''; }
 
 // --- NAVEGAÇÃO ---
 function toggleSb(){ document.getElementById('sb').classList.toggle('open'); document.getElementById('ov').classList.toggle('show'); }
@@ -384,17 +382,17 @@ function renderOnline(){
     const lista = document.getElementById('lista-online'); const provas = DB.provas || [];
     if(provas.length === 0){ lista.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);background:#fff;border-radius:12px;border:1px dashed var(--border)">Nenhuma atividade online criada.</div>'; return; }
     
-    // AQUI ESTÁ O SEU LINK OFICIAL DO ALUNO
-    const alunoURL = 'https://profdireito.github.io/estudodigital';
+    // LINK OFICIAL DO ALUNO (ESTUDO DIGITAL)
+    const alunoURL = 'https://profdireito.github.io/estudodigital'; 
     
-    lista.innerHTML = provas.sort((a,b)=>b.criadoEm.localeCompare(a.criadoEm)).map(tr => `<div class="card" style="padding:15px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h4 style="margin:0;font-size:16px;color:var(--verde)">${tr.titulo}</h4><small style="color:var(--muted)">Criado: ${new Date(tr.criadoEm).toLocaleDateString('pt-BR')} • ${tr.perguntas.length} Questões</small></div><div style="display:flex;gap:5px"><button class="btn bs bsm" onclick="editarAtividadeOnline('${tr.id}')" title="Editar Avaliação">✏️</button><button class="btn bd bsm" onclick="excluirAtividadeOnline('${tr.id}')" title="Excluir Avaliação">🗑️</button></div></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn bs" style="flex:1;background:#e6f4ea;color:var(--verde)" onclick="navigator.clipboard.writeText('${alunoURL}?prova=${tr.id}');alert('Link copiado!')">🔗 Copiar Link para Alunos</button></div></div>`).join('');
+    lista.innerHTML = provas.sort((a,b)=>b.criadoEm.localeCompare(a.criadoEm)).map(tr => `<div class="card" style="padding:15px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h4 style="margin:0;font-size:16px;color:var(--verde)">${tr.titulo}</h4><small style="color:var(--muted)">Criada em: ${new Date(tr.criadoEm).toLocaleDateString('pt-BR')} • ${tr.perguntas.length} Questões</small></div><div style="display:flex;gap:5px"><button class="btn bs bsm" onclick="editarAtividadeOnline('${tr.id}')" title="Editar Avaliação">✏️</button><button class="btn bd bsm" onclick="excluirAtividadeOnline('${tr.id}')" title="Excluir Avaliação">🗑️</button></div></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn bs" style="flex:1;background:#e6f4ea;color:var(--verde)" onclick="navigator.clipboard.writeText('${alunoURL}?prova=${tr.id}');alert('Link copiado para a área de transferência!')">🔗 Copiar Link para Alunos</button></div></div>`).join('');
 }
 function abrirCriadorOnline(){ document.getElementById('o-id').value = ''; document.getElementById('o-titulo').value = ''; document.getElementById('mc-titulo-modal').textContent = 'Nova Atividade Online'; construtorProvas = []; document.getElementById('ai-import-box').style.display='none'; desenharConstrutor(); abrirM('mcriador-online'); }
 function editarAtividadeOnline(id){ if(!DB.provas) DB.provas = []; const p = DB.provas.find(x => x.id === id); if(!p) return; document.getElementById('o-id').value = p.id; document.getElementById('o-titulo').value = p.titulo; document.getElementById('mc-titulo-modal').textContent = 'Editar Atividade Online'; construtorProvas = JSON.parse(JSON.stringify(p.perguntas)); document.getElementById('ai-import-box').style.display='none'; desenharConstrutor(); abrirM('mcriador-online'); }
 function addQ(tipo){ construtorProvas.push({ id: uid(), tipo: tipo, enunciado: '', alternativas: tipo === 'multipla' ? ['Opção A', 'Opção B', 'Opção C', 'Opção D'] : null, gabarito: tipo === 'multipla' ? 0 : null }); desenharConstrutor(); }
 function delQ(idx){ construtorProvas.splice(idx, 1); desenharConstrutor(); }
 function toggleIA(){ const box = document.getElementById('ai-import-box'); box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
-function copiarPromptIA() { const prompt = `Atue como professor e gere questões para uma prova/atividade. Retorne ESTRITAMENTE um array JSON válido, sem formatação markdown (sem \`\`\`json), exatamente neste formato: [{"tipo":"multipla", "enunciado":"Qual a capital do Brasil?", "alternativas":["Rio", "Brasília", "SP", "BH"], "gabarito": 1}, {"tipo":"texto", "enunciado":"Explique a diferença entre lei e moral."}] \nPor favor, gere 5 questões sobre o tema: [DIGITE SEU TEMA AQUI]`; navigator.clipboard.writeText(prompt); alert('Instrução copiada! Cole no Gemini/ChatGPT, insira o tema, copie a resposta JSON dele e cole na caixa abaixo.'); }
+function copiarPromptIA() { const prompt = `Atue como professor e gere questões para uma prova/atividade. Retorne ESTRITAMENTE um array JSON válido, sem formatação markdown (sem \`\`\`json), exatamente neste formato: [{"tipo":"multipla", "enunciado":"Qual a capital do Brasil?", "alternativas":["Rio", "Brasília", "SP", "BH"], "gabarito": 1}, {"tipo":"texto", "enunciado":"Explique a diferença entre lei e moral."}] \nPor favor, gere 5 questões sobre o tema: [DIGITE SEU TEMA AQUI]`; navigator.clipboard.writeText(prompt); alert('Instrução copiada! Cole no Gemini/ChatGPT, insira o tema, copie a resposta JSON e cole na caixa abaixo.'); }
 function processarJSONIA() {
     try {
         let val = document.getElementById('ai-json-input').value.trim(); if(!val) return alert('Cole o código gerado pela IA.');
@@ -511,7 +509,7 @@ async function gerarBoletimAluno(aid){
     } catch(e) { alert('Erro ao buscar dados online para o boletim.'); document.getElementById('sync-status').style.display='none'; }
 }
 
-// --- RESULTADOS DO QUIZ ONLINE ---
+// --- RESULTADOS DO QUIZ ONLINE COM ANEXO DE FOTO ---
 var _resDados=[], _resFiltroTurma='', _resBusca='';
 function toggleResCard(idx) { const body = document.getElementById('rbody-' + idx); body.style.display = (body.style.display === 'none' || body.style.display === '') ? 'block' : 'none'; }
 
@@ -525,7 +523,7 @@ function renderResultadosLista(){
     if(r.temasFragos&&r.temasFragos.length){ h+='<div style="font-size:10px;font-weight:800;color:var(--danger);margin-bottom:8px">⚠️ Temas Críticos</div><div style="margin-bottom:15px">'; r.temasFragos.forEach(t=>{h+=`<span style="background:#fee2e2;color:#991b1b;font-size:11px;padding:4px 8px;border-radius:6px;margin:2px;display:inline-block">${t}</span>`;}); h+='</div>'; }
     if(r.temasOk&&r.temasOk.length){ h+='<div style="font-size:10px;font-weight:800;color:var(--verde);margin-bottom:8px">✅ Domina bem</div><div style="margin-bottom:15px">'; r.temasOk.forEach(t=>{h+=`<span style="background:#dcfce7;color:#166534;font-size:11px;padding:4px 8px;border-radius:6px;margin:2px;display:inline-block">${t}</span>`;}); h+='</div>'; }
     if(r.respostasMC&&r.respostasMC.length){ h+='<div style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:8px">Gabarito Múltipla Escolha</div><div style="max-height:150px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:5px;margin-bottom:15px;background:#fff">'; r.respostasMC.forEach(mc=>{ h+=`<div style="display:flex;gap:8px;padding:6px;border-bottom:1px solid #f8fafc;font-size:12px;color:${mc.correto?'var(--text)':'#991b1b'}"><span style="font-weight:bold;color:${mc.correto?'#16a34a':'#dc2626'}">${mc.correto?'✓':'✕'}</span> ${mc.enunciado}</div>`; }); h+='</div>'; }
-    if(r.dissertativas&&r.dissertativas.length){ h+='<div style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:8px">Dissertativas</div>'; r.dissertativas.forEach((d,di)=>{ h+=`<div style="background:#fff;border:1px solid var(--border);padding:10px;border-radius:8px;margin-bottom:8px"><div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--verde)">Q${di+1}: ${d.enunciado}</div><div style="font-size:13px;color:#374151;white-space:pre-wrap">${d.respostaAluno&&d.respostaAluno.trim()?d.respostaAluno:'<i style="color:var(--muted)">Em branco</i>'}</div></div>`; }); }
+    if(r.dissertativas&&r.dissertativas.length){ h+='<div style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:8px">Respostas Escritas / Anexos</div>'; r.dissertativas.forEach((d,di)=>{ h+=`<div style="background:#fff;border:1px solid var(--border);padding:10px;border-radius:8px;margin-bottom:8px"><div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--verde)">Q${di+1}: ${d.enunciado}</div><div style="font-size:13px;color:#374151;white-space:pre-wrap">${d.respostaAluno&&d.respostaAluno.trim()?d.respostaAluno:'<i style="color:var(--muted)">Sem texto escrito</i>'}</div>${d.anexo ? `<div style="margin-top:10px;"><a href="${d.anexo}" download="anexo_q${di+1}.jpg" style="font-size:11px; color:var(--verde); text-decoration:none; font-weight:bold; background:#e6f4ea; padding:4px 8px; border-radius:4px; border:1px solid var(--verde3)">⬇️ Baixar Foto Anexada</a><br><img src="${d.anexo}" style="max-width:100%; max-height:250px; object-fit:contain; border-radius:8px; margin-top:8px; border:1px solid #eee;"></div>` : ''}</div>`; }); }
     return h + `</div></div>`;
   }).join('');
 }
