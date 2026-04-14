@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title id="page-title">Painel de Gestão LMS</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <style>
 :root{
   --verde:#1A4A2E; --verde2:#143d23; --verde3:#5BAD6F; --ouro:#D4AF37; 
@@ -94,8 +98,8 @@ input[type="color"]{padding:2px;cursor:pointer}
   <div class="lcard">
     <div style="text-align:center;margin-bottom:20px"><div style="font-size:36px;margin-bottom:5px">⚖️</div><h2 class="syne hdr-ttl" style="color:var(--verde)">LMS Professor</h2><p style="font-size:11px;color:var(--muted)">Área Restrita</p></div>
     <input type="text" id="lu" value="professor" style="margin-bottom:12px" placeholder="Usuário"/>
-    <input type="password" id="lp" value="1234" placeholder="Senha" style="margin-bottom:16px" onkeydown="if(event.key==='Enter')window.fazerLogin()"/>
-    <button class="l-btn" onclick="window.fazerLogin()">Acessar Painel</button>
+    <input type="password" id="lp" value="1234" placeholder="Senha" style="margin-bottom:16px" onkeydown="if(event.key==='Enter')window.login()"/>
+    <button class="l-btn" onclick="window.login()">Acessar Painel</button>
     <div id="lerr" style="color:red;font-size:12px;margin-top:12px;text-align:center;font-weight:600"></div>
   </div>
 </div>
@@ -255,17 +259,19 @@ input[type="color"]{padding:2px;cursor:pointer}
 
 <div class="mbg" id="mperfil"><div class="modal" id="perfilcon" style="padding-bottom:10px"></div></div>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, query, where, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
+<script>
 const FB_CONFIG = { apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU", authDomain:"professor-digital-8f792.firebaseapp.com", projectId:"professor-digital-8f792", storageBucket:"professor-digital-8f792.firebasestorage.app", messagingSenderId:"4515274923", appId:"1:4515274923:web:25e9bc6d350a411972d7ee" };
 let _db = null;
 
-try {
-    const app = initializeApp(FB_CONFIG);
-    _db = getFirestore(app);
-} catch(e) { console.error("Erro Firebase", e); }
+window.onload = function() {
+    try {
+        firebase.initializeApp(FB_CONFIG);
+        _db = firebase.firestore();
+    } catch(e) { console.error("Erro Firebase", e); }
+    
+    const local=localStorage.getItem('pdb'); const lAuth=localStorage.getItem('pau'); 
+    if(local) DB=JSON.parse(local); if(lAuth) AUTH=JSON.parse(lAuth);
+};
 
 let AUTH = {user:'professor',pass:'1234'};
 let DB = {turmas:[], atividades:{}, eventosAgenda:{}, provas:[], config:{}};
@@ -276,9 +282,6 @@ const DIA_N=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 let _syncTimer=null; let construtorProvas = [];
 
-window._resDados=[]; window._resFiltroTurma=''; window._resBusca='';
-
-// FUNÇÕES CORE Mapeadas Globalmente para o HTML não dar "undefined"
 window.getTurma = function(){ return DB.turmas.find(t=>t.id===turmaId); };
 window.abrirM = function(id){ document.getElementById(id).classList.add('show'); };
 window.fecharM = function(id){ document.getElementById(id).classList.remove('show'); };
@@ -299,7 +302,7 @@ window.aplicarConfig = function(){
 
 window.salvarPersonalizacao = function(){ DB.config.profNome = document.getElementById('cfg-nome').value.trim(); DB.config.sysNome = document.getElementById('cfg-titulo').value.trim(); DB.config.corP = document.getElementById('cfg-corp').value; DB.config.corS = document.getElementById('cfg-cors').value; window.save(); window.aplicarConfig(); alert('Aparência atualizada!'); };
 
-window.fazerLogin = function(){ 
+window.login = function(){ 
     const lu = document.getElementById('lu').value.trim(), lp = document.getElementById('lp').value.trim(); 
     if(lu === AUTH.user && lp === AUTH.pass){ 
         document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='flex'; window.iniciarApp(); 
@@ -328,15 +331,15 @@ window.save = async function(){
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(async ()=>{
     try {
-        await setDoc(doc(_db,'professor','dados'), {DB:JSON.stringify(DB), updatedAt:new Date().toISOString()});
-        await setDoc(doc(_db,'professor','auth'), {AUTH:JSON.stringify(AUTH)});
+        await _db.collection('professor').doc('dados').set({DB:JSON.stringify(DB), updatedAt:new Date().toISOString()});
+        await _db.collection('professor').doc('auth').set({AUTH:JSON.stringify(AUTH)});
         
         const pubTurmas = DB.turmas.map(t=>({id:t.id, nome:t.nome, disc:t.disc, materiais:t.materiais||[], checklists:t.checklists||[], alunos:t.alunos.filter(a=>a.ativo!==false).map(a=>({id:a.id, nome:a.nome, pin:a.pin||'1234', atividades:a.atividades||{}}))}));
-        await setDoc(doc(_db,'publico','turmas'), {turmas:JSON.stringify(pubTurmas)});
-        await setDoc(doc(_db,'publico','atividades_meta'), {meta:JSON.stringify(DB.atividades||{})}); 
+        await _db.collection('publico').doc('turmas').set({turmas:JSON.stringify(pubTurmas)});
+        await _db.collection('publico').doc('atividades_meta').set({meta:JSON.stringify(DB.atividades||{})}); 
         
-        await setDoc(doc(_db,'publico','provas'), {provas:JSON.stringify(DB.provas || [])});
-        await setDoc(doc(_db,'publico','config'), {config:JSON.stringify(DB.config || {})});
+        await _db.collection('publico').doc('provas').set({provas:JSON.stringify(DB.provas || [])});
+        await _db.collection('publico').doc('config').set({config:JSON.stringify(DB.config || {})});
         
         document.getElementById('sync-status').textContent='Sincronizado'; document.getElementById('sync-status').style.background='rgba(255,255,255,0.1)'; document.getElementById('sync-status').style.color='#86efac'; setTimeout(()=>document.getElementById('sync-status').style.display='none', 3000);
     } catch(e) { document.getElementById('sync-status').textContent='Erro Nuvem'; document.getElementById('sync-status').style.background='rgba(239, 68, 68, 0.1)'; document.getElementById('sync-status').style.color='#ef4444'; }
@@ -345,10 +348,10 @@ window.save = async function(){
 
 window.baixarDaNuvem = async function(){
   try {
-      const snapA = await getDoc(doc(_db,'professor','auth'));
-      if(snapA.exists()){ try{const rA=JSON.parse(snapA.data().AUTH); if(rA.user) AUTH=rA;}catch(e){} }
-      const snap = await getDoc(doc(_db,'professor','dados'));
-      if(snap.exists()){ 
+      const snapA = await _db.collection('professor').doc('auth').get();
+      if(snapA.exists){ try{const rA=JSON.parse(snapA.data().AUTH); if(rA.user) AUTH=rA;}catch(e){} }
+      const snap = await _db.collection('professor').doc('dados').get();
+      if(snap.exists){ 
         DB=JSON.parse(snap.data().DB); if(!DB.provas) DB.provas = []; if(!DB.config) DB.config = {}; window.aplicarConfig(); window.updSidebar(); 
         document.getElementById('hst').textContent = DB.turmas.length; document.getElementById('hsa').textContent = DB.turmas.reduce((s,t)=>s+(t.alunos?t.alunos.length:0),0);
         if(secAtual==='turmas'){ if(turmaId) window.renderMod(); else window.renderDashboard(); } else if (secAtual === 'online') { window.renderOnline(); }
@@ -439,7 +442,6 @@ window.salvarAtividadeOnline = function(){
 };
 window.excluirAtividadeOnline = function(id){ if(!confirm('Excluir atividade? O link dos alunos deixará de funcionar.')) return; DB.provas = DB.provas.filter(t => t.id !== id); window.save(); window.renderOnline(); };
 
-// --- GESTÃO OFFLINE (SALA) COM PIN ---
 window.salvarTurma = function(){ const n = document.getElementById('nt-n').value.trim(), d = document.getElementById('nt-d').value.trim(), p = document.getElementById('nt-p').value.trim(); if(!n) { alert('Nome obrigatório.'); return; } const id = 'tr_'+Date.now(); DB.turmas.push({id:id, nome:n, disc:d, per:p, alunos:[], diario:[], materiais:[], checklists:[]}); window.save(); window.fecharM('mturma'); window.updSidebar(); document.getElementById('hst').textContent = DB.turmas.length; turmaId = id; window.showTurma(); };
 window.excluirTurma = function(){ const t=window.getTurma(); if(!confirm(`Excluir a turma "${t.nome}"?`)) return; DB.turmas = DB.turmas.filter(x=>x.id!==turmaId); delete DB.atividades[turmaId]; window.save(); window.updSidebar(); document.getElementById('hst').textContent = DB.turmas.length; turmaId = null; document.getElementById('trhdr').style.display='none'; document.getElementById('empty-msg').style.display='block'; window.renderDashboard(); };
 window.salvarAluno = function(){ 
@@ -452,7 +454,7 @@ window.togStatusAluno = function(aid){const a=window.getTurma().alunos.find(x=>x
 window.excluirAluno = async function(aid){
     if(confirm('Apagar aluno permanentemente?')){
         window.getTurma().alunos=window.getTurma().alunos.filter(x=>x.id!==aid); 
-        try { await deleteDoc(doc(_db, 'lms_senhas', aid)); } catch(e) {} 
+        try { await _db.collection('lms_senhas').doc(aid).delete(); } catch(e) {} 
         window.save(); window.fecharM('mperfil'); window.renderMod(); document.getElementById('hsa').textContent=DB.turmas.reduce((s,tx)=>s+(tx.alunos?tx.alunos.length:0),0);
     }
 };
@@ -461,7 +463,7 @@ window.transferirAluno = function(aid, destId){ if(!destId || destId===turmaId){
 window.resetarPin = async function(aid) {
     if(confirm('Deseja apagar a senha deste aluno? Ele será obrigado a cadastrar uma nova senha no próximo acesso.')) {
         try {
-            await deleteDoc(doc(_db, 'lms_senhas', aid));
+            await _db.collection('lms_senhas').doc(aid).delete();
             alert('Senha do aluno resetada com sucesso!');
         } catch(e) { alert('Erro ao resetar a senha na nuvem.'); }
     }
@@ -531,7 +533,7 @@ window.gerarBoletimAluno = async function(aid){
     
     document.getElementById('sync-status').style.display='block'; document.getElementById('sync-status').textContent='Buscando dados online...';
     try {
-        const snap = await getDocs(query(collection(_db, 'quiz_resultados'), where('alunoId', '==', aid))); 
+        const snap = await _db.collection('quiz_resultados').where('alunoId', '==', aid).get(); 
         let onlineRes = []; snap.forEach(doc => onlineRes.push(doc.data()));
         if(onlineRes.length > 0){
             html += `<h4 style="color:var(--verde);margin-bottom:10px;border-bottom:2px solid var(--verde);padding-bottom:5px">Avaliações Online (Estudo Digital)</h4>`;
@@ -548,6 +550,7 @@ window.gerarBoletimAluno = async function(aid){
 };
 
 window.toggleResCard = function(idx) { const body = document.getElementById('rbody-' + idx); body.style.display = (body.style.display === 'none' || body.style.display === '') ? 'block' : 'none'; };
+var _resDados=[], _resFiltroTurma='', _resBusca='';
 
 window.renderResultadosLista = function(){
   const el=document.getElementById('res-lista');
@@ -567,7 +570,7 @@ window.renderResultadosLista = function(){
 window.buscarResultados = async function(){
   const el=document.getElementById('res-lista'); if(el) el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Buscando na nuvem...</div>';
   try{
-    const snap = await getDocs(collection(_db,'quiz_resultados'));
+    const snap = await _db.collection('quiz_resultados').get();
     window._resDados=[]; let turmas=new Set(), provas=new Set();
     snap.forEach(doc=>{ const d=doc.data(); d._docId=doc.id; window._resDados.push(d); if(d.turma)turmas.add(d.turma); if(d.tituloProva)provas.add(d.provaId+'|'+d.tituloProva); });
     window._resDados.sort((a,b)=>(b.dataHora||'').localeCompare(a.dataHora||''));
@@ -581,7 +584,7 @@ window.buscarResultados = async function(){
 
 window.excluirResultadoQuiz = async function(docId){
     if(!confirm('Deseja excluir este resultado permanentemente da nuvem?')) return;
-    try { await deleteDoc(doc(_db, 'quiz_resultados', docId)); window.buscarResultados(); } catch(e) { alert('Erro ao excluir.'); }
+    try { await _db.collection('quiz_resultados').doc(docId).delete(); window.buscarResultados(); } catch(e) { alert('Erro ao excluir.'); }
 };
 
 window.gerarPDFResultados = function() {
