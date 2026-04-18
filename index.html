@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
@@ -7,27 +7,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    /* Cores Premium */
     --verde: #1A4A2E; --verde-hover: #143d23;
     --ouro: #D4AF37; --bg: #F4F7F6;
     --card: #FFFFFF; --text: #1E293B; --muted: #64748B;
     --border: #E2E8F0; --danger: #EF4444;
-    
-    /* Variáveis Dinâmicas de UI (Controladas pelo Utilizador) */
-    --ui-font-size: 14px;
-    --ui-col-width: 140px;
-    --ui-padding: 10px 14px;
+    --ui-font-size: 14px; --ui-col-width: 140px; --ui-padding: 10px 14px;
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
   body { background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; font-size: var(--ui-font-size); transition: font-size 0.2s;}
   h1, h2, h3, .syne { font-family: 'Syne', sans-serif; }
 
+  /* TELA DE LOGIN */
+  #login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #0d2416 0%, #1A4A2E 60%, #0d2416 100%); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+  .lcard { background: #fff; border-radius: 24px; padding: 36px 28px; width: 90%; max-width: 360px; box-shadow: 0 24px 64px rgba(0,0,0,0.4); text-align: center; }
+  .l-btn { width: 100%; background: var(--verde); color: #fff; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: .15s; margin-top: 15px; }
+  .l-btn:hover { background: var(--verde-hover); }
+  input.log-inp { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid var(--border); background: var(--bg); font-family: inherit; font-size: 15px; outline: none; margin-bottom: 12px; }
+  input.log-inp:focus { border-color: var(--verde); background: #fff; }
+
+  /* APP */
+  #app { display: none; flex-direction: column; height: 100%; }
+
   /* HEADER */
   header { background: var(--verde); color: #fff; padding: 15px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 10; flex-wrap: wrap; gap: 15px; }
   .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;}
-  .header-logo { background: var(--ouro); color: var(--verde); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; }
-  
+  .header-logo { background: var(--ouro); color: var(--verde); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0; }
   select.turma-select { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; font-weight: 700; font-family: inherit; font-size: 14px; outline: none; cursor: pointer; max-width: 250px;}
   select.turma-select option { background: var(--card); color: var(--text); }
   
@@ -43,13 +48,13 @@
   .btn-icon:hover { background: rgba(255,255,255,0.1); }
 
   /* ÁREA DA PLANILHA */
-  #spreadsheet-container { flex: 1; overflow: auto; padding: 20px; }
+  #spreadsheet-container { flex: 1; overflow: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
   .table-wrapper { background: var(--card); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--border); width: max-content; min-width: 100%; }
   table { border-collapse: collapse; width: 100%; text-align: left; }
   
   th, td { border: 1px solid var(--border); padding: var(--ui-padding); white-space: nowrap; transition: padding 0.2s; }
   th { background: #f8fafc; font-size: 0.85em; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 var(--border); min-width: var(--ui-col-width); transition: min-width 0.2s;}
-  th:first-child { left: 0; z-index: 3; background: #f8fafc; box-shadow: 1px 1px 0 var(--border); min-width: 260px; }
+  th:first-child { left: 0; z-index: 3; background: #f8fafc; box-shadow: 1px 1px 0 var(--border); min-width: 260px; max-width: 260px;}
   td:first-child { left: 0; position: sticky; background: #fff; z-index: 1; font-weight: 600; box-shadow: 1px 0 0 var(--border); }
   
   tr:hover td { background-color: #fcfdfd; }
@@ -59,63 +64,115 @@
 
   /* NOME DO ALUNO CLICÁVEL */
   .aluno-link { color: var(--verde); cursor: pointer; display: flex; align-items: center; justify-content: space-between; width: 100%; }
-  .aluno-link:hover { color: var(--ouro); text-decoration: underline; }
-  .badge-inativo { font-size: 9px; background: var(--danger); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800; margin-left: 8px;}
+  .aluno-nome-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .aluno-link:hover .aluno-nome-txt { color: var(--ouro); text-decoration: underline; }
+  .badge-inativo { font-size: 9px; background: var(--danger); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800; margin-left: 8px; flex-shrink: 0;}
 
-  /* INPUTS DA PLANILHA */
+  /* INPUTS E CHECKBOX */
   .cell-input { width: 100%; border: none; background: transparent; font-family: inherit; font-size: inherit; outline: none; color: var(--text); }
   .cell-input.nota { text-align: center; font-weight: 700; width: 100%; }
   .cell-input:focus { background: #e2e8f0; border-radius: 4px; padding: 2px 4px; }
-  
-  /* CHECKBOX CUSTOMIZADO */
-  .check-wrapper { display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .check-wrapper { display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 5px; margin: -5px; }
   .check-wrapper input { display: none; }
-  .custom-box { width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: 0.15s; background: #fff; }
-  .check-wrapper input:checked + .custom-box { background: var(--verde); border-color: var(--verde); }
-  .check-wrapper input:checked + .custom-box::after { content: '✓'; color: #fff; font-weight: 900; font-size: 14px; }
-
+  .custom-box { width: 26px; height: 26px; border: 2px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: 0.15s; background: #fff; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .check-wrapper input:checked + .custom-box { background: var(--verde); border-color: var(--verde); box-shadow: 0 2px 8px rgba(26,74,46,0.3); transform: scale(1.05); }
+  .check-wrapper input:checked + .custom-box::after { content: '✓'; color: #fff; font-weight: 900; font-size: 16px; }
   .delete-col { background: none; border: none; color: #ef4444; padding: 2px; font-size: 14px; margin-left: 8px; cursor: pointer; opacity: 0.5; }
   .delete-col:hover { opacity: 1; }
 
-  /* MODAIS */
+  /* MODAIS E TOAST */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(2px); }
   .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
   .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 450px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto;}
   .modal-close { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
   @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-  /* SLIDERS E CONFIGS */
   .slider-group { margin-bottom: 20px; }
   .slider-group label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--muted); margin-bottom: 8px; text-transform: uppercase;}
   input[type=range] { width: 100%; accent-color: var(--verde); }
-
-  /* AVISO DE SALVAMENTO */
-  #toast { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 700; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 100; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+  #toast { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 700; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 3000; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
   #toast.show { opacity: 1; transform: translateY(-10px); }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    header { flex-direction: column; align-items: stretch; padding: 12px; gap: 10px; }
+    .header-left { justify-content: space-between; width: 100%; }
+    .header-left .syne { display: none; }
+    .turma-select { flex: 1; margin-left: 10px; font-size: 13px; max-width: 100%; }
+    .controls { overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    .controls button { flex-shrink: 0; padding: 8px 12px; font-size: 12px; }
+    #spreadsheet-container { padding: 0; }
+    .table-wrapper { border-radius: 0; border-left: none; border-right: none; }
+    th, td { padding: 10px 8px; }
+    th:first-child, td:first-child { min-width: 140px !important; max-width: 140px !important; }
+    .aluno-link { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .aluno-nome-txt { font-size: 13px; max-width: 100%; }
+    .aluno-link .ficha-txt { display: none; }
+    .badge-inativo { margin-left: 0; margin-top: 2px; }
+    .modal-box { padding: 15px; width: 95%; max-height: 95vh; }
+  }
+
+  /* ESTILOS PARA IMPRESSÃO / PDF */
+  @media print {
+    body { background: #fff; color: #000; font-size: 10pt; height: auto; overflow: visible; display: block; }
+    header, .controls, .modal-overlay, #toast, .delete-col, .ficha-txt { display: none !important; }
+    #login-screen { display: none !important; }
+    #app { display: block !important; }
+    #spreadsheet-container { padding: 0; overflow: visible; }
+    .table-wrapper { border: none; box-shadow: none; border-radius: 0; }
+    table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+    tr { page-break-inside: avoid; page-break-after: auto; }
+    th, td { border: 1px solid #000 !important; padding: 6px !important; color: #000 !important; background: transparent !important; box-shadow: none !important; position: static !important; }
+    th { background: #f0f0f0 !important; font-weight: bold; }
+    .cell-input { color: #000; font-weight: normal; }
+    .check-wrapper input:checked + .custom-box { background: #000 !important; border-color: #000 !important; }
+    /* Cabeçalho de Impressão Injetado via JS */
+    #print-header { display: block !important; margin-bottom: 20px; text-align: center; }
+    #print-header h2 { margin-bottom: 5px; font-size: 18pt; }
+    #print-header p { font-size: 12pt; color: #333; }
+  }
+  #print-header { display: none; }
 </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-left">
-      <div class="header-logo">⚖</div>
-      <div class="syne" style="font-size:18px">LMS Dr. Caio</div>
-      <select id="seletor-turma" class="turma-select" onchange="mudarTurma()"></select>
+  <div id="login-screen">
+    <div class="lcard">
+      <div style="font-size:36px;margin-bottom:5px">⚖️</div>
+      <h2 class="syne" style="color:var(--verde);margin-bottom:20px">Diário de Classe</h2>
+      <input type="text" id="lu" class="log-inp" placeholder="Usuário"/>
+      <input type="password" id="lp" class="log-inp" placeholder="Senha" onkeydown="if(event.key==='Enter')login()"/>
+      <button class="l-btn" onclick="login()">Acessar Sistema</button>
+      <div id="lerr" style="color:var(--danger);font-size:13px;margin-top:12px;font-weight:600"></div>
     </div>
-    <div class="controls">
-      <button class="btn-secondary" onclick="abrirDiario()">📖 Diário de Aula</button>
-      <button class="btn-secondary" onclick="adicionarAluno()">+ Novo Aluno</button>
-      <button class="btn-primary" onclick="adicionarAtividade()">+ Coluna (Atividade)</button>
-      <button class="btn-icon" onclick="abrirModal('modal-config')" title="Personalizar Visual">⚙️</button>
-    </div>
-  </header>
+  </div>
 
-  <div id="spreadsheet-container">
-    <div class="table-wrapper">
-      <table id="planilha">
-        <thead id="planilha-head"></thead>
-        <tbody id="planilha-body"></tbody>
-      </table>
+  <div id="app">
+    <div id="print-header">
+      <h2>Dr. Caio - Diário de Classe Oficial</h2>
+      <p id="print-turma-nome"></p>
+    </div>
+
+    <header>
+      <div class="header-left">
+        <div class="header-logo">⚖</div>
+        <div class="syne" style="font-size:18px">LMS Dr. Caio</div>
+        <select id="seletor-turma" class="turma-select" onchange="mudarTurma()"></select>
+      </div>
+      <div class="controls">
+        <button class="btn-secondary" onclick="abrirDiario()" title="Registo de Aulas">📖 Diário</button>
+        <button class="btn-primary" onclick="adicionarAtividade()">+ Atividade</button>
+        <button class="btn-secondary" onclick="imprimirPDF()" style="background:#10b981; color:#fff" title="Exportar para PDF">📄 PDF</button>
+        <button class="btn-icon" onclick="abrirModal('modal-config')" title="Configurações e Backup">⚙️</button>
+      </div>
+    </header>
+
+    <div id="spreadsheet-container">
+      <div class="table-wrapper">
+        <table id="planilha">
+          <thead id="planilha-head"></thead>
+          <tbody id="planilha-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -128,16 +185,14 @@
         <p style="color:var(--muted); font-size:13px; margin-top:4px;" id="perf-mat">Matrícula: ---</p>
         <div id="perf-badge-area" style="margin-top:8px;"></div>
       </div>
-
       <div style="background:var(--bg); border-radius:10px; padding:15px; margin-bottom:20px; border:1px solid var(--border)">
         <h4 style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-bottom:10px;">Resumo de Atividades</h4>
         <div id="perf-atividades"></div>
       </div>
-
       <h4 style="font-size:11px; font-weight:800; color:var(--danger); text-transform:uppercase; margin-bottom:10px;">Gestão do Aluno</h4>
-      <div style="display:flex; gap:10px;">
-        <button class="btn-secondary" style="flex:1; background:#e2e8f0; color:var(--text)" id="btn-tog-status">Desativar Aluno</button>
-        <button class="btn-danger" style="flex:1;" id="btn-del-aluno">Excluir Aluno</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-secondary" style="flex:1; background:#e2e8f0; color:var(--text); min-width:120px;" id="btn-tog-status">Desativar Aluno</button>
+        <button class="btn-danger" style="flex:1; min-width:120px;" id="btn-del-aluno">Excluir Aluno</button>
       </div>
     </div>
   </div>
@@ -146,7 +201,6 @@
     <div class="modal-box" style="max-width: 600px;">
       <button class="modal-close" onclick="fecharModal('modal-diario')">✕</button>
       <h2 class="syne" style="color:var(--verde); margin-bottom:20px;">📖 Diário de Aula</h2>
-      
       <div style="background:var(--light); padding:15px; border-radius:10px; border:1px solid var(--border); margin-bottom:20px;">
         <label style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-bottom:8px; display:block;">Registar Novo Conteúdo</label>
         <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
@@ -155,27 +209,23 @@
         </div>
         <button class="btn-primary" style="width:100%; justify-content:center;" onclick="salvarDiario()">Guardar Registo</button>
       </div>
-
-      <div id="lista-diario" style="max-height:300px; overflow-y:auto; padding-right:5px;">
-        </div>
+      <div id="lista-diario" style="max-height:300px; overflow-y:auto; padding-right:5px;"></div>
     </div>
   </div>
 
   <div class="modal-overlay" id="modal-config">
     <div class="modal-box">
       <button class="modal-close" onclick="fecharModal('modal-config')">✕</button>
-      <h2 class="syne" style="color:var(--verde); margin-bottom:20px;">Configurações de Exibição</h2>
+      <h2 class="syne" style="color:var(--verde); margin-bottom:20px;">Configurações</h2>
       
       <div class="slider-group">
         <label><span>Tamanho da Letra</span> <span id="lbl-fs">14px</span></label>
         <input type="range" min="11" max="20" value="14" id="ui-fs" oninput="previewUI()">
       </div>
-      
       <div class="slider-group">
-        <label><span>Largura das Colunas</span> <span id="lbl-cw">140px</span></label>
+        <label><span>Largura das Colunas (Tlmvls não aplica)</span> <span id="lbl-cw">140px</span></label>
         <input type="range" min="80" max="250" value="140" id="ui-cw" oninput="previewUI()">
       </div>
-
       <div class="slider-group">
         <label>Espaçamento das Células (Padding)</label>
         <select id="ui-pad" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); outline:none;" onchange="previewUI()">
@@ -186,14 +236,33 @@
       </div>
 
       <hr style="margin:20px 0; border:none; border-top:1px solid var(--border)">
-      <button class="btn-primary" style="width:100%; justify-content:center;" onclick="salvarConfigUI()">Aplicar e Guardar Preferências</button>
+      <button class="btn-primary" style="width:100%; justify-content:center;" onclick="salvarConfigUI()">Aplicar e Guardar Visual</button>
+      
+      <div style="margin-top:20px; display:flex; gap:10px;">
+        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border); background:#fff;" onclick="adicionarAluno()">+ Novo Aluno</button>
+        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border); background:#fff;" onclick="exportarBackup()">📥 Exportar JSON</button>
+      </div>
     </div>
   </div>
 
   <div id="toast">✅ Guardado!</div>
 
 <script>
-// --- 1. BANCO DE DADOS (PRESERVADO) ---
+// --- 0. LÓGICA DE LOGIN ---
+function login() {
+  const u = document.getElementById('lu').value.trim();
+  const p = document.getElementById('lp').value.trim();
+  // Credenciais do backup original (professor / 5864)
+  if (u === 'professor' && p === '5864') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    iniciarApp();
+  } else {
+    document.getElementById('lerr').textContent = 'Usuário ou Senha incorretos.';
+  }
+}
+
+// --- 1. BANCO DE DADOS INTEGRAL (INICIAL/BACKUP) ---
 const JSON_MIGRACAO = {
   "turmas": [
     { "id": "l7jqflfw", "nome": "MAT T1 - 1 Periodo Manha", "alunos": [
@@ -307,7 +376,7 @@ const JSON_MIGRACAO = {
   }
 };
 
-// --- 2. ESTADO DA APLICAÇÃO E PREFERÊNCIAS UI ---
+// --- ESTADO DA APLICAÇÃO E PREFERÊNCIAS UI ---
 let db = null;
 let turmaSelecionadaId = null;
 let alunoAtivoPerfil = null; 
@@ -318,9 +387,8 @@ let UI_PREFS = {
   padding: "10px 14px"
 };
 
-window.onload = () => {
-  // Carrega Dados DB
-  const salvo = localStorage.getItem('drcaio_diariopro');
+function iniciarApp() {
+  const salvo = localStorage.getItem('drcaio_diariopro_v3');
   if (salvo) {
     db = JSON.parse(salvo);
   } else {
@@ -328,8 +396,7 @@ window.onload = () => {
     salvar();
   }
 
-  // Carrega Preferências Visuais
-  const uiSalvo = localStorage.getItem('drcaio_uiprefs');
+  const uiSalvo = localStorage.getItem('drcaio_uiprefs_v3');
   if (uiSalvo) {
     UI_PREFS = JSON.parse(uiSalvo);
     document.getElementById('ui-fs').value = UI_PREFS.fontSize;
@@ -344,10 +411,10 @@ window.onload = () => {
     document.getElementById('seletor-turma').value = turmaSelecionadaId;
     renderizarPlanilha();
   }
-};
+}
 
 function salvar() {
-  localStorage.setItem('drcaio_diariopro', JSON.stringify(db));
+  localStorage.setItem('drcaio_diariopro_v3', JSON.stringify(db));
   mostrarToast();
 }
 
@@ -372,12 +439,14 @@ function mudarTurma() {
   renderizarPlanilha();
 }
 
-// --- 3. RENDERIZAÇÃO DA PLANILHA ---
+// --- RENDERIZAÇÃO DA PLANILHA ---
 function renderizarPlanilha() {
   if (!turmaSelecionadaId) return;
 
   const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
   const colunas = db.atividades[turmaSelecionadaId] || [];
+
+  document.getElementById('print-turma-nome').textContent = "Turma: " + turma.nome;
 
   const thead = document.getElementById('planilha-head');
   const tbody = document.getElementById('planilha-body');
@@ -406,8 +475,11 @@ function renderizarPlanilha() {
     let tr = `<tr class="${inativoClass}">
       <td>
         <div class="aluno-link" onclick="abrirPerfilAluno('${aluno.id}')">
-            <span>${aluno.nome} ${badgeInativo}</span>
-            <span style="color:var(--muted); font-size:10px; font-weight:bold;">FICHA ➔</span>
+            <span class="aluno-nome-txt">${aluno.nome}</span>
+            <div style="display:flex; align-items:center;">
+              ${badgeInativo}
+              <span class="ficha-txt" style="color:var(--muted); font-size:10px; font-weight:bold; margin-left:8px;">FICHA ➔</span>
+            </div>
         </div>
       </td>`;
       
@@ -437,7 +509,7 @@ function renderizarPlanilha() {
   tbody.innerHTML = htmlBody;
 }
 
-// --- 4. DIÁRIO DE AULA ---
+// --- DIÁRIO DE AULA ---
 function abrirDiario() {
     document.getElementById('diario-data').value = new Date().toISOString().split('T')[0];
     document.getElementById('diario-conteudo').value = '';
@@ -456,7 +528,6 @@ function renderizarDiario() {
     }
 
     const ordenados = [...diarios].sort((a,b) => b.data.localeCompare(a.data));
-    
     let html = '';
     ordenados.forEach(d => {
         const dataFormatada = d.data.split('-').reverse().join('/');
@@ -475,21 +546,10 @@ function renderizarDiario() {
 function salvarDiario() {
     const data = document.getElementById('diario-data').value;
     const conteudo = document.getElementById('diario-conteudo').value.trim();
-    
-    if (!data || !conteudo) {
-        alert("Por favor, preencha a data e o conteúdo da aula.");
-        return;
-    }
-
+    if (!data || !conteudo) { alert("Por favor, preencha a data e o conteúdo da aula."); return; }
     const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
     if (!turma.diario) turma.diario = [];
-    
-    turma.diario.push({
-        id: "di_" + gerarId(),
-        data: data,
-        conteudo: conteudo
-    });
-    
+    turma.diario.push({ id: "di_" + gerarId(), data: data, conteudo: conteudo });
     salvar();
     document.getElementById('diario-conteudo').value = '';
     renderizarDiario();
@@ -499,29 +559,25 @@ function excluirDiario(id) {
     if(confirm("Tem a certeza que deseja excluir este registo do diário?")) {
         const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
         turma.diario = turma.diario.filter(d => d.id !== id);
-        salvar();
-        renderizarDiario();
+        salvar(); renderizarDiario();
     }
 }
 
-// --- 5. GESTÃO DE COLUNAS E REGISTROS ---
+// --- GESTÃO DE COLUNAS E REGISTROS ---
 function adicionarAluno() {
   const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
   const nome = prompt("Digite o nome completo do novo aluno:");
   if(nome && nome.trim() !== '') {
       turma.alunos.push({ id: gerarId(), nome: nome.trim(), mat: "---", atividades: {}, ativo: true });
-      salvar();
-      renderizarPlanilha();
+      salvar(); renderizarPlanilha();
   }
 }
 
 function adicionarAtividade() {
-  const nome = prompt("Nome da Atividade (ex: Trabalho de Pesquisa):");
+  const nome = prompt("Nome da Atividade (ex: Fichamento):");
   if (!nome) return;
   const tipoInput = confirm("Clique em OK se for SOMENTE VISTO (✓)\nClique em CANCELAR se for VALER NOTA (0-10)");
-  
   if (!db.atividades[turmaSelecionadaId]) { db.atividades[turmaSelecionadaId] = []; }
-
   db.atividades[turmaSelecionadaId].push({ id: "col_" + gerarId(), nome: nome, tipo: tipoInput ? "visto" : "nota" });
   salvar(); renderizarPlanilha();
 }
@@ -544,17 +600,15 @@ function removerColuna(colId) {
 function atualizarRegistro(alunoId, colId, valor, tipo) {
   const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
   const aluno = turma.alunos.find(a => a.id === alunoId);
-  
   if (!aluno.atividades) aluno.atividades = {};
   if (!aluno.atividades[colId]) aluno.atividades[colId] = {};
   
   if (tipo === 'nota') aluno.atividades[colId].nota = valor === '' ? null : parseFloat(valor);
   else aluno.atividades[colId].visto = valor;
-  
   salvar();
 }
 
-// --- 6. PERFIL DO ALUNO E GESTÃO DE ESTADO ---
+// --- PERFIL DO ALUNO E GESTÃO DE ESTADO ---
 function abrirPerfilAluno(alunoId) {
     alunoAtivoPerfil = alunoId;
     const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
@@ -570,47 +624,22 @@ function abrirPerfilAluno(alunoId) {
         ? '<span style="background:#10b981; color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:bold;">Ativo na Turma</span>' 
         : '<span style="background:var(--danger); color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:bold;">Matrícula Trancada / Inativo</span>';
 
-    let htmlAtivs = '';
-    let somaNotas = 0, qtdNotas = 0;
-
-    if (colunas.length === 0) {
-        htmlAtivs = '<div style="color:var(--muted); font-size:12px; text-align:center">Nenhuma atividade registada para a turma.</div>';
-    } else {
+    let htmlAtivs = ''; let somaNotas = 0, qtdNotas = 0;
+    if (colunas.length === 0) { htmlAtivs = '<div style="color:var(--muted); font-size:12px; text-align:center">Nenhuma atividade registada para a turma.</div>'; } 
+    else {
         colunas.forEach(col => {
             const reg = (aluno.atividades && aluno.atividades[col.id]) ? aluno.atividades[col.id] : null;
             let status = '--';
-            
-            if (col.tipo === 'visto') {
-                status = (reg && reg.visto) ? '<span style="color:#10b981; font-weight:bold">✓ Visto Dado</span>' : '<span style="color:var(--danger)">Pendente</span>';
-            } else {
-                if (reg && reg.nota != null) {
-                    status = `<span style="font-weight:bold">${reg.nota}</span>/10`;
-                    somaNotas += reg.nota; qtdNotas++;
-                } else {
-                    status = '<span style="color:var(--danger)">Sem nota</span>';
-                }
-            }
-
-            htmlAtivs += `
-                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px;">
-                    <span style="color:var(--text); font-weight:600">${col.nome}</span>
-                    <span>${status}</span>
-                </div>
-            `;
+            if (col.tipo === 'visto') { status = (reg && reg.visto) ? '<span style="color:#10b981; font-weight:bold">✓ Visto Dado</span>' : '<span style="color:var(--danger)">Pendente</span>'; } 
+            else { if (reg && reg.nota != null) { status = `<span style="font-weight:bold">${reg.nota}</span>/10`; somaNotas += reg.nota; qtdNotas++; } else { status = '<span style="color:var(--danger)">Sem nota</span>'; } }
+            htmlAtivs += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px;"><span style="color:var(--text); font-weight:600">${col.nome}</span><span>${status}</span></div>`;
         });
-        
         if (qtdNotas > 0) {
             const media = (somaNotas / qtdNotas).toFixed(1);
             const corMedia = media >= 6 ? '#10b981' : 'var(--danger)';
-            htmlAtivs += `
-                <div style="display:flex; justify-content:space-between; padding:12px 0 0 0; font-size:15px; margin-top:8px;">
-                    <span style="font-weight:800; color:var(--text)">MÉDIA (Notas):</span>
-                    <span style="font-weight:900; color:${corMedia}">${media}</span>
-                </div>
-            `;
+            htmlAtivs += `<div style="display:flex; justify-content:space-between; padding:12px 0 0 0; font-size:15px; margin-top:8px;"><span style="font-weight:800; color:var(--text)">MÉDIA (Notas):</span><span style="font-weight:900; color:${corMedia}">${media}</span></div>`;
         }
     }
-
     document.getElementById('perf-atividades').innerHTML = htmlAtivs;
 
     const btnToggle = document.getElementById('btn-tog-status');
@@ -626,23 +655,30 @@ function abrirPerfilAluno(alunoId) {
 function alternarStatusAluno(alunoId, novoStatus) {
     const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
     const aluno = turma.alunos.find(a => a.id === alunoId);
-    aluno.ativo = novoStatus;
-    salvar();
-    fecharModal('modal-perfil');
-    renderizarPlanilha();
+    aluno.ativo = novoStatus; salvar(); fecharModal('modal-perfil'); renderizarPlanilha();
 }
 
 function confirmarExclusaoAluno(alunoId) {
     if(confirm("ATENÇÃO: A exclusão é permanente e irá apagar todas as notas e vistos deste aluno.\n\nDeseja prosseguir?")) {
         const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
         turma.alunos = turma.alunos.filter(a => a.id !== alunoId);
-        salvar();
-        fecharModal('modal-perfil');
-        renderizarPlanilha();
+        salvar(); fecharModal('modal-perfil'); renderizarPlanilha();
     }
 }
 
-// --- 7. PREFERÊNCIAS DA INTERFACE (UI) ---
+// --- UTILITÁRIOS (PDF e Exportação) ---
+function exportarBackup() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+    const a = document.createElement('a'); a.setAttribute("href", dataStr);
+    a.setAttribute("download", `Backup_Offline_DrCaio_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(a); a.click(); a.remove();
+}
+
+function imprimirPDF() {
+    window.print();
+}
+
+// --- PREFERÊNCIAS DA INTERFACE (UI) ---
 function abrirModal(id) { document.getElementById(id).classList.add('show'); }
 function fecharModal(id) { document.getElementById(id).classList.remove('show'); }
 
@@ -660,12 +696,8 @@ function previewUI() {
 }
 
 function salvarConfigUI() {
-    UI_PREFS = {
-        fontSize: document.getElementById('ui-fs').value,
-        colWidth: document.getElementById('ui-cw').value,
-        padding: document.getElementById('ui-pad').value
-    };
-    localStorage.setItem('drcaio_uiprefs', JSON.stringify(UI_PREFS));
+    UI_PREFS = { fontSize: document.getElementById('ui-fs').value, colWidth: document.getElementById('ui-cw').value, padding: document.getElementById('ui-pad').value };
+    localStorage.setItem('drcaio_uiprefs_v3', JSON.stringify(UI_PREFS));
     fecharModal('modal-config');
 }
 
