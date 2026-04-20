@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>LMS Professor Caio - Gestão Pro Cloud</title>
+<title>LMS Gestão Pro - Dr. Caio</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -11,10 +11,11 @@
 
 <style>
   :root {
-    --verde: #1A4A2E; --verde-hover: #143d23; --ouro: #D4AF37;
-    --bg: #F4F7F6; --card: #FFFFFF; --text: #1E293B; --muted: #64748B;
+    --verde: #1A4A2E; --verde-hover: #113620; --verde-fundo: #e6f4ea;
+    --ouro: #D4AF37; --ouro-hover: #b59228;
+    --bg: #F4F7F9; --card: #FFFFFF; --text: #1E293B; --muted: #64748B;
     --border: #E2E8F0; --danger: #EF4444;
-    --ui-font-size: 14px; --ui-col-width: 90px; --ui-padding: 8px 10px;
+    --ui-font-size: 13px; --ui-col-width: 90px; --ui-padding: 10px 12px;
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
@@ -22,105 +23,105 @@
   h1, h2, h3, .syne { font-family: 'Syne', sans-serif; }
 
   /* TELA DE LOGIN */
-  #login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #0d2416 0%, #1A4A2E 60%, #0d2416 100%); display: flex; align-items: center; justify-content: center; z-index: 5000; }
-  .lcard { background: #fff; border-radius: 24px; padding: 36px 28px; width: 90%; max-width: 360px; box-shadow: 0 24px 64px rgba(0,0,0,0.4); text-align: center; }
-  .l-btn { width: 100%; background: var(--verde); color: #fff; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: .15s; margin-top: 15px; }
-  .l-btn:hover { background: var(--verde-hover); }
-  input.log-inp { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid var(--border); background: var(--bg); font-family: inherit; font-size: 15px; outline: none; margin-bottom: 12px; text-align: center;}
-  input.log-inp:focus { border-color: var(--verde); background: #fff; }
+  #login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #0f2b1b 0%, #1A4A2E 100%); display: flex; align-items: center; justify-content: center; z-index: 5000; }
+  .lcard { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 24px; padding: 40px 30px; width: 90%; max-width: 380px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); text-align: center; border: 1px solid rgba(255,255,255,0.2);}
+  .l-btn { width: 100%; background: var(--verde); color: #fff; border: none; border-radius: 12px; padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 15px;}
+  .l-btn:hover { background: var(--verde-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,74,46,0.3);}
+  input.log-inp { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid var(--border); background: #fff; font-family: inherit; font-size: 15px; outline: none; margin-bottom: 12px; text-align: center; transition: 0.2s;}
+  input.log-inp:focus { border-color: var(--ouro); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); }
 
-  #loader-cloud { display:none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 4500; align-items: center; justify-content: center; flex-direction: column; }
-  .spinner { border: 4px solid rgba(26, 74, 46, 0.2); border-left-color: var(--verde); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom:15px;}
+  #loader-cloud { display:none; position: fixed; inset: 0; background: rgba(244, 247, 249, 0.95); z-index: 4500; align-items: center; justify-content: center; flex-direction: column; }
+  .spinner { border: 4px solid var(--border); border-left-color: var(--verde); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom:20px;}
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
   #app { display: none; flex-direction: column; height: 100%; }
 
   /* HEADER */
-  header { background: var(--verde); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 10; flex-wrap: wrap; gap: 10px; }
-  .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;}
-  .header-logo { background: var(--ouro); color: var(--verde); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0; }
-  select.turma-select { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; font-weight: 700; font-family: inherit; font-size: 14px; outline: none; cursor: pointer; max-width: 250px;}
+  header { background: var(--verde); color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08); z-index: 10; flex-wrap: wrap; gap: 15px; }
+  .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap;}
+  .header-logo { background: linear-gradient(135deg, var(--ouro), #f2d472); color: var(--verde); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.2);}
+  select.turma-select { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 10px; font-weight: 700; font-family: inherit; font-size: 14px; outline: none; cursor: pointer; max-width: 280px; transition: 0.2s;}
   select.turma-select option { background: var(--card); color: var(--text); }
   
-  .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center;}
-  button { font-family: inherit; font-weight: 700; cursor: pointer; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-  button:active { transform: scale(0.97); }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
+  button { font-family: inherit; font-weight: 700; cursor: pointer; border: none; border-radius: 10px; padding: 10px 16px; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  button:active { transform: scale(0.96); }
   .btn-primary { background: var(--ouro); color: var(--verde); }
-  .btn-primary:hover { filter: brightness(1.1); }
-  .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.05); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);}
+  .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1);}
   .btn-secondary:hover { background: rgba(255,255,255,0.2); }
   .btn-danger { background: var(--danger); color: #fff; }
-  .btn-icon { padding: 8px; font-size: 16px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .btn-icon { padding: 10px; font-size: 16px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
   .btn-icon:hover { background: rgba(255,255,255,0.1); }
 
-  /* SYNC BADGE */
-  #sync-badge { font-size: 11px; font-weight: 800; background: var(--ouro); color: var(--verde); padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 4px; transition: 0.3s;}
-
-  /* SEARCH BAR */
-  .search-box { position: relative; display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 0 10px; border: 1px solid rgba(255,255,255,0.2);}
-  .search-box input { background: transparent; border: none; color: #fff; padding: 8px 5px; outline: none; font-family: inherit; font-weight: 500; font-size: 13px; width: 160px; }
+  #sync-badge { font-size: 11px; font-weight: 800; background: var(--ouro); color: var(--verde); padding: 8px 14px; border-radius: 20px; display: flex; align-items: center; gap: 6px; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.15);}
+  .search-box { position: relative; display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 0 12px; border: 1px solid rgba(255,255,255,0.2);}
+  .search-box input { background: transparent; border: none; color: #fff; padding: 10px 6px; outline: none; font-family: inherit; font-weight: 500; font-size: 13px; width: 160px; }
   .search-box input::placeholder { color: rgba(255,255,255,0.6); }
 
   /* ÁREA DA PLANILHA */
-  #spreadsheet-container { flex: 1; overflow: auto; padding: 15px; -webkit-overflow-scrolling: touch; }
-  .table-wrapper { background: var(--card); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--border); width: max-content; min-width: 100%; }
+  #main-content { flex: 1; overflow: auto; padding: 20px 25px; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column;}
+  .table-wrapper { background: var(--card); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); border: 1px solid var(--border); width: max-content; min-width: 100%; overflow: hidden; }
   table { border-collapse: collapse; width: 100%; text-align: left; }
   
-  th, td { border: 1px solid var(--border); padding: var(--ui-padding); white-space: nowrap; transition: padding 0.2s; }
-  th { background: #f8fafc; font-size: 0.8em; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 var(--border); min-width: var(--ui-col-width); transition: min-width 0.2s;}
-  th:first-child { left: 0; z-index: 3; background: #f8fafc; box-shadow: 1px 1px 0 var(--border); min-width: 260px; max-width: 260px;}
+  th, td { border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: var(--ui-padding); white-space: nowrap; transition: padding 0.2s; }
+  th { background: #f8fafc; font-size: 0.8em; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 var(--border); min-width: var(--ui-col-width); transition: min-width 0.2s; font-weight: 800;}
+  th:first-child { left: 0; z-index: 3; background: #f8fafc; box-shadow: 1px 1px 0 var(--border); min-width: 280px; max-width: 280px;}
   td:first-child { left: 0; position: sticky; background: #fff; z-index: 1; box-shadow: 1px 0 0 var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   
-  tr:hover td { background-color: #fcfdfd; }
-  tr:hover td:first-child { background-color: #fcfdfd; }
-  tr.inativo td { opacity: 0.4; background-color: #f8fafc; }
-  tr.inativo td:first-child { background-color: #f8fafc; }
+  tr:hover td { background-color: #f8fafc; }
+  tr:hover td:first-child { background-color: #f8fafc; }
+  tr.inativo td { opacity: 0.4; background-color: #f1f5f9; }
+  tr.inativo td:first-child { background-color: #f1f5f9; }
 
   /* NOME E INPUTS */
-  .cell-input { width: 100%; border: none; background: transparent; font-family: inherit; font-size: inherit; outline: none; color: var(--text); }
+  .cell-input { width: 100%; border: none; background: transparent; font-family: inherit; font-size: inherit; outline: none; color: var(--text); transition: 0.2s;}
   .cell-input.nome { font-weight: 700; color: var(--verde); cursor: text; }
-  .cell-input.nota { text-align: center; font-weight: 700; width: 100%; }
-  .cell-input:focus { background: #e2e8f0; border-radius: 4px; padding: 2px 4px; box-shadow: inset 0 0 0 1px var(--ouro); }
+  .cell-input.nota { text-align: center; font-weight: 800; width: 100%; color: var(--text);}
+  .cell-input:focus { background: #fff; border-radius: 6px; padding: 4px 6px; box-shadow: 0 0 0 2px var(--ouro); }
   
-  .btn-ficha { background: var(--bg); border: 1px solid var(--border); color: var(--muted); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+  .btn-ficha { background: var(--bg); border: 1px solid var(--border); color: var(--muted); font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;}
   .btn-ficha:hover { background: var(--ouro); color: #fff; border-color: var(--ouro); }
 
   /* CHECKBOX CUSTOMIZADO ACESSÍVEL */
-  .check-wrapper { display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+  .check-wrapper { display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; padding: 2px; }
   .check-wrapper input { position: absolute; opacity: 0; width: 0; height: 0; }
-  .custom-box { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: 0.1s; background: #fff; }
-  .check-wrapper input:checked + .custom-box { background: var(--verde); border-color: var(--verde); }
-  .check-wrapper input:checked + .custom-box::after { content: '✓'; color: #fff; font-weight: 900; font-size: 14px; }
-  .check-wrapper input:focus + .custom-box { outline: 2px solid var(--ouro); outline-offset: 2px; }
+  .custom-box { width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 7px; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact;}
+  .check-wrapper input:checked + .custom-box { background: var(--verde); border-color: var(--verde); box-shadow: 0 4px 10px rgba(26,74,46,0.25); transform: scale(1.08); }
+  .check-wrapper input:checked + .custom-box::after { content: '✓'; color: #fff; font-weight: 900; font-size: 15px; }
 
-  .delete-col { background: none; border: none; color: #ef4444; padding: 2px; font-size: 14px; margin-left: 8px; cursor: pointer; opacity: 0.5; }
-  .delete-col:hover { opacity: 1; }
+  .delete-col { background: none; border: none; color: #ef4444; padding: 4px; font-size: 15px; margin-left: 8px; cursor: pointer; opacity: 0.4; transition: 0.2s;}
+  .delete-col:hover { opacity: 1; transform: scale(1.1);}
 
   /* MODAIS E TOAST */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(2px); }
-  .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
-  .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 500px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto;}
-  .modal-close { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); z-index: 2000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(4px); }
+  .modal-overlay.show { display: flex; animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+  .modal-box { background: #fff; border-radius: 20px; width: 100%; max-width: 500px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto;}
+  .modal-close { position: absolute; top: 20px; right: 20px; background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 50%; font-weight: bold; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center;}
+  @keyframes fadeIn { from { opacity: 0; transform: scale(0.96) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
   
-  .log-item { padding: 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .log-time { font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
-  .log-desc { color: var(--text); line-height: 1.4; }
+  .slider-group { margin-bottom: 20px; }
+  .slider-group label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--muted); margin-bottom: 10px; text-transform: uppercase;}
+  input[type=range] { width: 100%; accent-color: var(--verde); height: 6px; border-radius: 4px;}
+
+  #toast { position: fixed; bottom: 24px; right: 24px; background: #10b981; color: white; padding: 14px 28px; border-radius: 12px; font-weight: 700; opacity: 0; transition: 0.4s; pointer-events: none; z-index: 3000; box-shadow: 0 10px 25px rgba(16,185,129,0.3);}
+  #toast.show { opacity: 1; transform: translateY(-10px); }
+
+  /* TELA DE IMPORTAÇÃO (APENAS 1ª VEZ) */
+  #import-screen { display:none; position: fixed; inset: 0; background: var(--bg); z-index: 6000; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center; }
 
   /* MOBILE */
   @media (max-width: 768px) {
-    header { flex-direction: column; align-items: stretch; padding: 12px; gap: 10px; }
+    header { flex-direction: column; align-items: stretch; padding: 15px; gap: 12px; }
     .header-left { justify-content: space-between; width: 100%; }
     .header-left .syne { display: none; }
-    .turma-select { flex: 1; margin-left: 10px; font-size: 13px; max-width: 100%; }
-    .controls { overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
-    .controls button { flex-shrink: 0; padding: 8px 12px; font-size: 12px; }
-    .search-box { width: 100%; }
-    .search-box input { width: 100%; }
-    #spreadsheet-container { padding: 0; }
-    .table-wrapper { border-radius: 0; border-left: none; border-right: none; }
-    th:first-child { min-width: 200px !important; max-width: 200px !important; }
-    .btn-ficha { padding: 4px 6px; font-size: 9px; }
+    .turma-select { flex: 1; margin-left: 10px; font-size: 14px; max-width: 100%; }
+    .controls { overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; -webkit-overflow-scrolling: touch;}
+    .controls button { flex-shrink: 0; padding: 10px 14px; font-size: 13px; }
+    .search-box, .search-box input { width: 100%; }
+    #main-content { padding: 15px; }
+    th:first-child, td:first-child { min-width: 160px !important; max-width: 160px !important; }
+    .modal-box { padding: 20px; width: 95%; max-height: 92vh; }
   }
 </style>
 </head>
@@ -128,19 +129,28 @@
 
   <div id="login-screen">
     <div class="lcard">
-      <div style="font-size:36px;margin-bottom:5px">⚖️</div>
-      <h2 class="syne" style="color:var(--verde);margin-bottom:20px">Diário Pro Cloud</h2>
-      <input type="text" id="lu" class="log-inp" placeholder="Usuário (professor)" value="professor"/>
-      <input type="password" id="lp" class="log-inp" placeholder="Senha (5864)" onkeydown="if(event.key==='Enter')login()"/>
-      <button class="l-btn" onclick="login()">Acessar Sistema</button>
-      <div id="lerr" style="color:var(--danger);font-size:13px;margin-top:12px;font-weight:600"></div>
+      <div style="font-size:42px;margin-bottom:10px;">⚖️</div>
+      <h2 class="syne" style="color:var(--verde);margin-bottom:5px; font-size: 24px;">Gestão Pro</h2>
+      <p style="color:var(--muted); font-size:13px; margin-bottom: 25px;">Prof. Caio Duarte Araújo</p>
+      <input type="text" id="lu" class="log-inp" placeholder="Usuário" value="professor"/>
+      <input type="password" id="lp" class="log-inp" placeholder="Senha" value="5864" onkeydown="if(event.key==='Enter')login()"/>
+      <button class="l-btn" onclick="login()">Entrar e Sincronizar</button>
     </div>
   </div>
 
   <div id="loader-cloud">
     <div class="spinner"></div>
-    <h2 class="syne" style="color:var(--verde); font-size:18px;">Conectando ao Firebase...</h2>
-    <p style="color:var(--muted); font-size:13px;">Buscando os seus 287 alunos e turmas.</p>
+    <h2 class="syne" style="color:var(--verde); font-size:20px;">Sincronizando Nuvem...</h2>
+    <p style="color:var(--muted); font-size:14px; text-align:center;">Buscando os seus dados mais recentes.</p>
+  </div>
+
+  <div id="import-screen">
+    <div style="background:#fff; padding:40px; border-radius:20px; max-width:400px; box-shadow:0 10px 40px rgba(0,0,0,0.1);">
+      <h2 class="syne" style="color:var(--verde); margin-bottom:15px;">Bem-vindo à Nuvem</h2>
+      <p style="color:var(--muted); margin-bottom:25px; line-height:1.5;">Sua base de dados está limpa. Para começar, importe o seu backup de 287 alunos apenas uma vez. Depois, o sistema fará tudo sozinho.</p>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="processarImportacao(event)">
+      <button class="l-btn" onclick="document.getElementById('import-file').click()">📂 Importar Alunos (JSON)</button>
+    </div>
   </div>
 
   <div id="app">
@@ -151,19 +161,18 @@
         <select id="seletor-turma" class="turma-select" onchange="mudarTurma()"></select>
       </div>
       <div class="controls">
-        <div id="sync-badge">☁️ Nuvem Ativa</div>
+        <div id="sync-badge">☁️ Conectando...</div>
         <div class="search-box">
-          <span style="font-size:12px; opacity:0.6;">🔍</span>
+          <span style="font-size:14px; opacity:0.6;">🔍</span>
           <input type="text" id="busca-aluno" placeholder="Buscar aluno..." onkeyup="filtrarTabela()">
         </div>
         <button class="btn-secondary" onclick="abrirDiario()">📖 Diário</button>
-        <button class="btn-secondary" onclick="abrirLogs()" style="background:rgba(212,175,55,0.2); color:var(--ouro)">⏱️ Auditoria</button>
         <button class="btn-primary" onclick="adicionarAtividade()">+ Atividade</button>
         <button class="btn-icon" onclick="abrirModal('modal-config')">⚙️</button>
       </div>
     </header>
 
-    <div id="spreadsheet-container">
+    <div id="main-content">
       <div class="table-wrapper">
         <table id="planilha">
           <thead id="planilha-head"></thead>
@@ -176,20 +185,11 @@
   <div class="modal-overlay" id="modal-perfil">
     <div class="modal-box">
       <button class="modal-close" onclick="fecharModal('modal-perfil')">✕</button>
-      <div style="text-align:center; margin-bottom:20px;">
-        <div style="width:60px; height:60px; background:var(--verde); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:bold; margin:0 auto 10px auto" id="perf-avatar">--</div>
-        <h2 class="syne" style="color:var(--verde); font-size:20px;" id="perf-nome">Nome do Aluno</h2>
-        <p style="color:var(--muted); font-size:13px; margin-top:4px;" id="perf-mat">Matrícula: ---</p>
-        <div id="perf-badge-area" style="margin-top:8px;"></div>
-      </div>
-      <div style="background:var(--bg); border-radius:10px; padding:15px; margin-bottom:20px; border:1px solid var(--border)">
-        <h4 style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-bottom:10px;">Atividades Realizadas</h4>
-        <div id="perf-atividades"></div>
-      </div>
-      <h4 style="font-size:11px; font-weight:800; color:var(--danger); text-transform:uppercase; margin-bottom:10px;">Gestão do Aluno</h4>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-secondary" style="flex:1; background:#e2e8f0; color:var(--text); min-width:120px;" id="btn-tog-status">Desativar Aluno</button>
-        <button class="btn-danger" style="flex:1; min-width:120px;" id="btn-del-aluno">Excluir Aluno</button>
+      <div style="text-align:center; margin-bottom:20px;"><h2 class="syne" style="color:var(--verde); font-size:22px;" id="perf-nome">Nome do Aluno</h2></div>
+      <div style="background:var(--bg); border-radius:12px; padding:15px; margin-bottom:20px; border:1px solid var(--border)" id="perf-atividades"></div>
+      <div style="display:flex; gap:12px;">
+        <button class="btn-secondary" style="flex:1; background:#e2e8f0; color:var(--text);" id="btn-tog-status">Desativar Aluno</button>
+        <button class="btn-danger" style="flex:1;" id="btn-del-aluno">Excluir Aluno</button>
       </div>
     </div>
   </div>
@@ -198,274 +198,140 @@
     <div class="modal-box" style="max-width: 600px;">
       <button class="modal-close" onclick="fecharModal('modal-diario')">✕</button>
       <h2 class="syne" style="color:var(--verde); margin-bottom:20px;">📖 Diário de Aula</h2>
-      <div style="background:var(--bg); padding:15px; border-radius:10px; border:1px solid var(--border); margin-bottom:20px;">
-        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
-          <input type="date" id="diario-data" style="border:1px solid var(--border); border-radius:8px; padding:10px; font-family:inherit; outline:none;">
-          <input type="text" id="diario-conteudo" style="border:1px solid var(--border); border-radius:8px; padding:10px; flex:1; min-width:200px; font-family:inherit; outline:none;" placeholder="Conteúdo lecionado..." onkeydown="if(event.key==='Enter')salvarDiario()">
-        </div>
-        <button class="btn-primary" style="width:100%; justify-content:center;" onclick="salvarDiario()">Guardar Registo e Sincronizar</button>
-      </div>
-      <div id="lista-diario" style="max-height:300px; overflow-y:auto; padding-right:5px;"></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="modal-logs">
-    <div class="modal-box" style="max-width: 500px;">
-      <button class="modal-close" onclick="fecharModal('modal-logs')">✕</button>
-      <h2 class="syne" style="color:var(--ouro); margin-bottom:5px;">⏱️ Auditoria e Histórico</h2>
-      <p style="color:var(--muted); font-size:12px; margin-bottom:20px;">Registo automático na nuvem.</p>
-      <div id="lista-logs" style="max-height:350px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; background:var(--bg);"></div>
-      <button class="btn-secondary" style="width:100%; justify-content:center; margin-top:15px; color:var(--danger); border:1px solid var(--danger); background:#fff;" onclick="limparLogs()">Apagar Histórico</button>
+      <div style="display:flex; gap:10px; margin-bottom:15px;"><input type="date" id="diario-data" style="border:1px solid var(--border); border-radius:8px; padding:10px;"><input type="text" id="diario-conteudo" style="border:1px solid var(--border); border-radius:8px; padding:10px; flex:1;" placeholder="Matéria dada..." onkeydown="if(event.key==='Enter')salvarDiario()"></div>
+      <button class="btn-primary" style="width:100%; margin-bottom:15px;" onclick="salvarDiario()">Registar</button>
+      <div id="lista-diario" style="max-height:250px; overflow-y:auto;"></div>
     </div>
   </div>
 
   <div class="modal-overlay" id="modal-config">
     <div class="modal-box">
       <button class="modal-close" onclick="fecharModal('modal-config')">✕</button>
-      <h2 class="syne" style="color:var(--verde); margin-bottom:20px;">Configurações</h2>
-      
-      <div class="slider-group">
-        <label><span>Tamanho da Letra</span> <span id="lbl-fs">14px</span></label>
-        <input type="range" min="11" max="20" value="14" id="ui-fs" oninput="previewUI()">
-      </div>
-      <div class="slider-group">
-        <label><span>Largura das Colunas de Atividade</span> <span id="lbl-cw">90px</span></label>
-        <input type="range" min="60" max="200" value="90" id="ui-cw" oninput="previewUI()">
-      </div>
-
-      <hr style="margin:20px 0; border:none; border-top:1px solid var(--border)">
-      <button class="btn-primary" style="width:100%; justify-content:center;" onclick="salvarConfigUI()">Aplicar Visual</button>
-      
-      <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border); background:#fff;" onclick="adicionarAluno()">+ Novo Aluno</button>
-        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border); background:#fff;" onclick="exportarBackup()">📥 Exportar PDF / JSON</button>
+      <h2 class="syne" style="color:var(--verde); margin-bottom:20px;">⚙️ Opções</h2>
+      <div class="slider-group"><label>Letra <span id="lbl-fs">13px</span></label><input type="range" min="11" max="18" value="13" id="ui-fs" oninput="previewUI()"></div>
+      <div class="slider-group"><label>Largura <span id="lbl-cw">90px</span></label><input type="range" min="60" max="180" value="90" id="ui-cw" oninput="previewUI()"></div>
+      <button class="btn-primary" style="width:100%; margin-bottom: 20px;" onclick="salvarConfigUI()">Aplicar Visual</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border);" onclick="adicionarAluno()">+ Novo Aluno</button>
+        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border);" onclick="window.print()">📄 Imprimir</button>
+        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border);" onclick="exportarBackup()">📥 Extrair Backup</button>
       </div>
     </div>
   </div>
 
+  <div id="toast">✅ Guardado na Nuvem!</div>
+
 <script>
-// --- 1. CONFIGURAÇÃO FIREBASE DO SEU FICHEIRO ORIGINAL ---
-const FB_CONFIG = {
-  apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU",
-  authDomain:"professor-digital-8f792.firebaseapp.com",
-  projectId:"professor-digital-8f792",
-  storageBucket:"professor-digital-8f792.firebasestorage.app",
-  messagingSenderId:"4515274923",
-  appId:"1:4515274923:web:25e9bc6d350a411972d7ee"
-};
-
+// --- 1. FIREBASE CONFIG ---
+const FB_CONFIG = { apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU", authDomain:"professor-digital-8f792.firebaseapp.com", projectId:"professor-digital-8f792", storageBucket:"professor-digital-8f792.firebasestorage.app" };
 let _dbFirestore = null;
-try {
-  firebase.initializeApp(FB_CONFIG);
-  _dbFirestore = firebase.firestore();
-} catch(e) { console.error("Firebase Erro:", e); }
+try { firebase.initializeApp(FB_CONFIG); _dbFirestore = firebase.firestore(); } catch(e) { console.error("Firebase Erro"); }
 
-// --- 2. SEMENTE DOS 287 ALUNOS (CASO A NUVEM ESTEJA VAZIA) ---
-const JSON_SEMENTE = {
-  "turmas": [
-    { "id": "l7jqflfw", "nome": "MAT T1 - 1 Periodo Manha", "alunos": [
-      { "id": "l983kgn9", "nome": "Adlinef Santana Rodrigues", "mat": "20260406", "atividades": { "at_1775492006176": { "visto": true }, "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "0ovn1auv", "nome": "Alex Sandro Amorim Pereira", "mat": "20260416", "atividades": {} },
-      { "id": "t9ab98ao", "nome": "Ana Clara de Souza Bressan", "mat": "20260418", "atividades": {} },
-      { "id": "2jjv9oti", "nome": "Anelissa de Paula Amaral", "mat": "20260398", "atividades": { "at_1775492006176": { "visto": true }, "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "d7la8az6", "nome": "Anna Clara Souza Ferreira", "mat": "20260413", "atividades": { "at_1775492006176": { "visto": true }, "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "qskqjpqg", "nome": "Brenda Regiane Santos Batista", "mat": "20260400", "atividades": {} },
-      { "id": "4yzuv7x5", "nome": "Clara Lessa Ferreira", "mat": "20260395", "atividades": { "at_1775557265504": { "visto": true } } },
-      { "id": "b6r63pqx", "nome": "Dardielle Vitoria dos Santos Siqueira", "mat": "20260415", "atividades": { "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "o55lszpi", "nome": "Dayanne Francisca Vieira", "mat": "20260391", "atividades": { "at_1775492006176": { "visto": true }, "at_1775557265504": { "visto": true } } },
-      { "id": "n5rfuu8w", "nome": "Eliane Rodrigues Pereira Alves", "mat": "20260389", "atividades": { "at_1775492006176": { "visto": false } } },
-      { "id": "2kt1hgu3", "nome": "Emanuelle Fabricia Pereira Praes", "mat": "20260412", "atividades": {} },
-      { "id": "sgtp1yc2", "nome": "Emily Gabrielle Lopes dos Santos", "mat": "20260414", "atividades": { "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "9sexhuv6", "nome": "Fernanda Teixeira Santos", "mat": "20260419", "atividades": { "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "90xrr64x", "nome": "Gabriel Caua Araujo Santos", "mat": "20260404", "atividades": { "at_1775557265504": { "visto": false }, "at_1776075426368": { "visto": true } } },
-      { "id": "yfz44pzt", "nome": "Gabriele Eduarda Melo de Jesus", "mat": "20221251", "atividades": { "at_1775557265504": { "visto": true } } },
-      { "id": "yc171m7j", "nome": "Gilson Farlley Oliveira Andrade", "mat": "20260399", "atividades": { "at_1775492006176": { "visto": true } } },
-      { "id": "9gymj5dw", "nome": "Hidelane de Souza Silva Alves", "mat": "20260397", "atividades": {} },
-      { "id": "jmsxgojj", "nome": "Iori Henrique Marques Cortez", "mat": "20260405", "atividades": { "at_1775492006176": { "visto": true } } },
-      { "id": "4qml02ex", "nome": "Janaina de Jesus Carneiro Goncalves", "mat": "20260403", "atividades": {} },
-      { "id": "aa8zh92q", "nome": "Joyce Santos Goncalves", "mat": "20260407", "atividades": { "at_1776075426368": { "visto": true } } },
-      { "id": "qg29xi7r", "nome": "Julia Ferreira Batista", "mat": "15010008", "atividades": { "at_1775557265504": { "visto": true } } },
-      { "id": "s506fxfa", "nome": "Kaylane Nicolle Dias Alves", "mat": "20260401", "atividades": {} },
-      { "id": "a56ccv7s", "nome": "Livia Karolyne Vieira Boas", "mat": "20260409", "atividades": {} },
-      { "id": "03fx2hna", "nome": "Lucas Gabriel da Consolacao Ferreira", "mat": "20220531", "atividades": {} },
-      { "id": "a9wcvuwz", "nome": "Marco Tulio Rodrigues Souza", "mat": "20221419", "atividades": {} },
-      { "id": "w5ijmbwe", "nome": "Maria Clara Menezes Carvalho", "mat": "20260392", "atividades": { "at_1775492006176": { "visto": true }, "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "5ay4qp0t", "nome": "Miriely dos Reis da Silva", "mat": "20260402", "atividades": {} },
-      { "id": "yokxqbl3", "nome": "Pamella Thais Adriano Prates", "mat": "13010197", "atividades": {} },
-      { "id": "kyasl334", "nome": "Ryane Dias Ribeiro", "mat": "20260387", "atividades": { "at_1776075426368": { "visto": true } } },
-      { "id": "mrb7siij", "nome": "Samyra Gabriele da Silva Freire", "mat": "20260393", "atividades": { "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "vqvuoy9c", "nome": "Sarah Daniele Santos Carvalho", "mat": "20260410", "atividades": { "at_1776075426368": { "visto": true } } },
-      { "id": "eb2puvih", "nome": "Shara Vitoria da Silva Mota", "mat": "20260411", "atividades": { "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "ot9kamkq", "nome": "Tailane Monique Batista Souza", "mat": "20260394", "atividades": {} },
-      { "id": "75sglb6l", "nome": "Talita Emanuely Pereira", "mat": "20260408", "atividades": {} },
-      { "id": "99z13rfb", "nome": "Vitoria Tauane dos Santos Dias", "mat": "20260388", "atividades": {} },
-      { "id": "lgbbp79u", "nome": "Vivian Ariane Santos Anacleto", "mat": "20210412", "atividades": { "at_1775557265504": { "visto": true }, "at_1776075426368": { "visto": true } } },
-      { "id": "0bqge97e", "nome": "Lavinea Emanuelle Silva Souza", "mat": "20260483", "atividades": {} }
-    ], "diario": [ { "id": "cvc3q12o", "data": "2026-04-13", "conteudo": "vistos e conteudo - fontes do direito" } ]},
-    { "id": "t21mh239", "nome": "MAT T2 - 1 Periodo Manha", "alunos": [
-      { "id": "ldlep1ju", "nome": "Ana Claudia Pereira da Silva", "mat": "20260424", "atividades": { "at_1775644819871": { "visto": true } } },
-      { "id": "y1v7l4ci", "nome": "Anna Vitoria Alves Vieira", "mat": "20221490", "atividades": { "at_1775644260590": { "visto": true }, "at_1776248177198": { "visto": true } } },
-      { "id": "0t4w5y1f", "nome": "Arlinda de Cassia Cavalcante Monteiro", "mat": "20260430", "atividades": { "at_1775644260590": { "visto": true }, "at_1776248177198": { "visto": true } } }
-    ], "diario": [ { "id": "lgwy6b5s", "data": "2026-04-08", "conteudo": "dinâmica da vila" } ]},
-    { "id": "sguyovii", "nome": "NOT T1 - 1 Periodo Noturno", "alunos": [
-      { "id": "uecvvriv", "nome": "Agatha Karine Cardoso Siqueira", "mat": "20260493", "atividades": { "at_1775515158020": { "visto": true } } },
-      { "id": "7ugo0g1o", "nome": "Alice Almeida Dias", "mat": "20260528", "atividades": {} },
-      { "id": "r05v706n", "nome": "Amanda Silva Reis", "mat": "20260508", "atividades": { "at_1775515158020": { "visto": true } } }
-    ], "diario": [ { "id": "i5okm5ue", "data": "2026-04-06", "conteudo": "explicação fontes do direito" } ]},
-    { "id": "goqrbn2h", "nome": "NOT T2 - 1 Periodo Noturno", "alunos": [
-      { "id": "91d16271", "nome": "Adriana Alves Silva", "mat": "20260555", "atividades": { "at_1776377928040": { "visto": true } } },
-      { "id": "bc75og3f", "nome": "Ana Vitoria Duarte da Silva", "mat": "20260575", "atividades": {} },
-      { "id": "4x7r4ocn", "nome": "Andressa Lorrayne Nascimento Silva", "mat": "20260543", "atividades": { "at_1776377928040": { "visto": true } } }
-    ], "diario": []},
-    { "id": "iaj1iwnh", "nome": "VESP T1 - 1 Periodo Vespertino", "alunos": [
-      { "id": "lb1jn1ys", "nome": "Ana Julia Soares Noronha", "mat": "20260512", "atividades": { "at_1775445431529": { "nota": 3 }, "at_1776104165869": { "visto": true } } },
-      { "id": "1y2jjlxs", "nome": "Ana Paula do Rosario Silva", "mat": "20260454", "atividades": {} },
-      { "id": "e6ipftje", "nome": "Anne Gabrielly dos Santos", "mat": "20260492", "atividades": { "at_1775502439653": { "visto": true }, "at_1776104165869": { "visto": true } } }
-    ], "diario": []},
-    { "id": "fgf5tza5", "nome": "VESP T2 - 1 Periodo Vespertino", "alunos": [
-      { "id": "ehmwx4ms", "nome": "Anna Julia Silva", "mat": "20260476", "atividades": { "aw9wf68z": { "visto": true }, "at_1775762221065": { "nota": 3 } } },
-      { "id": "4inis4co", "nome": "Arthur Mendes Reis", "mat": "20260460", "atividades": { "6w0bttjh": { "nota": 0 } } },
-      { "id": "yjbcpzt8", "nome": "Bruna Emanuelle Costa", "mat": "20260489", "atividades": {} }
-    ], "diario": [ { "id": "tg127imw", "data": "2026-04-06", "conteudo": "revisão da prova" } ]},
-    { "id": "oxw1z1aq", "nome": "3P NOT - 3 Periodo Noturno", "alunos": [
-      { "id": "gb249j6c", "nome": "Agata Fernanda Vieira Leite", "mat": "20253178", "atividades": {} },
-      { "id": "h3fz94rs", "nome": "Ana Luiza de Souza Oliveira", "mat": "20253163", "atividades": {} },
-      { "id": "sok646ce", "nome": "Analice Alves dos Santos", "mat": "20253185", "atividades": {} }
-    ], "diario": []},
-    { "id": "iyfuec41", "nome": "3P VESP - 3 Periodo Vespertino", "alunos": [
-      { "id": "gruroy53", "nome": "Ana Clara Andrade Silva", "mat": "20253136", "atividades": {} },
-      { "id": "t5oxqsva", "nome": "Ana Clara Rodrigues Batista", "mat": "20253132", "atividades": {} },
-      { "id": "unq04ypt", "nome": "Anna Cecilia da Silva Praes", "mat": "20253139", "atividades": {} }
-    ], "diario": []}
-  ],
-  "atividades": {
-    "l7jqflfw": [{ "id": "at_1775492006176", "nome": "Dinâmica da Vila", "tipo": "visto" }, { "id": "at_1775557265504", "nome": "Código de Hamurabi", "tipo": "visto" }, { "id": "at_1776075426368", "nome": "Apostila Impressa", "tipo": "visto" }],
-    "t21mh239": [{ "id": "at_1775644260590", "nome": "Dinâmica da Vila", "tipo": "visto" }, { "id": "at_1775644819871", "nome": "Fontes do Direito", "tipo": "visto" }, { "id": "at_1776248177198", "nome": "Apostila", "tipo": "visto" }],
-    "sguyovii": [{ "id": "at_1775515158020", "nome": "Dinâmica da Vila", "tipo": "visto" }, { "id": "at_1775515337359", "nome": "Fontes", "tipo": "visto" }],
-    "goqrbn2h": [{ "id": "at_1776377928040", "nome": "Visto atividade", "tipo": "visto" }],
-    "iaj1iwnh": [{ "id": "at_1775445431529", "nome": "OK", "tipo": "nota" }],
-    "fgf5tza5": [{ "id": "aw9wf68z", "nome": "Dinâmica da Vila", "tipo": "visto" }]
-  },
-  "logs": []
-};
-
-// --- 3. ESTADO E LÓGICA DE APLICAÇÃO ---
-let db = null;
+// --- 2. ESTADO E NUVEM SILENCIOSA ---
+let db = { turmas: [], atividades: {} };
 let turmaSelecionadaId = null;
 let syncTimer = null;
-let UI_PREFS = { fontSize: 13, colWidth: 90, padding: "8px 10px" };
+let UI_PREFS = { fontSize: 13, colWidth: 90, padding: "10px 12px" };
 
 function login() {
-  const u = document.getElementById('lu').value.trim();
-  const p = document.getElementById('lp').value.trim();
-  if (u === 'professor' && p === '5864') {
+  if (document.getElementById('lu').value === 'professor' && document.getElementById('lp').value === '5864') {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('loader-cloud').style.display = 'flex';
     conectarNuvem();
-  } else {
-    document.getElementById('lerr').textContent = 'Usuário ou Senha incorretos.';
   }
 }
 
 async function conectarNuvem() {
-  try {
-    const docRef = await _dbFirestore.collection('professor').doc('dados').get();
-    if (docRef.exists && docRef.data().DB) {
-      db = JSON.parse(docRef.data().DB);
-      if(!db.logs) db.logs = [];
-    } else {
-      db = JSON_SEMENTE; // Planta a semente se a nuvem estiver vazia
-      _dbFirestore.collection('professor').doc('dados').set({ DB: JSON.stringify(db) });
-    }
-    
-    // UI Preferences Locais
-    const uiSalvo = localStorage.getItem('drcaio_uiprefs_v8');
-    if (uiSalvo) { UI_PREFS = JSON.parse(uiSalvo); aplicarEstilosGlobais(); }
+  // Puxa o backup local primeiro para não deixar o usuário esperando
+  const localDB = localStorage.getItem('drcaio_lms_v_auto');
+  if(localDB) db = JSON.parse(localDB);
 
-    document.getElementById('loader-cloud').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    preencherSeletorTurmas();
-    if(db.turmas.length > 0) {
-      turmaSelecionadaId = db.turmas[0].id;
-      document.getElementById('seletor-turma').value = turmaSelecionadaId;
-      renderizarPlanilha();
+  try {
+    // Busca na Nuvem
+    const doc = await _dbFirestore.collection('professor').doc('dados_v2').get();
+    if (doc.exists && doc.data().DB) {
+      db = JSON.parse(doc.data().DB);
+      localStorage.setItem('drcaio_lms_v_auto', doc.data().DB);
+      iniciarUI();
+    } else if (!db.turmas.length) {
+      // Se a nuvem e o local estão vazios, pede para importar 1 vez
+      document.getElementById('loader-cloud').style.display = 'none';
+      document.getElementById('import-screen').style.display = 'flex';
+    } else {
+      iniciarUI();
     }
   } catch(e) {
-    alert("Falha de rede. O sistema funcionará apenas offline neste momento.");
-    db = JSON_SEMENTE;
-    document.getElementById('loader-cloud').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    preencherSeletorTurmas();
-    if(db.turmas.length>0) { turmaSelecionadaId=db.turmas[0].id; renderizarPlanilha();}
+    // Se a internet falhar, abre com os dados locais
+    if(db.turmas.length) iniciarUI();
+    else document.getElementById('import-screen').style.display = 'flex';
   }
 }
 
-// --- SINCRONIZAÇÃO EM TEMPO REAL ---
-function salvarNuvem() {
-  const badge = document.getElementById('sync-badge');
-  badge.textContent = 'Salvando... ⏳';
-  badge.style.background = '#64748B';
-  badge.style.color = '#fff';
-
-  clearTimeout(syncTimer);
-  syncTimer = setTimeout(() => {
-    if(!_dbFirestore) return;
-    _dbFirestore.collection('professor').doc('dados').set({
-      DB: JSON.stringify(db),
-      updatedAt: new Date().toISOString()
-    }, {merge:true}).then(() => {
-      badge.textContent = 'Sincronizado ✅';
-      badge.style.background = '#10b981';
-      setTimeout(() => { badge.textContent = '☁️ Nuvem Ativa'; badge.style.background = 'var(--ouro)'; badge.style.color = 'var(--verde)'; }, 2000);
-    }).catch(e => {
-      badge.textContent = 'Erro Nuvem ❌';
-      badge.style.background = 'var(--danger)';
-    });
-  }, 1200); // Aguarda 1.2 segundos após o último clique para empacotar e enviar (evita travar a grelha)
+function processarImportacao(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const conteudo = JSON.parse(e.target.result);
+    db = conteudo.DB ? conteudo.DB : conteudo;
+    document.getElementById('import-screen').style.display = 'none';
+    salvarCompleto(); // Salva local e na nuvem
+    iniciarUI();
+  };
+  reader.readAsText(file);
 }
 
-function gerarId() { return "id_" + Math.random().toString(36).substr(2, 9); }
-function formataDataHora(isoString) {
-  if (!isoString) return 'S/ Data';
-  const d = new Date(isoString);
-  return d.toLocaleDateString('pt-PT') + ' às ' + d.toLocaleTimeString('pt-PT', {hour:'2-digit', minute:'2-digit'});
-}
-
-// --- LOG DE AUDITORIA ---
-function registrarLog(acao, detalhe) {
-  db.logs.unshift({ id: gerarId(), data: new Date().toISOString(), acao: acao, detalhe: detalhe });
-  if (db.logs.length > 300) db.logs.pop(); 
-}
-
-function abrirLogs() {
-  const lista = document.getElementById('lista-logs');
-  if (db.logs.length === 0) lista.innerHTML = '<div style="padding:20px; text-align:center; color:var(--muted); font-size:12px;">Sem histórico.</div>';
-  else {
-    lista.innerHTML = db.logs.map(log => `<div class="log-item"><div class="log-time">${formataDataHora(log.data)}</div><div class="log-desc"><strong>${log.acao}:</strong> ${log.detalhe}</div></div>`).join('');
+function iniciarUI() {
+  document.getElementById('loader-cloud').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  
+  const uiSalvo = localStorage.getItem('drcaio_uiprefs_auto');
+  if (uiSalvo) { UI_PREFS = JSON.parse(uiSalvo); aplicarEstilosGlobais(UI_PREFS); }
+  
+  document.getElementById('sync-badge').innerHTML = '☁️ Nuvem Ativa';
+  
+  preencherSeletorTurmas();
+  if(db.turmas.length > 0) {
+    turmaSelecionadaId = db.turmas[0].id;
+    document.getElementById('seletor-turma').value = turmaSelecionadaId;
+    renderizarPlanilha();
   }
-  abrirModal('modal-logs');
 }
-function limparLogs() { if(confirm("Apagar o histórico na nuvem?")) { db.logs = []; salvarNuvem(); abrirLogs(); } }
+
+// A Mágica Acontece Aqui: Salva no aparelho imediatamente, envia para nuvem invisível
+function salvarCompleto() {
+  // 1. Salva Local Instantâneo
+  localStorage.setItem('drcaio_lms_v_auto', JSON.stringify(db));
+  
+  // 2. Envia para a nuvem sem travar a tela
+  if(_dbFirestore) {
+    const badge = document.getElementById('sync-badge');
+    badge.innerHTML = 'A Guardar... ⏳';
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => {
+      _dbFirestore.collection('professor').doc('dados_v2').set({ DB: JSON.stringify(db) })
+      .then(() => { badge.innerHTML = 'Sincronizado ✅'; setTimeout(()=>badge.innerHTML='☁️ Nuvem Ativa', 2000); })
+      .catch(() => { badge.innerHTML = 'Gravado Localmente 📱'; });
+    }, 1500);
+  }
+  mostrarToast();
+}
+
+function mostrarToast() {
+  const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1500);
+}
 
 // --- RENDERIZAÇÃO E NAVEGAÇÃO ---
+function gerarId() { return "id_" + Math.random().toString(36).substr(2, 9); }
 function preencherSeletorTurmas() {
-  const sel = document.getElementById('seletor-turma');
-  sel.innerHTML = '';
+  const sel = document.getElementById('seletor-turma'); sel.innerHTML = '';
   db.turmas.forEach(t => { sel.innerHTML += `<option value="${t.id}">${t.nome}</option>`; });
 }
-
-function mudarTurma() {
-  turmaSelecionadaId = document.getElementById('seletor-turma').value;
-  document.getElementById('busca-aluno').value = '';
-  renderizarPlanilha();
-}
-
+function mudarTurma() { turmaSelecionadaId = document.getElementById('seletor-turma').value; renderizarPlanilha(); }
 function filtrarTabela() {
   const termo = document.getElementById('busca-aluno').value.toLowerCase();
-  const linhas = document.querySelectorAll('#planilha-body tr');
-  linhas.forEach(linha => {
-    const nome = linha.getAttribute('data-nome').toLowerCase();
-    linha.style.display = nome.includes(termo) ? '' : 'none';
+  document.querySelectorAll('#planilha-body tr').forEach(linha => {
+    linha.style.display = linha.getAttribute('data-nome').toLowerCase().includes(termo) ? '' : 'none';
   });
 }
 
@@ -480,9 +346,9 @@ function renderizarPlanilha() {
   let trHead = `<tr><th>NOME DO ALUNO</th>`;
   colunas.forEach(col => {
     trHead += `<th>
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:2px">
-        <input type="text" class="cell-input" value="${col.nome}" style="font-weight:800;color:var(--muted);text-transform:uppercase" onchange="atualizarNomeColuna('${col.id}', this.value, '${col.nome}')">
-        <button class="delete-col" onclick="removerColuna('${col.id}', '${col.nome}')" title="Excluir Coluna">✕</button>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <input type="text" class="cell-input" value="${col.nome}" style="font-weight:800;color:var(--muted);text-transform:uppercase; font-size:11px;" onchange="atualizarNomeColuna('${col.id}', this.value)">
+        <button class="delete-col" onclick="removerColuna('${col.id}')">✕</button>
       </div>
     </th>`;
   });
@@ -493,39 +359,32 @@ function renderizarPlanilha() {
   let htmlBody = '';
   
   alunos.forEach((aluno, rIndex) => {
-    const inativoClass = aluno.ativo === false ? 'inativo' : '';
-    let tr = `<tr class="${inativoClass}" data-nome="${aluno.nome}">
+    if(aluno.ativo === false) return; // Esconde Inativos da Tabela
+    let tr = `<tr data-nome="${aluno.nome}">
       <td>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <input type="text" class="cell-input nome" data-r="${rIndex}" data-c="0" value="${aluno.nome}" onchange="atualizarNomeAluno('${aluno.id}', this.value, '${aluno.nome}')" onkeydown="navGrid(event, ${rIndex}, 0)">
+        <div style="display:flex; align-items:center; gap:8px; justify-content:space-between; width:100%">
+          <div style="display:flex; align-items:center; gap:8px; flex:1">
+            <span style="font-size:11px; color:var(--muted); font-weight:800">${rIndex+1}.</span>
+            <input type="text" class="cell-input nome" data-r="${rIndex}" data-c="0" value="${aluno.nome}" onchange="atualizarNomeAluno('${aluno.id}', this.value)" onkeydown="navGrid(event, ${rIndex}, 0)">
+          </div>
           <button class="btn-ficha" onclick="abrirPerfilAluno('${aluno.id}')">FICHA</button>
         </div>
       </td>`;
       
     colunas.forEach((col, cIndex) => {
       const registro = (aluno.atividades && aluno.atividades[col.id]) ? aluno.atividades[col.id] : null;
-      const disabled = aluno.ativo === false ? 'disabled' : '';
       const c = cIndex + 1; 
 
       if (col.tipo === 'visto') {
         const isChecked = (typeof registro === 'object' ? registro.visto : registro === true) ? 'checked' : '';
-        tr += `<td style="text-align:center">
-          <label class="check-wrapper">
-            <input type="checkbox" data-r="${rIndex}" data-c="${c}" onchange="atualizarRegistro('${aluno.id}', '${col.id}', this.checked, 'visto')" onkeydown="navGrid(event, ${rIndex}, ${c})" ${isChecked} ${disabled}>
-            <div class="custom-box"></div>
-          </label>
-        </td>`;
+        tr += `<td style="text-align:center"><label class="check-wrapper"><input type="checkbox" data-r="${rIndex}" data-c="${c}" onchange="atualizarRegistro('${aluno.id}', '${col.id}', this.checked, 'visto')" onkeydown="navGrid(event, ${rIndex}, ${c})" ${isChecked}><div class="custom-box"></div></label></td>`;
       } else {
         const valNota = (typeof registro === 'object' && registro.nota != null) ? registro.nota : (typeof registro === 'number' ? registro : '');
-        tr += `<td style="text-align:center">
-          <input type="number" class="cell-input nota" data-r="${rIndex}" data-c="${c}" placeholder="-" step="0.1" min="0" max="10" value="${valNota}" onchange="atualizarRegistro('${aluno.id}', '${col.id}', this.value, 'nota')" onkeydown="navGrid(event, ${rIndex}, ${c})" ${disabled}>
-        </td>`;
+        tr += `<td style="text-align:center"><input type="number" class="cell-input nota" data-r="${rIndex}" data-c="${c}" placeholder="--" step="0.1" min="0" max="10" value="${valNota}" onchange="atualizarRegistro('${aluno.id}', '${col.id}', this.value, 'nota')" onkeydown="navGrid(event, ${rIndex}, ${c})"></td>`;
       }
     });
-    tr += `</tr>`;
-    htmlBody += tr;
+    tr += `</tr>`; htmlBody += tr;
   });
-
   tbody.innerHTML = htmlBody;
 }
 
@@ -533,153 +392,59 @@ function navGrid(event, r, c) {
   const keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
   if (!keys.includes(event.key)) return;
   let nextR = r, nextC = c;
-  if (event.key === 'ArrowUp') nextR--;
-  if (event.key === 'ArrowDown') nextR++;
-  if (event.key === 'ArrowLeft') nextC--;
-  if (event.key === 'ArrowRight') nextC++;
-
+  if (event.key === 'ArrowUp') nextR--; if (event.key === 'ArrowDown') nextR++;
+  if (event.key === 'ArrowLeft') nextC--; if (event.key === 'ArrowRight') nextC++;
   const nextEl = document.querySelector(`[data-r="${nextR}"][data-c="${nextC}"]`);
   if (nextEl) { event.preventDefault(); nextEl.focus(); if(nextEl.type === 'text' || nextEl.type === 'number') nextEl.select(); }
 }
 
 // --- AÇÕES ---
-function adicionarAluno() {
-  const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
-  const nome = prompt("Nome do novo aluno:");
-  if(nome && nome.trim() !== '') {
-      turma.alunos.push({ id: gerarId(), nome: nome.trim(), atividades: {}, ativo: true });
-      registrarLog("Aluno Adicionado", `${nome.trim()} à turma ${turma.nome}.`);
-      salvarNuvem(); renderizarPlanilha();
-  }
-}
-
-function atualizarNomeAluno(alunoId, novoNome, nomeAntigo) {
-  const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
-  const aluno = turma.alunos.find(a => a.id === alunoId);
-  if (aluno && novoNome.trim() !== '') {
-      aluno.nome = novoNome.trim();
-      registrarLog("Nome Alterado", `De '${nomeAntigo}' para '${novoNome.trim()}'.`);
-      salvarNuvem();
-  }
-}
-
-function adicionarAtividade() {
-  const nome = prompt("Nome da Atividade:");
-  if (!nome) return;
-  const tipoInput = confirm("OK = Somente Visto (✓)\nCANCELAR = Dar Nota (0-10)");
-  if (!db.atividades[turmaSelecionadaId]) db.atividades[turmaSelecionadaId] = [];
-  db.atividades[turmaSelecionadaId].push({ id: "col_" + gerarId(), nome: nome, tipo: tipoInput ? "visto" : "nota" });
-  registrarLog("Atividade Criada", `'${nome}'.`);
-  salvarNuvem(); renderizarPlanilha();
-}
-
-function atualizarNomeColuna(colId, novoNome, nomeAntigo) {
-  const colunas = db.atividades[turmaSelecionadaId];
-  const col = colunas.find(c => c.id === colId);
-  if (col && novoNome.trim() !== '') { col.nome = novoNome.trim(); registrarLog("Atividade Renomeada", `De '${nomeAntigo}' para '${novoNome.trim()}'.`); salvarNuvem(); }
-}
-
-function removerColuna(colId, nomeCol) {
-  if (confirm(`Excluir '${nomeCol}' e as notas de TODOS os alunos na nuvem?`)) {
-    db.atividades[turmaSelecionadaId] = db.atividades[turmaSelecionadaId].filter(c => c.id !== colId);
-    db.turmas.find(t => t.id === turmaSelecionadaId).alunos.forEach(aluno => { if(aluno.atividades && aluno.atividades[colId]) delete aluno.atividades[colId]; });
-    registrarLog("Atividade Excluída", `'${nomeCol}'.`);
-    salvarNuvem(); renderizarPlanilha();
-  }
-}
-
+function adicionarAluno() { const t=db.turmas.find(t=>t.id===turmaSelecionadaId); const n=prompt("Nome do aluno:"); if(n) { t.alunos.push({id:gerarId(),nome:n.trim(),atividades:{},ativo:true}); salvarCompleto(); renderizarPlanilha(); } }
+function atualizarNomeAluno(id, nome) { const t=db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.find(a=>a.id===id); if(t&&nome){t.nome=nome.trim(); salvarCompleto();} }
+function adicionarAtividade() { const n=prompt("Nome da Atividade:"); if(!n)return; const tp=confirm("OK=Visto | CANCELAR=Nota"); if(!db.atividades[turmaSelecionadaId]) db.atividades[turmaSelecionadaId]=[]; db.atividades[turmaSelecionadaId].push({id:"col_"+gerarId(),nome:n,tipo:tp?"visto":"nota"}); salvarCompleto(); renderizarPlanilha(); }
+function atualizarNomeColuna(id, nome) { const c=db.atividades[turmaSelecionadaId].find(c=>c.id===id); if(c&&nome){c.nome=nome.trim(); salvarCompleto();} }
+function removerColuna(id) { if(confirm("Excluir coluna para todos?")) { db.atividades[turmaSelecionadaId]=db.atividades[turmaSelecionadaId].filter(c=>c.id!==id); salvarCompleto(); renderizarPlanilha(); } }
 function atualizarRegistro(alunoId, colId, valor, tipo) {
-  const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
-  const aluno = turma.alunos.find(a => a.id === alunoId);
-  const colName = db.atividades[turmaSelecionadaId].find(c => c.id === colId).nome;
-  if (!aluno.atividades) aluno.atividades = {};
-  const timestamp = new Date().toISOString();
-
-  if (tipo === 'nota') {
-    const valNota = valor === '' ? null : parseFloat(valor);
-    aluno.atividades[colId] = { nota: valNota, data: timestamp };
-    registrarLog("Nota", `${valNota != null ? valNota : 'Apagada'} para ${aluno.nome} em '${colName}'.`);
-  } else {
-    aluno.atividades[colId] = { visto: valor, data: timestamp };
-    registrarLog("Visto", `${valor ? 'Dado' : 'Removido'} para ${aluno.nome} em '${colName}'.`);
-  }
-  salvarNuvem();
+  const a = db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.find(a=>a.id===alunoId);
+  if (!a.atividades) a.atividades = {};
+  if (tipo === 'nota') a.atividades[colId] = { nota: valor===''?null:parseFloat(valor), data: new Date().toISOString() };
+  else a.atividades[colId] = { visto: valor, data: new Date().toISOString() };
+  salvarCompleto();
 }
 
-// --- PERFIL DO ALUNO ---
-function abrirPerfilAluno(alunoId) {
-    const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
-    const aluno = turma.alunos.find(a => a.id === alunoId);
-    const colunas = db.atividades[turmaSelecionadaId] || [];
-
-    document.getElementById('perf-avatar').textContent = aluno.nome.charAt(0).toUpperCase();
-    document.getElementById('perf-nome').textContent = aluno.nome;
-    document.getElementById('perf-mat').textContent = `Matrícula: ${aluno.mat || '--'}`;
-
-    const isAtivo = aluno.ativo !== false;
-    document.getElementById('perf-badge-area').innerHTML = isAtivo ? '<span style="background:#10b981; color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:bold;">Ativo</span>' : '<span style="background:var(--danger); color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:bold;">Inativo</span>';
-
-    let htmlAtivs = ''; let somaNotas = 0, qtdNotas = 0;
-    if (colunas.length === 0) htmlAtivs = '<div style="color:var(--muted); font-size:12px; text-align:center">Nenhuma atividade.</div>'; 
-    else {
-        colunas.forEach(col => {
-            const reg = (aluno.atividades && aluno.atividades[col.id]) ? aluno.atividades[col.id] : null;
-            let status = '--'; let timeStr = '';
-            const isRegObj = typeof reg === 'object' && reg !== null;
-            const dataReg = (isRegObj && reg.data) ? formataDataHora(reg.data) : 'Registo antigo/offline';
-
-            if (col.tipo === 'visto') { 
-                if(isRegObj ? reg.visto : reg === true) { status = '<span style="color:#10b981; font-weight:bold">✓ Visto</span>'; timeStr = `<div style="font-size:10px; color:var(--muted); margin-top:2px;">${dataReg}</div>`; }
-                else status = '<span style="color:var(--danger)">Pendente</span>';
-            } else { 
-                const notaVal = isRegObj ? reg.nota : (typeof reg === 'number' ? reg : null);
-                if (notaVal != null) { status = `<span style="font-weight:bold">${notaVal}</span>/10`; somaNotas += notaVal; qtdNotas++; timeStr = `<div style="font-size:10px; color:var(--muted); margin-top:2px;">${dataReg}</div>`; }
-                else status = '<span style="color:var(--danger)">Sem nota</span>'; 
-            }
-            htmlAtivs += `<div style="padding:10px 0; border-bottom:1px solid var(--border); font-size:13px; display:flex; justify-content:space-between; align-items:center;"><div><span style="color:var(--text); font-weight:700">${col.nome}</span>${timeStr}</div><div>${status}</div></div>`;
-        });
-        if (qtdNotas > 0) htmlAtivs += `<div style="display:flex; justify-content:space-between; padding:12px 0 0 0; font-size:15px; margin-top:8px;"><span style="font-weight:800;">MÉDIA (Notas):</span><span style="font-weight:900; color:${(somaNotas/qtdNotas) >= 6 ? '#10b981' : 'var(--danger)'}">${(somaNotas/qtdNotas).toFixed(1)}</span></div>`;
-    }
-    document.getElementById('perf-atividades').innerHTML = htmlAtivs;
-    document.getElementById('btn-tog-status').onclick = () => alternarStatusAluno(alunoId, !isAtivo, aluno.nome);
-    document.getElementById('btn-del-aluno').onclick = () => confirmarExclusaoAluno(alunoId, aluno.nome);
-    abrirModal('modal-perfil');
-}
-
-function alternarStatusAluno(id, st, nome) {
-    db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.find(a=>a.id===id).ativo = st; 
-    registrarLog("Status Alterado", `${nome} -> ${st?'Ativo':'Inativo'}`); salvarNuvem(); fecharModal('modal-perfil'); renderizarPlanilha();
-}
-
-function confirmarExclusaoAluno(id, nome) {
-    if(confirm("Excluir permanentemente este aluno e suas notas da nuvem?")) {
-        const t = db.turmas.find(t=>t.id===turmaSelecionadaId); t.alunos = t.alunos.filter(a=>a.id!==id);
-        registrarLog("Aluno Excluído", nome); salvarNuvem(); fecharModal('modal-perfil'); renderizarPlanilha();
-    }
-}
-
-// --- DIÁRIO E UTILS ---
-function abrirDiario(){ document.getElementById('diario-data').value=new Date().toISOString().split('T')[0]; document.getElementById('diario-conteudo').value=''; renderizarDiario(); abrirModal('modal-diario'); }
-function renderizarDiario(){
-  const d = db.turmas.find(t=>t.id===turmaSelecionadaId).diario || []; const l = document.getElementById('lista-diario');
-  if(!d.length) { l.innerHTML = '<div style="text-align:center; padding:20px;">Vazio</div>'; return; }
-  l.innerHTML = [...d].sort((a,b)=>b.data.localeCompare(a.data)).map(x=>`<div style="background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between;"><div style="font-size:13px"><strong>${x.data.split('-').reverse().join('/')}</strong><br>${x.conteudo}</div><button class="delete-col" onclick="excluirDiario('${x.id}')">✕</button></div>`).join('');
-}
-function salvarDiario() { const data=document.getElementById('diario-data').value; const cont=document.getElementById('diario-conteudo').value.trim(); if(!data||!cont)return; const t=db.turmas.find(t=>t.id===turmaSelecionadaId); if(!t.diario)t.diario=[]; t.diario.push({id:gerarId(),data:data,conteudo:cont}); registrarLog("Diário", `Aula ${data}`); salvarNuvem(); document.getElementById('diario-conteudo').value=''; renderizarDiario(); }
-function excluirDiario(id) { if(confirm("Excluir registo?")) { const t=db.turmas.find(t=>t.id===turmaSelecionadaId); t.diario=t.diario.filter(d=>d.id!==id); salvarNuvem(); renderizarDiario(); } }
-
-function exportarBackup() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-    const a = document.createElement('a'); a.setAttribute("href", dataStr);
-    a.setAttribute("download", `BKP_NUVEM_DrCaio_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(a); a.click(); a.remove();
-}
-
+// --- UTILIDADES ---
 function abrirModal(id) { document.getElementById(id).classList.add('show'); }
 function fecharModal(id) { document.getElementById(id).classList.remove('show'); }
-function previewUI() { const fs=document.getElementById('ui-fs').value; const cw=document.getElementById('ui-cw').value; document.getElementById('lbl-fs').textContent=fs+'px'; document.getElementById('lbl-cw').textContent=cw+'px'; document.documentElement.style.setProperty('--ui-font-size', fs+'px'); document.documentElement.style.setProperty('--ui-col-width', cw+'px'); }
-function salvarConfigUI() { UI_PREFS = { fontSize: document.getElementById('ui-fs').value, colWidth: document.getElementById('ui-cw').value }; localStorage.setItem('drcaio_uiprefs_v8', JSON.stringify(UI_PREFS)); fecharModal('modal-config'); }
-function aplicarEstilosGlobais() { document.documentElement.style.setProperty('--ui-font-size', UI_PREFS.fontSize+'px'); document.documentElement.style.setProperty('--ui-col-width', UI_PREFS.colWidth+'px'); }
+function previewUI() { document.getElementById('lbl-fs').textContent=document.getElementById('ui-fs').value+'px'; document.getElementById('lbl-cw').textContent=document.getElementById('ui-cw').value+'px'; aplicarEstilosGlobais({fontSize:document.getElementById('ui-fs').value, colWidth:document.getElementById('ui-cw').value}); }
+function salvarConfigUI() { UI_PREFS={fontSize:document.getElementById('ui-fs').value, colWidth:document.getElementById('ui-cw').value}; localStorage.setItem('drcaio_uiprefs_auto', JSON.stringify(UI_PREFS)); fecharModal('modal-config'); }
+function aplicarEstilosGlobais(prefs) { document.documentElement.style.setProperty('--ui-font-size', prefs.fontSize+'px'); document.documentElement.style.setProperty('--ui-col-width', prefs.colWidth+'px'); }
+
+function abrirPerfilAluno(id) {
+  const a = db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.find(a=>a.id===id);
+  document.getElementById('perf-nome').textContent = a.nome;
+  let html = '';
+  (db.atividades[turmaSelecionadaId]||[]).forEach(c => {
+    const r = a.atividades?.[c.id];
+    let st = '--'; if(c.tipo==='visto'){ st = (r?.visto || r===true)?'✓ Visto':'Pendente'; }else{ st = (r?.nota!=null)?r.nota+'/10':'Sem Nota'; }
+    html += `<div style="padding:8px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between"><span>${c.nome}</span><strong>${st}</strong></div>`;
+  });
+  document.getElementById('perf-atividades').innerHTML = html || 'Nenhuma atividade.';
+  document.getElementById('btn-del-aluno').onclick = () => { if(confirm("Excluir?")){ db.turmas.find(t=>t.id===turmaSelecionadaId).alunos=db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.filter(x=>x.id!==id); salvarCompleto(); fecharModal('modal-perfil'); renderizarPlanilha(); } };
+  document.getElementById('btn-tog-status').onclick = () => { a.ativo=false; salvarCompleto(); fecharModal('modal-perfil'); renderizarPlanilha(); };
+  abrirModal('modal-perfil');
+}
+
+function abrirDiario(){ document.getElementById('diario-data').value=new Date().toISOString().split('T')[0]; renderDiario(); abrirModal('modal-diario'); }
+function renderDiario() {
+  const d = db.turmas.find(t=>t.id===turmaSelecionadaId).diario || [];
+  document.getElementById('lista-diario').innerHTML = d.map(x=>`<div style="padding:10px; border:1px solid #ccc; border-radius:8px; margin-bottom:8px"><strong>${x.data}</strong><br>${x.conteudo}</div>`).join('');
+}
+function salvarDiario() { const t=db.turmas.find(t=>t.id===turmaSelecionadaId); if(!t.diario)t.diario=[]; t.diario.push({data:document.getElementById('diario-data').value, conteudo:document.getElementById('diario-conteudo').value}); salvarCompleto(); renderDiario(); }
+function exportarBackup() {
+    const a = document.createElement('a'); a.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)));
+    a.setAttribute("download", `BKP_Caio_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(a); a.click(); a.remove();
+}
 </script>
 </body>
 </html>
