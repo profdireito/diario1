@@ -37,15 +37,15 @@
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .list-card { display: flex; justify-content: space-between; align-items: flex-start; cursor: pointer; transition: 0.2s;}
         .list-card:active { transform: scale(0.98); }
-        .c-title { font-weight: 700; color: var(--primary); font-size: 16px; margin-bottom: 4px; }
+        .c-title { font-weight: 700; color: var(--primary); font-size: 15px; margin-bottom: 4px; }
         .c-sub { font-size: 12px; color: var(--muted); font-weight: 500;}
         
         .badge { background: #e6f4ea; color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase;}
         .badge.inativo { background: #fee2e2; color: var(--danger); }
 
-        .btn { width: 100%; padding: 15px; border-radius: 12px; font-weight: 700; border: none; color: white; background: var(--primary); font-size: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px;}
+        .btn { width: 100%; padding: 15px; border-radius: 12px; font-weight: 700; border: none; color: white; background: var(--primary); font-size: 13px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 10px;}
         .btn-danger { background: var(--danger); }
-        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
 
         input[type="text"], input[type="date"], input[type="time"], select, textarea { width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); outline:none; font-size:15px; font-family: inherit; margin-bottom: 15px; background: var(--surface);}
 
@@ -83,6 +83,11 @@
             #print-area { display: block !important; }
             body { background: white; }
         }
+
+        /* GRID BOTOES DE AÇÃO */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .action-grid .btn { margin-bottom: 0; padding: 12px 5px; font-size: 11px; flex-direction: column; gap: 5px; text-align: center;}
+        .action-grid .btn i { font-size: 16px; }
     </style>
 </head>
 <body>
@@ -104,11 +109,14 @@
 
             <!-- TELA 2: ALUNOS DA TURMA -->
             <div id="tela-alunos" class="screen">
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <button class="btn btn-outline" style="padding: 12px; font-size: 12px;" onclick="adicionarAluno()"><i class="fa-solid fa-user-plus"></i> Matricular</button>
-                    <button class="btn btn-outline" style="padding: 12px; font-size: 12px; color: var(--accent); border-color: var(--accent);" onclick="criarAtividade()"><i class="fa-solid fa-file-pen"></i> Dar Atividade</button>
+                
+                <div class="action-grid">
+                    <button class="btn btn-outline" onclick="adicionarAluno()"><i class="fa-solid fa-user-plus"></i> Matricular</button>
+                    <button class="btn btn-outline" onclick="criarAtividade()"><i class="fa-solid fa-file-pen"></i> Dar Atividade</button>
+                    <button class="btn btn-outline" style="color: var(--accent); border-color: var(--accent);" onclick="abrirModalImportacao()"><i class="fa-solid fa-file-import"></i> Importar Notas</button>
                 </div>
-                <button class="btn" onclick="gerarPDF()"><i class="fa-solid fa-file-pdf"></i> Gerar Relatório (PDF)</button>
+                
+                <button class="btn" style="background: var(--text);" onclick="gerarPDF()"><i class="fa-solid fa-file-pdf"></i> Gerar Relatório Diário (PDF)</button>
                 
                 <input type="text" id="busca" placeholder="🔍 Buscar aluno..." onkeyup="renderAlunos()">
                 <div id="lista-alunos"></div>
@@ -117,7 +125,6 @@
             <!-- TELA 3: DIÁRIO DE AULAS -->
             <div id="tela-diario" class="screen">
                 <h2 style="color: var(--primary); margin-bottom: 20px;">Diário de Aulas</h2>
-                
                 <div class="card" style="cursor: default;">
                     <h3 style="font-size: 14px; margin-bottom: 15px; color: var(--muted);">Registrar Nova Aula</h3>
                     <select id="diario-turma"></select>
@@ -128,7 +135,6 @@
                     <textarea id="diario-desc" rows="3" placeholder="Resumo do que foi ensinado / Atividade dada..."></textarea>
                     <button class="btn" onclick="salvarDiario()"><i class="fa-solid fa-floppy-disk"></i> Gravar no Diário</button>
                 </div>
-
                 <h3 style="font-size: 14px; margin: 20px 0 10px 0; color: var(--muted);">Histórico de Aulas</h3>
                 <div id="lista-diario"></div>
             </div>
@@ -159,8 +165,31 @@
                 <div class="h-scroll" id="linha-atividades"></div>
                 <div style="height: 1px; background: var(--border); margin: 25px 0;"></div>
                 <h4 style="font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px;">Cadastro</h4>
-                <button class="btn" id="btn-status" style="background: var(--muted);" onclick="toggleStatus()"><i class="fa-solid fa-power-off"></i> Desativar</button>
-                <button class="btn btn-danger" onclick="excluirAluno()"><i class="fa-solid fa-trash-can"></i> Excluir Aluno</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" id="btn-status" style="background: var(--muted); flex:1;" onclick="toggleStatus()"><i class="fa-solid fa-power-off"></i> Desativar</button>
+                    <button class="btn btn-danger" style="flex:1;" onclick="excluirAluno()"><i class="fa-solid fa-trash-can"></i> Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM SHEET: IMPORTAR NOTAS -->
+    <div class="bottom-sheet" id="sheet-importar" onclick="fecharModalImportacao(event)">
+        <div class="bs-content" onclick="event.stopPropagation()">
+            <div class="bs-header">
+                <h3 style="color: var(--primary); font-size:18px;">Importador Inteligente</h3>
+                <button class="btn-icon" style="color: var(--muted);" onclick="fecharModalImportacaoForcado()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="bs-body">
+                <p style="font-size: 12px; color: var(--muted); margin-bottom: 15px;">Copie a lista com <b>Nome</b> e <b>Nota</b> do Google Classroom, Excel ou Word e cole na caixa abaixo.</p>
+                
+                <select id="import-atividade" style="margin-bottom: 15px; font-weight: 600;">
+                    <!-- Preenchido via JS -->
+                </select>
+
+                <textarea id="import-texto" rows="6" placeholder="Exemplo:&#10;Anna Julia Silva    8.5&#10;Arthur Mendes Reis    9.0"></textarea>
+                
+                <button class="btn" onclick="executarImportacao()"><i class="fa-solid fa-bolt"></i> Processar Notas</button>
             </div>
         </div>
     </div>
@@ -215,28 +244,19 @@
             { id: "at_18", turmaId: "t6", titulo: "Prova", tipo: "nota", data: "06/04/2026", hora: "16:00" }
         ];
 
-        const SEMENTE_DIARIO = SEMENTE_ATIVIDADES.map((at, index) => ({
-            id: 'd_' + index,
-            turmaId: at.turmaId,
-            data: at.data,
-            hora: at.hora,
-            desc: `Aplicação / Visto da atividade: ${at.titulo}`
-        }));
-
         let db = { turmas: [], alunos: [], atividades_turma: [], notas: {}, diario: [] };
         let currentTurmaId = null;
         let currentAlunoId = null;
 
-        // INICIALIZAÇÃO
         window.onload = () => {
-            const data = localStorage.getItem('GestaoProDB_v3');
+            const data = localStorage.getItem('GestaoProDB_v4');
             if(data) {
                 db = JSON.parse(data);
             } else {
                 db.turmas = SEMENTE_TURMAS;
                 db.alunos = SEMENTE_ALUNOS.map((a, i) => ({ id: 'a_' + i, turmaId: a.turmaId, nome: a.nome, status: 'Ativo' }));
                 db.atividades_turma = SEMENTE_ATIVIDADES;
-                db.diario = SEMENTE_DIARIO;
+                db.diario = [];
                 salvarDB();
             }
             document.getElementById('count-alunos').innerText = db.alunos.length;
@@ -246,10 +266,10 @@
             document.getElementById('diario-hora').value = new Date().toTimeString().substring(0,5);
         };
 
-        function salvarDB() { localStorage.setItem('GestaoProDB_v3', JSON.stringify(db)); }
+        function salvarDB() { localStorage.setItem('GestaoProDB_v4', JSON.stringify(db)); }
 
         // ==========================================
-        // NAVEGAÇÃO
+        // NAVEGAÇÃO E RENDERIZAÇÃO
         // ==========================================
         function navTo(idTela, idNav) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -266,9 +286,6 @@
 
         function voltarTela() { navTo('tela-turmas', 'nav-turmas'); renderTurmas(); }
 
-        // ==========================================
-        // TURMAS E ALUNOS (Com Cálculo de Pendentes)
-        // ==========================================
         function renderTurmas() {
             const container = document.getElementById('lista-turmas');
             container.innerHTML = "";
@@ -312,7 +329,6 @@
 
             alunosTurma.forEach(a => {
                 const badgeClass = a.status === 'Ativo' ? 'badge' : 'badge inativo';
-                
                 let pendentes = 0, soma = 0, qtd = 0, vTotal = 0, vGanhos = 0;
                 
                 ativsTurma.forEach(at => {
@@ -322,12 +338,8 @@
                         if(val === true) vGanhos++;
                         else pendentes++;
                     } else {
-                        if(val !== undefined && val !== null && val !== "") {
-                            soma += parseFloat(val);
-                            qtd++;
-                        } else {
-                            pendentes++;
-                        }
+                        if(val !== undefined && val !== null && val !== "") { soma += parseFloat(val); qtd++; } 
+                        else { pendentes++; }
                     }
                 });
                 
@@ -353,6 +365,92 @@
             });
         }
 
+        // ==========================================
+        // IMPORTADOR INTELIGENTE DE NOTAS
+        // ==========================================
+        function abrirModalImportacao() {
+            const select = document.getElementById('import-atividade');
+            select.innerHTML = '<option value="">Selecione a Atividade de Destino...</option>';
+            
+            const ativsTurma = db.atividades_turma.filter(at => at.turmaId === currentTurmaId);
+            if(ativsTurma.length === 0) return alert("Crie pelo menos uma atividade nesta turma primeiro.");
+            
+            ativsTurma.forEach(at => {
+                select.innerHTML += `<option value="${at.id}">${at.titulo} (${at.tipo === 'nota' ? 'Nota' : 'Visto'})</option>`;
+            });
+
+            document.getElementById('import-texto').value = '';
+            document.getElementById('sheet-importar').classList.add('active');
+        }
+
+        function fecharModalImportacao(e) { if(e.target === document.getElementById('sheet-importar')) fecharModalImportacaoForcado(); }
+        function fecharModalImportacaoForcado() { document.getElementById('sheet-importar').classList.remove('active'); }
+
+        function normalizarString(str) {
+            // Remove acentos e converte para minúscula para facilitar o cruzamento de dados
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+        }
+
+        function executarImportacao() {
+            const idAtiv = document.getElementById('import-atividade').value;
+            const textoRaw = document.getElementById('import-texto').value;
+
+            if(!idAtiv) return alert("Selecione a atividade de destino.");
+            if(!textoRaw.trim()) return alert("Cole os dados na caixa de texto.");
+
+            const atividade = db.atividades_turma.find(a => a.id === idAtiv);
+            const alunosTurma = db.alunos.filter(a => a.turmaId === currentTurmaId);
+            
+            const linhas = textoRaw.split('\n');
+            let sucesso = 0;
+            let naoEncontrados = 0;
+
+            linhas.forEach(linha => {
+                if(!linha.trim()) return;
+                
+                // Tenta quebrar por TAB (Excel/Sheets) ou por Virgula (CSV)
+                let partes = linha.split('\t');
+                if(partes.length < 2) partes = linha.split(',');
+
+                if(partes.length >= 2) {
+                    let nomeColado = normalizarString(partes[0]);
+                    let notaOuVistoColado = partes[1].trim();
+
+                    // Procura o aluno na lista oficial
+                    let alunoEncontrado = alunosTurma.find(a => normalizarString(a.nome) === nomeColado);
+
+                    if(alunoEncontrado) {
+                        const key = `${alunoEncontrado.id}_${idAtiv}`;
+                        if(atividade.tipo === 'nota') {
+                            // Converte vírgula para ponto se necessário
+                            let valorNum = parseFloat(notaOuVistoColado.replace(',', '.'));
+                            if(!isNaN(valorNum)) {
+                                db.notas[key] = valorNum;
+                                sucesso++;
+                            }
+                        } else {
+                            // Se for visto, e tiver algo escrito que indique presença
+                            let v = notaOuVistoColado.toLowerCase();
+                            if(v === '1' || v === 'v' || v === 'ok' || v === 'sim' || v === 'true' || v !== '') {
+                                db.notas[key] = true;
+                                sucesso++;
+                            }
+                        }
+                    } else {
+                        naoEncontrados++;
+                    }
+                }
+            });
+
+            salvarDB();
+            renderAlunos(); // Atualiza a tela de fundo
+            fecharModalImportacaoForcado();
+            alert(`Importação Concluída!\n\n✅ ${sucesso} notas/vistos importados com sucesso.\n⚠️ ${naoEncontrados} linhas ignoradas (aluno não encontrado ou formato inválido).`);
+        }
+
+        // ==========================================
+        // RESTANTE DO CÓDIGO (FICHA, DIÁRIO, PDF, ETC)
+        // ==========================================
         function adicionarAluno() {
             const nome = prompt("Nome completo do Aluno:");
             if(nome && nome.trim() !== "") {
@@ -361,19 +459,14 @@
             }
         }
 
-        // ==========================================
-        // ATIVIDADES E FICHAS
-        // ==========================================
         function criarAtividade() {
             const titulo = prompt("Título da Avaliação ou Dinâmica:");
             if(!titulo) return;
             let tipo = prompt("Digite V para Visto (Check) ou N para Nota (0-10):");
             if(tipo) tipo = tipo.toLowerCase().trim();
             if(tipo !== 'v' && tipo !== 'n') return alert("Cancelado. Digite V ou N.");
-            
             let dt = prompt("Data da atividade (DD/MM/AAAA):", new Date().toLocaleDateString('pt-BR'));
             let hr = prompt("Hora da atividade (HH:MM):", new Date().toTimeString().substring(0,5));
-
             db.atividades_turma.push({ id: 'at_' + Date.now(), turmaId: currentTurmaId, titulo: titulo, tipo: tipo === 'v' ? 'visto' : 'nota', data: dt, hora: hr });
             salvarDB(); alert("Atividade criada com data e hora!"); renderAlunos();
         }
@@ -384,11 +477,9 @@
             document.getElementById('ficha-nome').innerText = aluno.nome;
             document.getElementById('ficha-status').innerText = aluno.status;
             document.getElementById('ficha-status').className = aluno.status === 'Ativo' ? 'badge' : 'badge inativo';
-            
             const btnStatus = document.getElementById('btn-status');
             if(aluno.status === 'Ativo') { btnStatus.innerHTML = '<i class="fa-solid fa-power-off"></i> Desativar'; btnStatus.style.background = "var(--muted)"; } 
             else { btnStatus.innerHTML = '<i class="fa-solid fa-check"></i> Reativar'; btnStatus.style.background = "var(--success)"; }
-
             renderLinhaAtividades();
             document.getElementById('sheet-aluno').classList.add('active');
         }
@@ -400,18 +491,10 @@
             const linha = document.getElementById('linha-atividades');
             linha.innerHTML = "";
             const ativsTurma = db.atividades_turma.filter(at => at.turmaId === currentTurmaId);
-
-            if(ativsTurma.length === 0) {
-                linha.innerHTML = `<div style="font-size:13px; color:var(--muted); padding:10px;">Nenhuma atividade cadastrada.</div>`;
-                return;
-            }
-
+            if(ativsTurma.length === 0) return linha.innerHTML = `<div style="font-size:13px; color:var(--muted); padding:10px;">Nenhuma atividade cadastrada.</div>`;
             ativsTurma.forEach(at => {
-                const key = `${currentAlunoId}_${at.id}`;
-                const val = db.notas[key];
-
+                const val = db.notas[`${currentAlunoId}_${at.id}`];
                 let dhHtml = `<div style="font-size:10px; color:var(--muted); margin-bottom:8px;"><i class="fa-regular fa-clock"></i> ${at.data || '--'} ${at.hora || ''}</div>`;
-
                 if(at.tipo === 'visto') {
                     const conc = (val === true);
                     linha.innerHTML += `<div class="ativ-card ${conc ? 'concluido' : ''}">${dhHtml}<div class="ativ-title">${at.titulo}</div><button class="toggle-btn ${conc ? 'active' : ''}" onclick="salvarLancamento('${at.id}', ${!conc})"><i class="fa-solid ${conc ? 'fa-check-double' : 'fa-check'}"></i> ${conc ? 'Visto' : 'Dar Visto'}</button></div>`;
@@ -425,9 +508,7 @@
             const key = `${currentAlunoId}_${idAtiv}`;
             if(valor === "" || valor === null) delete db.notas[key];
             else db.notas[key] = valor;
-            salvarDB(); 
-            renderLinhaAtividades();
-            renderAlunos(); // Atualiza a lista no fundo da tela (Estatísticas e Pendentes)
+            salvarDB(); renderLinhaAtividades(); renderAlunos();
         }
 
         function toggleStatus() {
@@ -444,9 +525,6 @@
             }
         }
 
-        // ==========================================
-        // DIÁRIO DE AULAS
-        // ==========================================
         function abrirDiario() {
             navTo('tela-diario', 'nav-diario');
             const select = document.getElementById('diario-turma');
@@ -460,52 +538,32 @@
             const dt = document.getElementById('diario-data').value;
             const hr = document.getElementById('diario-hora').value;
             const desc = document.getElementById('diario-desc').value;
-
             if(!tId || !dt || !desc) return alert("Preencha turma, data e o resumo.");
-            
             db.diario.push({ id: 'd_'+Date.now(), turmaId: tId, data: dt.split('-').reverse().join('/'), hora: hr, desc: desc });
-            salvarDB();
-            document.getElementById('diario-desc').value = "";
-            renderListaDiario();
+            salvarDB(); document.getElementById('diario-desc').value = ""; renderListaDiario();
         }
 
         function renderListaDiario() {
             const container = document.getElementById('lista-diario');
             container.innerHTML = "";
             let diarioRev = [...db.diario].reverse();
-            
             if(diarioRev.length === 0) container.innerHTML = "<p style='font-size:13px; color:var(--muted);'>Nenhuma aula registrada.</p>";
-
             diarioRev.forEach(d => {
                 const tNome = db.turmas.find(t => t.id === d.turmaId)?.nome || "Turma Excluída";
-                container.innerHTML += `
-                    <div class="card" style="cursor:default;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                            <span class="badge" style="background:var(--primary); color:white;">${tNome}</span>
-                            <span style="font-size:12px; color:var(--muted); font-weight:600;"><i class="fa-regular fa-clock"></i> ${d.data} ${d.hora}</span>
-                        </div>
-                        <p style="font-size:14px; color:var(--text); line-height:1.4;">${d.desc}</p>
-                    </div>
-                `;
+                container.innerHTML += `<div class="card" style="cursor:default;"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span class="badge" style="background:var(--primary); color:white;">${tNome}</span><span style="font-size:12px; color:var(--muted); font-weight:600;"><i class="fa-regular fa-clock"></i> ${d.data} ${d.hora}</span></div><p style="font-size:14px; color:var(--text); line-height:1.4;">${d.desc}</p></div>`;
             });
         }
 
-        // ==========================================
-        // GERADOR DE PDF
-        // ==========================================
         function gerarPDF() {
             if(!currentTurmaId) return;
             const turma = db.turmas.find(t => t.id === currentTurmaId);
             const alunos = db.alunos.filter(a => a.turmaId === currentTurmaId).sort((a,b) => a.nome.localeCompare(b.nome));
             const ativs = db.atividades_turma.filter(at => at.turmaId === currentTurmaId);
-
             document.getElementById('print-title').innerText = `Diário de Classe: ${turma.nome}`;
             document.getElementById('print-subtitle').innerText = `Relatório gerado em: ${new Date().toLocaleString('pt-BR')}`;
-
             let thead = `<tr><th>Aluno</th><th>Status</th>`;
             ativs.forEach(at => { thead += `<th>${at.titulo}<br><span style="font-size:9px; font-weight:normal;">${at.data || ''}</span></th>`; });
             thead += `</tr>`;
-
             let tbody = ``;
             alunos.forEach(al => {
                 tbody += `<tr><td>${al.nome}</td><td>${al.status}</td>`;
@@ -518,7 +576,6 @@
                 });
                 tbody += `</tr>`;
             });
-
             document.getElementById('print-table-container').innerHTML = `<table><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
             window.print();
         }
