@@ -1,450 +1,537 @@
+Dr. Caio, excelente sacada de usabilidade.
+Um sistema de gestão de verdade tem que dar a informação ao professor antes mesmo de ele clicar. Ficar abrindo aluno por aluno para descobrir quem está devendo nota ou visto não é produtivo.
+Programei o motor do aplicativo para fazer um **cálculo em tempo real**. Agora, embaixo do nome de cada aluno, o sistema varre todas as atividades daquela turma e exibe duas linhas de informação:
+ 1. **Dados (Estatísticas):** Mostra a **Média** atualizada do aluno e o número de **Vistos** ganhos.
+ 2. **Pendentes:** Mostra de forma destacada (em vermelho) quantas atividades ou vistos estão faltando. Se o aluno fez tudo, aparece um selo verde "Tudo em dia".
+Além disso, atualizei a lógica para que, assim que o senhor lança uma nota ou visto dentro da ficha do aluno, a lista lá no fundo da tela já se atualize instantaneamente sozinha.
+Copie o código abaixo, salve por cima do seu **gestao.html** e teste a diferença na visualização:
+```html
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>LMS Gestão Pro - Dr. Caio</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestão Acadêmica Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1A4A2E; 
+            --accent: #D4AF37; 
+            --bg: #F4F7F6;
+            --surface: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --danger: #EF4444;
+        }
 
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-<style>
-  :root {
-    --verde: #1A4A2E; --verde-hover: #113620; --verde-fundo: #e6f4ea;
-    --ouro: #D4AF37; --ouro-hover: #b59228;
-    --bg: #F4F7F9; --card: #FFFFFF; --text: #1E293B; --muted: #64748B;
-    --border: #E2E8F0; --danger: #EF4444;
-    --ui-font-size: 13px; --ui-col-width: 90px; --ui-padding: 10px 12px;
-  }
-  
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
-  body { background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; font-size: var(--ui-font-size); transition: font-size 0.2s;}
-  h1, h2, h3, .syne { font-family: 'Syne', sans-serif; }
+        #app-ui { display: flex; flex-direction: column; height: 100%; width: 100%; }
+        
+        header { background: var(--primary); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-height: 70px; z-index: 10;}
+        .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--accent); font-weight: 700;}
+        .btn-icon { color: white; background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px;}
+        
+        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; }
+        
+        .screen { display: none; animation: fadeIn 0.2s ease-out; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform: translateX(10px); } to {opacity:1; transform: translateX(0);} }
 
-  /* TELA DE LOGIN */
-  #login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #0f2b1b 0%, #1A4A2E 100%); display: flex; align-items: center; justify-content: center; z-index: 5000; }
-  .lcard { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 24px; padding: 40px 30px; width: 90%; max-width: 380px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); text-align: center; border: 1px solid rgba(255,255,255,0.2);}
-  .l-btn { width: 100%; background: var(--verde); color: #fff; border: none; border-radius: 12px; padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 15px;}
-  .l-btn:hover { background: var(--verde-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,74,46,0.3);}
-  input.log-inp { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid var(--border); background: #fff; font-family: inherit; font-size: 15px; outline: none; margin-bottom: 12px; text-align: center; transition: 0.2s;}
-  input.log-inp:focus { border-color: var(--ouro); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .list-card { display: flex; justify-content: space-between; align-items: flex-start; cursor: pointer; transition: 0.2s;}
+        .list-card:active { transform: scale(0.98); }
+        .c-title { font-weight: 700; color: var(--primary); font-size: 16px; margin-bottom: 4px; }
+        .c-sub { font-size: 12px; color: var(--muted); font-weight: 500;}
+        
+        .badge { background: #e6f4ea; color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase;}
+        .badge.inativo { background: #fee2e2; color: var(--danger); }
 
-  #loader-cloud { display:none; position: fixed; inset: 0; background: rgba(244, 247, 249, 0.95); z-index: 4500; align-items: center; justify-content: center; flex-direction: column; }
-  .spinner { border: 4px solid var(--border); border-left-color: var(--verde); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom:20px;}
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn { width: 100%; padding: 15px; border-radius: 12px; font-weight: 700; border: none; color: white; background: var(--primary); font-size: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px;}
+        .btn-danger { background: var(--danger); }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
 
-  #app { display: none; flex-direction: column; height: 100%; }
+        input[type="text"], input[type="date"], input[type="time"], select, textarea { width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); outline:none; font-size:15px; font-family: inherit; margin-bottom: 15px; background: var(--surface);}
 
-  /* HEADER */
-  header { background: var(--verde); color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08); z-index: 10; flex-wrap: wrap; gap: 15px; }
-  .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap;}
-  .header-logo { background: linear-gradient(135deg, var(--ouro), #f2d472); color: var(--verde); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.2);}
-  select.turma-select { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 10px; font-weight: 700; font-family: inherit; font-size: 14px; outline: none; cursor: pointer; max-width: 280px; transition: 0.2s;}
-  select.turma-select option { background: var(--card); color: var(--text); }
-  
-  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
-  button { font-family: inherit; font-weight: 700; cursor: pointer; border: none; border-radius: 10px; padding: 10px 16px; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-  button:active { transform: scale(0.96); }
-  .btn-primary { background: var(--ouro); color: var(--verde); }
-  .btn-primary:hover { filter: brightness(1.05); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);}
-  .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1);}
-  .btn-secondary:hover { background: rgba(255,255,255,0.2); }
-  .btn-danger { background: var(--danger); color: #fff; }
-  .btn-icon { padding: 10px; font-size: 16px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
-  .btn-icon:hover { background: rgba(255,255,255,0.1); }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--surface); display: flex; justify-content: space-around; padding: 12px 10px 25px 10px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); border-top: 1px solid var(--border); z-index: 20; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 600; }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { color: var(--accent); }
 
-  #sync-badge { font-size: 11px; font-weight: 800; background: var(--ouro); color: var(--verde); padding: 8px 14px; border-radius: 20px; display: flex; align-items: center; gap: 6px; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.15);}
-  .search-box { position: relative; display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 0 12px; border: 1px solid rgba(255,255,255,0.2);}
-  .search-box input { background: transparent; border: none; color: #fff; padding: 10px 6px; outline: none; font-family: inherit; font-weight: 500; font-size: 13px; width: 160px; }
-  .search-box input::placeholder { color: rgba(255,255,255,0.6); }
+        .bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: none; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(3px);}
+        .bottom-sheet.active { display: flex; animation: fadeBg 0.3s forwards; }
+        .bs-content { background: var(--bg); width: 100%; max-height: 90vh; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; animation: slideUp 0.3s forwards; }
+        .bs-header { padding: 20px; background: var(--surface); border-radius: 24px 24px 0 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;}
+        .bs-body { padding: 20px; overflow-y: auto; flex: 1; }
 
-  /* ÁREA DA PLANILHA */
-  #main-content { flex: 1; overflow: auto; padding: 20px 25px; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column;}
-  .table-wrapper { background: var(--card); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); border: 1px solid var(--border); width: max-content; min-width: 100%; overflow: hidden; }
-  table { border-collapse: collapse; width: 100%; text-align: left; }
-  
-  th, td { border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: var(--ui-padding); white-space: nowrap; transition: padding 0.2s; }
-  th { background: #f8fafc; font-size: 0.8em; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 var(--border); min-width: var(--ui-col-width); transition: min-width 0.2s; font-weight: 800;}
-  th:first-child { left: 0; z-index: 3; background: #f8fafc; box-shadow: 1px 1px 0 var(--border); min-width: 280px; max-width: 280px;}
-  td:first-child { left: 0; position: sticky; background: #fff; z-index: 1; box-shadow: 1px 0 0 var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  
-  tr:hover td { background-color: #f8fafc; }
-  tr:hover td:first-child { background-color: #f8fafc; }
-  tr.inativo td { opacity: 0.4; background-color: #f1f5f9; }
-  tr.inativo td:first-child { background-color: #f1f5f9; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeBg { from { opacity: 0; } to { opacity: 1; } }
 
-  /* NOME E INPUTS */
-  .cell-input { width: 100%; border: none; background: transparent; font-family: inherit; font-size: inherit; outline: none; color: var(--text); transition: 0.2s;}
-  .cell-input.nome { font-weight: 700; color: var(--verde); cursor: text; }
-  .cell-input.nota { text-align: center; font-weight: 800; width: 100%; color: var(--text);}
-  .cell-input:focus { background: #fff; border-radius: 6px; padding: 4px 6px; box-shadow: 0 0 0 2px var(--ouro); }
-  
-  .btn-ficha { background: var(--bg); border: 1px solid var(--border); color: var(--muted); font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;}
-  .btn-ficha:hover { background: var(--ouro); color: #fff; border-color: var(--ouro); }
+        .h-scroll { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 15px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .h-scroll::-webkit-scrollbar { display: none; }
+        .ativ-card { background: var(--surface); min-width: 170px; border-radius: 16px; padding: 15px; border: 1px solid var(--border); scroll-snap-align: start; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between;}
+        .ativ-card.concluido { border-color: var(--success); background: #f0fdf4; }
+        .ativ-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 15px; line-height: 1.3;}
+        .toggle-btn { width: 100%; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; background: var(--border); color: var(--muted); }
+        .toggle-btn.active { background: var(--success); color: white; }
+        .nota-input { width: 100%; padding: 10px; border-radius: 8px; border: 2px solid var(--border); font-size: 14px; font-weight: 700; text-align: center; color: var(--primary); outline: none;}
 
-  /* CHECKBOX CUSTOMIZADO ACESSÍVEL */
-  .check-wrapper { display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; padding: 2px; }
-  .check-wrapper input { position: absolute; opacity: 0; width: 0; height: 0; }
-  .custom-box { width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 7px; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact;}
-  .check-wrapper input:checked + .custom-box { background: var(--verde); border-color: var(--verde); box-shadow: 0 4px 10px rgba(26,74,46,0.25); transform: scale(1.08); }
-  .check-wrapper input:checked + .custom-box::after { content: '✓'; color: #fff; font-weight: 900; font-size: 15px; }
+        #print-area { display: none; background: white; width: 100%; min-height: 100vh; padding: 20px; color: black; font-family: Arial, sans-serif;}
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;}
+        th { background-color: #f2f2f2; }
 
-  .delete-col { background: none; border: none; color: #ef4444; padding: 4px; font-size: 15px; margin-left: 8px; cursor: pointer; opacity: 0.4; transition: 0.2s;}
-  .delete-col:hover { opacity: 1; transform: scale(1.1);}
-
-  /* MODAIS E TOAST */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); z-index: 2000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(4px); }
-  .modal-overlay.show { display: flex; animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-  .modal-box { background: #fff; border-radius: 20px; width: 100%; max-width: 500px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto;}
-  .modal-close { position: absolute; top: 20px; right: 20px; background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 50%; font-weight: bold; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center;}
-  @keyframes fadeIn { from { opacity: 0; transform: scale(0.96) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-  
-  .slider-group { margin-bottom: 20px; }
-  .slider-group label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--muted); margin-bottom: 10px; text-transform: uppercase;}
-  input[type=range] { width: 100%; accent-color: var(--verde); height: 6px; border-radius: 4px;}
-
-  #toast { position: fixed; bottom: 24px; right: 24px; background: #10b981; color: white; padding: 14px 28px; border-radius: 12px; font-weight: 700; opacity: 0; transition: 0.4s; pointer-events: none; z-index: 3000; box-shadow: 0 10px 25px rgba(16,185,129,0.3);}
-  #toast.show { opacity: 1; transform: translateY(-10px); }
-
-  /* TELA DE IMPORTAÇÃO (APENAS 1ª VEZ) */
-  #import-screen { display:none; position: fixed; inset: 0; background: var(--bg); z-index: 6000; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center; }
-
-  /* MOBILE */
-  @media (max-width: 768px) {
-    header { flex-direction: column; align-items: stretch; padding: 15px; gap: 12px; }
-    .header-left { justify-content: space-between; width: 100%; }
-    .header-left .syne { display: none; }
-    .turma-select { flex: 1; margin-left: 10px; font-size: 14px; max-width: 100%; }
-    .controls { overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; -webkit-overflow-scrolling: touch;}
-    .controls button { flex-shrink: 0; padding: 10px 14px; font-size: 13px; }
-    .search-box, .search-box input { width: 100%; }
-    #main-content { padding: 15px; }
-    th:first-child, td:first-child { min-width: 160px !important; max-width: 160px !important; }
-    .modal-box { padding: 20px; width: 95%; max-height: 92vh; }
-  }
-</style>
+        @media print {
+            #app-ui { display: none !important; }
+            #print-area { display: block !important; }
+            body { background: white; }
+        }
+    </style>
 </head>
 <body>
 
-  <div id="login-screen">
-    <div class="lcard">
-      <div style="font-size:42px;margin-bottom:10px;">⚖️</div>
-      <h2 class="syne" style="color:var(--verde);margin-bottom:5px; font-size: 24px;">Gestão Pro</h2>
-      <p style="color:var(--muted); font-size:13px; margin-bottom: 25px;">Prof. Caio Duarte Araújo</p>
-      <input type="text" id="lu" class="log-inp" placeholder="Usuário" value="professor"/>
-      <input type="password" id="lp" class="log-inp" placeholder="Senha" value="5864" onkeydown="if(event.key==='Enter')login()"/>
-      <button class="l-btn" onclick="login()">Entrar e Sincronizar</button>
+    <div id="app-ui">
+        <header>
+            <button class="btn-icon" id="btn-voltar" style="display:none;" onclick="voltarTela()"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="logo" id="logo-header"><i class="fa-solid fa-scale-balanced"></i> Gestão Pro</div>
+            <div id="titulo-header" style="display:none; font-weight:600; font-size:15px; flex:1; text-align:center;"></div>
+            <button class="btn-icon" style="opacity: 0; pointer-events:none;"><i class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <main>
+            <!-- TELA 1: TURMAS -->
+            <div id="tela-turmas" class="screen active">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">Turmas (<span id="count-alunos">0</span> Alunos)</h2>
+                <div id="lista-turmas"></div>
+            </div>
+
+            <!-- TELA 2: ALUNOS DA TURMA -->
+            <div id="tela-alunos" class="screen">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button class="btn btn-outline" style="padding: 12px; font-size: 12px;" onclick="adicionarAluno()"><i class="fa-solid fa-user-plus"></i> Matricular</button>
+                    <button class="btn btn-outline" style="padding: 12px; font-size: 12px; color: var(--accent); border-color: var(--accent);" onclick="criarAtividade()"><i class="fa-solid fa-file-pen"></i> Dar Atividade</button>
+                </div>
+                <button class="btn" onclick="gerarPDF()"><i class="fa-solid fa-file-pdf"></i> Gerar Relatório (PDF)</button>
+                
+                <input type="text" id="busca" placeholder="🔍 Buscar aluno..." onkeyup="renderAlunos()">
+                <div id="lista-alunos"></div>
+            </div>
+
+            <!-- TELA 3: DIÁRIO DE AULAS -->
+            <div id="tela-diario" class="screen">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">Diário de Aulas</h2>
+                
+                <div class="card" style="cursor: default;">
+                    <h3 style="font-size: 14px; margin-bottom: 15px; color: var(--muted);">Registrar Nova Aula</h3>
+                    <select id="diario-turma"></select>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="date" id="diario-data" style="flex:2;">
+                        <input type="time" id="diario-hora" style="flex:1;">
+                    </div>
+                    <textarea id="diario-desc" rows="3" placeholder="Resumo do que foi ensinado / Atividade dada..."></textarea>
+                    <button class="btn" onclick="salvarDiario()"><i class="fa-solid fa-floppy-disk"></i> Gravar no Diário</button>
+                </div>
+
+                <h3 style="font-size: 14px; margin: 20px 0 10px 0; color: var(--muted);">Histórico de Aulas</h3>
+                <div id="lista-diario"></div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" id="nav-turmas" onclick="navTo('tela-turmas', 'nav-turmas')">
+                <i class="fa-solid fa-layer-group"></i><span>Turmas</span>
+            </div>
+            <div class="nav-item" id="nav-diario" onclick="abrirDiario()">
+                <i class="fa-solid fa-book-open"></i><span>Diário</span>
+            </div>
+        </nav>
     </div>
-  </div>
 
-  <div id="loader-cloud">
-    <div class="spinner"></div>
-    <h2 class="syne" style="color:var(--verde); font-size:20px;">Sincronizando Nuvem...</h2>
-    <p style="color:var(--muted); font-size:14px; text-align:center;">Buscando os seus dados mais recentes.</p>
-  </div>
-
-  <div id="import-screen">
-    <div style="background:#fff; padding:40px; border-radius:20px; max-width:400px; box-shadow:0 10px 40px rgba(0,0,0,0.1);">
-      <h2 class="syne" style="color:var(--verde); margin-bottom:15px;">Bem-vindo à Nuvem</h2>
-      <p style="color:var(--muted); margin-bottom:25px; line-height:1.5;">Sua base de dados está limpa. Para começar, importe o seu backup de 287 alunos apenas uma vez. Depois, o sistema fará tudo sozinho.</p>
-      <input type="file" id="import-file" accept=".json" style="display:none" onchange="processarImportacao(event)">
-      <button class="l-btn" onclick="document.getElementById('import-file').click()">📂 Importar Alunos (JSON)</button>
-    </div>
-  </div>
-
-  <div id="app">
-    <header>
-      <div class="header-left">
-        <div class="header-logo">⚖</div>
-        <div class="syne" style="font-size:18px">LMS Caio</div>
-        <select id="seletor-turma" class="turma-select" onchange="mudarTurma()"></select>
-      </div>
-      <div class="controls">
-        <div id="sync-badge">☁️ Conectando...</div>
-        <div class="search-box">
-          <span style="font-size:14px; opacity:0.6;">🔍</span>
-          <input type="text" id="busca-aluno" placeholder="Buscar aluno..." onkeyup="filtrarTabela()">
+    <!-- BOTTOM SHEET: FICHA DO ALUNO -->
+    <div class="bottom-sheet" id="sheet-aluno" onclick="fecharFicha(event)">
+        <div class="bs-content" onclick="event.stopPropagation()">
+            <div class="bs-header">
+                <div>
+                    <h3 id="ficha-nome" style="color: var(--primary); font-size:18px; margin-bottom:4px;">Nome</h3>
+                    <span id="ficha-status" class="badge">Ativo</span>
+                </div>
+                <button class="btn-icon" style="color: var(--muted);" onclick="fecharFichaForcado()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="bs-body">
+                <h4 style="font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px;">Atividades Avaliativas</h4>
+                <div class="h-scroll" id="linha-atividades"></div>
+                <div style="height: 1px; background: var(--border); margin: 25px 0;"></div>
+                <h4 style="font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px;">Cadastro</h4>
+                <button class="btn" id="btn-status" style="background: var(--muted);" onclick="toggleStatus()"><i class="fa-solid fa-power-off"></i> Desativar</button>
+                <button class="btn btn-danger" onclick="excluirAluno()"><i class="fa-solid fa-trash-can"></i> Excluir Aluno</button>
+            </div>
         </div>
-        <button class="btn-secondary" onclick="abrirDiario()">📖 Diário</button>
-        <button class="btn-primary" onclick="adicionarAtividade()">+ Atividade</button>
-        <button class="btn-icon" onclick="abrirModal('modal-config')">⚙️</button>
-      </div>
-    </header>
-
-    <div id="main-content">
-      <div class="table-wrapper">
-        <table id="planilha">
-          <thead id="planilha-head"></thead>
-          <tbody id="planilha-body"></tbody>
-        </table>
-      </div>
     </div>
-  </div>
 
-  <div class="modal-overlay" id="modal-perfil">
-    <div class="modal-box">
-      <button class="modal-close" onclick="fecharModal('modal-perfil')">✕</button>
-      <div style="text-align:center; margin-bottom:20px;"><h2 class="syne" style="color:var(--verde); font-size:22px;" id="perf-nome">Nome do Aluno</h2></div>
-      <div style="background:var(--bg); border-radius:12px; padding:15px; margin-bottom:20px; border:1px solid var(--border)" id="perf-atividades"></div>
-      <div style="display:flex; gap:12px;">
-        <button class="btn-secondary" style="flex:1; background:#e2e8f0; color:var(--text);" id="btn-tog-status">Desativar Aluno</button>
-        <button class="btn-danger" style="flex:1;" id="btn-del-aluno">Excluir Aluno</button>
-      </div>
+    <!-- ÁREA DE IMPRESSÃO (PDF) -->
+    <div id="print-area">
+        <h1 id="print-title" style="text-align: center; margin-bottom: 5px;">Relatório de Turma</h1>
+        <p id="print-subtitle" style="text-align: center; font-size: 14px; color: #555; margin-bottom: 20px;"></p>
+        <div id="print-table-container"></div>
     </div>
-  </div>
 
-  <div class="modal-overlay" id="modal-diario">
-    <div class="modal-box" style="max-width: 600px;">
-      <button class="modal-close" onclick="fecharModal('modal-diario')">✕</button>
-      <h2 class="syne" style="color:var(--verde); margin-bottom:20px;">📖 Diário de Aula</h2>
-      <div style="display:flex; gap:10px; margin-bottom:15px;"><input type="date" id="diario-data" style="border:1px solid var(--border); border-radius:8px; padding:10px;"><input type="text" id="diario-conteudo" style="border:1px solid var(--border); border-radius:8px; padding:10px; flex:1;" placeholder="Matéria dada..." onkeydown="if(event.key==='Enter')salvarDiario()"></div>
-      <button class="btn-primary" style="width:100%; margin-bottom:15px;" onclick="salvarDiario()">Registar</button>
-      <div id="lista-diario" style="max-height:250px; overflow-y:auto;"></div>
-    </div>
-  </div>
+    <script>
+        // ==========================================
+        // DADOS ESTRUTURAIS (DNA DO SISTEMA)
+        // ==========================================
+        const SEMENTE_TURMAS = [
+            { id: "t1", nome: "MAT T1 - 1 Periodo" }, { id: "t2", nome: "MAT T2 - 1 Periodo" },
+            { id: "t3", nome: "NOT T1 - 1 Periodo" }, { id: "t4", nome: "NOT T2 - 1 Periodo" },
+            { id: "t5", nome: "VESP T1 - 1 Periodo" }, { id: "t6", nome: "VESP T2 - 1 Periodo" },
+            { id: "t7", nome: "3P NOT" }, { id: "t8", nome: "3P VESP" }
+        ];
 
-  <div class="modal-overlay" id="modal-config">
-    <div class="modal-box">
-      <button class="modal-close" onclick="fecharModal('modal-config')">✕</button>
-      <h2 class="syne" style="color:var(--verde); margin-bottom:20px;">⚙️ Opções</h2>
-      <div class="slider-group"><label>Letra <span id="lbl-fs">13px</span></label><input type="range" min="11" max="18" value="13" id="ui-fs" oninput="previewUI()"></div>
-      <div class="slider-group"><label>Largura <span id="lbl-cw">90px</span></label><input type="range" min="60" max="180" value="90" id="ui-cw" oninput="previewUI()"></div>
-      <button class="btn-primary" style="width:100%; margin-bottom: 20px;" onclick="salvarConfigUI()">Aplicar Visual</button>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border);" onclick="adicionarAluno()">+ Novo Aluno</button>
-        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border);" onclick="window.print()">📄 Imprimir</button>
-        <button class="btn-secondary" style="flex:1; color:var(--text); border:1px solid var(--border);" onclick="exportarBackup()">📥 Extrair Backup</button>
-      </div>
-    </div>
-  </div>
+        const SEMENTE_ALUNOS = [
+            ...["Adlinef Santana Rodrigues", "Alex Sandro Amorim Pereira", "Ana Clara de Souza Bressan", "Anelissa de Paula Amaral", "Anna Clara Souza Ferreira", "Brenda Regiane Santos Batista", "Clara Lessa Ferreira", "Dardielle Vitoria dos Santos Siqueira", "Dayanne Francisca Vieira", "Eliane Rodrigues Pereira Alves", "Emanuelle Fabricia Pereira Praes", "Emily Gabrielle Lopes dos Santos", "Fernanda Teixeira Santos", "Gabriel Caua Araujo Santos", "Gabriele Eduarda Melo de Jesus", "Gilson Farlley Oliveira Andrade", "Hidelane de Souza Silva Alves", "Iori Henrique Marques Cortez", "Janaina de Jesus Carneiro Goncalves", "Joyce Santos Goncalves", "Julia Ferreira Batista", "Kaylane Nicolle Dias Alves", "Livia Karolyne Vieira Boas", "Lucas Gabriel da Consolacao Ferreira", "Marco Tulio Rodrigues Souza", "Maria Clara Menezes Carvalho", "Miriely dos Reis da Silva", "Pamella Thais Adriano Prates", "Ryane Dias Ribeiro", "Samyra Gabriele da Silva Freire", "Sarah Daniele Santos Carvalho", "Shara Vitoria da Silva Mota", "Tailane Monique Batista Souza", "Talita Emanuely Pereira", "Vitoria Tauane dos Santos Dias", "Vivian Ariane Santos Anacleto", "Lavinea Emanuelle Silva Souza"].map(n => ({turmaId: "t1", nome: n})),
+            ...["Ana Claudia Pereira da Silva", "Anna Clara Rodrigues Dias", "Anna Vitoria Alves Vieira", "Arlinda de Cassia Cavalcante Monteiro", "Camila Fernanda Cardoso de Souza", "Cibelle Soares da Rocha", "Clara Meirian Alves Veloso", "Claudia Danielle Pereira Santos", "Dalila Aniele Souza Pires", "Dayanne Souza Santos", "Emilly Araujo Costa", "Emilly Araujo Costa II", "Izabella Fernanda da Silva Gomes", "Jhonya Safira Peres", "Joao Vitor Barroso Andrade", "Joseniete Pereira", "Joyce Ferreira de Oliveira", "Julio Cesar Oliveira Andrade", "Karoline Tamara dos Santos Moreira", "Luanna Arianne Nascimento Silva", "Lucas Ariel Dias Macedo", "Luis Fernando Macedo Peixoto", "Maria Elisa Pereira de Freitas", "Maria Isabela Boas Ribeiro", "Maria Julia Ribeiro Alves", "Marilia de Cassia Andrade Alkmim Duarte", "Marla Fabricia Pereira Santos", "Matheus Elias Rocha Amorim", "Nathalia Fanny Rodrigues Silva", "Nathalia Vitoria Oliveira de Souza", "Samira Cristina Caldeira dos Santos", "Silvane Regina Braganca", "Thais Gabriela Cunha", "Vitoria Izabelle Santos Pimenta", "Willian Pires Barbosa"].map(n => ({turmaId: "t2", nome: n})),
+            ...["Agatha Karine Cardoso Siqueira", "Alice Almeida Dias", "Amanda Silva Reis", "Ana Clara Ramos Araujo", "Beatriz Soares Coimbra Silva", "Bruna Eduarda Andrade", "Bruna Victoria Oliveira Andrade", "Carolina Silva Pereira", "Cleiton Cesar Maia Pereira", "Edson Gabriel das Neves Pereira", "Eloa Cristina Souza dos Santos", "Emilly Kauanny Souza Veloso", "Erika Patricia Santos Pereira", "Geovana Daniely Medeiros da Silva", "Geovana Duarte Mello", "Helen Cristina Silva Fernandes", "Hellen Patricia Almeida Morais", "Hellen Sabrina Fernandes Alves", "Heloa Camile Ferreira Siqueira", "Hugo Felipe Oliveira", "Isabelle Cristine Rodrigues Oliveira", "Isadora Cristine Ferreira Soares", "Joao Vitor dos Santos Rocha", "Josimara Silva Ferreira", "Jucileia dos Santos Costa Pereira", "Kathlen Tauane de Jesus Santos", "Kauanne Meyrielle dos Reis Santos", "Keila Fabricia Alves Fonseca", "Lara Cristiny Alves Azevedo", "Lara Malu Oliveira Santos", "Luana Carolina Pereira", "Luana Helena da Costa Farias", "Lucio Paulo Fernandes Gomes", "Maria Eduarda dos Santos Reis", "Maria Fernanda Silva Pereira", "Maria Julia Santos Costa", "Maria Luiza Siqueira Silva", "Maria Sabrina Veloso", "Maria Tereza Pereira Moreira", "Natalia Esthefany Soares Sousa", "Rafael de Castro Souza", "Sabrina Pereira Dias", "Samira Natalia Souza Peixoto", "Samira Souza Martins", "Sarah Carolinne Dias Jorge", "Stefany Silva Nunes", "Thiago Arthur Souza Lima", "Vitoria Samara Soares Santos", "Wigner Silva Cardoso", "Yasmin dos Santos Soares"].map(n => ({turmaId: "t3", nome: n})),
+            ...["Adriana Alves Silva", "Ana Vitoria Duarte da Silva", "Andressa Lorrayne Nascimento Silva", "Anna Lyce Moreira Lima", "Anna Paula Antunes", "Anne Gabrielle Ferreira dos Santos", "Anny Luiza Teixeira", "Arthur Gabriel Boas Cruz", "Ayressa Gabriele Fonseca Lopes", "Barbara Izabel Bispo Santos", "Emanuelly Virginio Duarte Azevedo", "Emilly Thalita Moura de Souza", "Emily Tauane Meira Souza", "Endrian Gabriel Soares Silva", "Eric Ryan Silva Macedo", "Fernanda Graziela Santos Fonseca", "Francisco Duraes Borem", "Geiciane Silva Alves", "Gustavo Henrique Oliveira da Paixao", "Helder Cleriston Moreira da Silva", "Isabella Cardoso Vieira", "Isis Daniele Medeiros Fonseca", "Jhennyfer Emanuelle da Silva", "Julio Cesar Santos Silva", "Junia Andressa Ramos Nogueira", "Kamila Izabela Cardoso", "Livia Marques Ferreira", "Luana Pereira da Silva", "Marcella Santos Goncalves", "Marcelly Yasmin Duarte Carvalho", "Maria Cecilia Cardoso Meira", "Maria Eduarda Ferreira Carvalho", "Maria Eduarda Oliveira de Souza", "Maria Eduarda Silva Praes", "Maria Elisa Silva Souza", "Maria Fernanda Neves Tiago", "Maria Julia Lopes Goncalves", "Maria Luisa do Amaral Lima", "Mariana Taina Alves Cardoso", "Natalia dos Santos Barbosa", "Pacifica dos Santos Lima", "Pedro Lucas Vieira Santos", "Sthefany Lorrana Almeida Santos", "Tauanne Karolayne Neves Silva", "Thamires Emanuelle Jardim de Souza", "Thayna Colen Silva", "Vanessa Alves Ferreira", "Vitor Gabriel Santos Neres", "Yasmim dos Reis Dias"].map(n => ({turmaId: "t4", nome: n})),
+            ...["Ana Julia Soares Noronha", "Ana Paula do Rosario Silva", "Anne Gabrielly dos Santos", "Bruna Eloa Ferreira Noronha", "Carlos Eduardo Silva Duarte", "Daniela Vitoria Silva Souza", "Elisangela Aparecida de Oliveira", "Eloisa Thaina Cardoso Martins", "Emily Fernanda Rodrigues Pereira", "Evellyn Cristina Santos Rodrigues", "Flavia Alessandra Pereira Andrade", "Gustavo Alves Santos", "Jeanne Rosa Moreira", "Joyce Emanuelle Goncalves Santos", "Julia Marcelly Duarte Dias", "Leidi Laura Nunes Montes", "Luanna Gabrielle de Souza Duarte", "Marcela Tamara Silva Benevides", "Maria Aparecida Silva de Oliveira", "Maria Clara Duraes Santos", "Maria Vitoria Alves Carneiro", "Mariana Oliveira Versiani", "Miriam Fernanda Pereira da Silva", "Rayssa Vitoria Pereira Cruz", "Sarah Marianne do Carmo Ferreira", "Sherlen Sabrina Bispo Campos", "Thaemilly Gabrielle de Souza Alves", "Thayla Ketlen Lemos Santos", "Vitoria Aparecida Marques"].map(n => ({turmaId: "t5", nome: n})),
+            ...["Anna Julia Silva", "Arthur Mendes Reis", "Bruna Emanuelle Costa", "Carolayne Tayna Lopes Figueiredo", "Elaine Aparecida Matias", "Ellen Vitoria Boas Carneiro", "Emilly Thayna Silva Goncalves", "Emily Vitoria Silva Amorim", "Evelyn Tamires Teles de Jesus", "Gleyce Aparecida Goncalves", "Ivone Marinho dos Santos", "Joao Vitor Almeida Macedo", "Julia dos Santos Costa Pereira", "Kevelyn Fernandes Alves", "Lavinia Emanuele Oliveira Lima", "Leidmilla Souza Silva", "Luma Lorrane Nunes da Silva", "Marcos Leandro Goncalves Maia", "Maria Clara Alves Teixeira de Jesus", "Maria Julia Santos Soares", "Mariana Domingues Alves", "Marina de Souza Martins Neta", "Mateus Emanuel Pereira Silva", "Rayssa Aparecida Teles de Jesus", "Sabrina Caroline Teixeira Santos", "Saulo Daniel Cruz Rocha", "Simone Nayara Catone de Jesus", "Thalita Teles Almeida", "Valeria Pestanha Siqueira de Oliveira", "Yasmin Pereira Silva"].map(n => ({turmaId: "t6", nome: n})),
+            ...["Agata Fernanda Vieira Leite", "Ana Luiza de Souza Oliveira", "Analice Alves dos Santos", "Anne Karine Martins Moura", "Arthur Baruck Dias de Souza", "Barbara Sabrina Santos Ferreira", "Catia Regina de Souza", "Cecilia Cabral de Souza", "Elizangela Macedo Dias Simao", "Emanuelle Krislaine Macedo Pereira", "Emanuelly Ferreira Rolim", "Gabriela Eduarda Silva de Paula", "Ingrid Mariane Moreira de Souza", "Izabela Geovana Oliveira Soares", "Izabelle Lorrane Silva Souza", "Juliana de Souza Pereira", "Luane Santos Cruz", "Lucas Fernandes Lopes da Silveira", "Maria Cecilia de Souza Dias", "Maria Clara dos Santos", "Maria Eduarda Paixao Teles", "Maria Luiza de Souza Silva", "Mariana Leite Vieira", "Matheus Henrique Silva Fonseca", "Patricia Vilas Boas dos Reis", "Pedro Lucas Souza", "Vitoria Lima Goncalves de Souza", "Vitoria Soares Silva", "Yasmin Luana Moreira Guimaraes"].map(n => ({turmaId: "t7", nome: n})),
+            ...["Ana Clara Andrade Silva", "Ana Clara Rodrigues Batista", "Anna Cecilia da Silva Praes", "Bianca Barros de Oliveira", "Emanuelle Beatriz Rodrigues Oliveira", "Erika Hipolito Virginio dos Santos", "Esmeralda Teixeira Araujo Leite", "Esther Emanuelle Gomes Santos", "Gabriel Cardoso Dias Soares", "Gabrielle Vitoria Fernandes Teixeira", "Hellen Laurianny Martins Silva", "Jennifer Amanda Pereira dos Santos", "Joao Carlos dos Santos Silva", "Julia Lorrane Souza Carvalho", "Kelly Stefane Pereira", "Laura Francielle Duraes Rodrigues", "Lavinia Danielle Cardoso Martins", "Marcela Marques Santana", "Maria Luiza da Silva Barbosa", "Maria Paula Andrade Nascimento", "Maria Zelia de Jesus Macedo Siqueira", "Mariane de Kassia Cardoso", "Mariane Pereira Nascimento", "Natalia Bianca Aguilar Santana", "Pyetra Gabriela Araujo Leite Pimenta", "Rayssa Mariane Ribeiro Campos", "Sirleia Cordeiro Lopes", "Vitor Otavio Maia Leite"].map(n => ({turmaId: "t8", nome: n}))
+        ];
 
-  <div id="toast">✅ Guardado na Nuvem!</div>
+        const SEMENTE_ATIVIDADES = [
+            { id: "at_1", turmaId: "t1", titulo: "Dinâmica da Vila", tipo: "visto", data: "05/03/2026", hora: "08:00" },
+            { id: "at_2", turmaId: "t1", titulo: "Código de Hamurabi", tipo: "visto", data: "12/03/2026", hora: "08:00" },
+            { id: "at_3", turmaId: "t1", titulo: "Apostila Impressa", tipo: "visto", data: "19/03/2026", hora: "08:00" },
+            { id: "at_4", turmaId: "t2", titulo: "Dinâmica da Vila", tipo: "visto", data: "06/03/2026", hora: "10:00" },
+            { id: "at_5", turmaId: "t2", titulo: "Fontes do Direito", tipo: "visto", data: "13/03/2026", hora: "10:00" },
+            { id: "at_6", turmaId: "t2", titulo: "Apostila Impressa", tipo: "visto", data: "20/03/2026", hora: "10:00" },
+            { id: "at_7", turmaId: "t3", titulo: "Dinâmica da Vila", tipo: "visto", data: "05/03/2026", hora: "19:00" },
+            { id: "at_8", turmaId: "t3", titulo: "Fontes do Direito", tipo: "visto", data: "12/03/2026", hora: "19:00" },
+            { id: "at_9", turmaId: "t3", titulo: "Ativ 6 Questões", tipo: "visto", data: "19/03/2026", hora: "19:00" },
+            { id: "at_10", turmaId: "t4", titulo: "Visto Atividade", tipo: "visto", data: "10/03/2026", hora: "20:30" },
+            { id: "at_11", turmaId: "t5", titulo: "Avaliação", tipo: "nota", data: "15/03/2026", hora: "14:00" },
+            { id: "at_12", turmaId: "t5", titulo: "Fontes 5Q", tipo: "visto", data: "22/03/2026", hora: "14:00" },
+            { id: "at_13", turmaId: "t5", titulo: "Fontes 5Q(2)", tipo: "visto", data: "29/03/2026", hora: "14:00" },
+            { id: "at_14", turmaId: "t5", titulo: "Apostila", tipo: "visto", data: "05/04/2026", hora: "14:00" },
+            { id: "at_15", turmaId: "t6", titulo: "Dinâmica da Vila", tipo: "visto", data: "16/03/2026", hora: "16:00" },
+            { id: "at_16", turmaId: "t6", titulo: "Apostila", tipo: "visto", data: "23/03/2026", hora: "16:00" },
+            { id: "at_17", turmaId: "t6", titulo: "Questão Fixação", tipo: "nota", data: "30/03/2026", hora: "16:00" },
+            { id: "at_18", turmaId: "t6", titulo: "Prova", tipo: "nota", data: "06/04/2026", hora: "16:00" }
+        ];
 
-<script>
-// --- 1. FIREBASE CONFIG ---
-const FB_CONFIG = { apiKey:"AIzaSyB2Y6Uggohrp8hMPIa3GyPqgqyOygRA0SU", authDomain:"professor-digital-8f792.firebaseapp.com", projectId:"professor-digital-8f792", storageBucket:"professor-digital-8f792.firebasestorage.app" };
-let _dbFirestore = null;
-try { firebase.initializeApp(FB_CONFIG); _dbFirestore = firebase.firestore(); } catch(e) { console.error("Firebase Erro"); }
+        const SEMENTE_DIARIO = SEMENTE_ATIVIDADES.map((at, index) => ({
+            id: 'd_' + index,
+            turmaId: at.turmaId,
+            data: at.data,
+            hora: at.hora,
+            desc: `Aplicação / Visto da atividade: ${at.titulo}`
+        }));
 
-// --- 2. ESTADO E NUVEM SILENCIOSA ---
-let db = { turmas: [], atividades: {} };
-let turmaSelecionadaId = null;
-let syncTimer = null;
-let UI_PREFS = { fontSize: 13, colWidth: 90, padding: "10px 12px" };
+        let db = { turmas: [], alunos: [], atividades_turma: [], notas: {}, diario: [] };
+        let currentTurmaId = null;
+        let currentAlunoId = null;
 
-function login() {
-  if (document.getElementById('lu').value === 'professor' && document.getElementById('lp').value === '5864') {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('loader-cloud').style.display = 'flex';
-    conectarNuvem();
-  }
-}
+        // INICIALIZAÇÃO
+        window.onload = () => {
+            const data = localStorage.getItem('GestaoProDB_v3');
+            if(data) {
+                db = JSON.parse(data);
+            } else {
+                db.turmas = SEMENTE_TURMAS;
+                db.alunos = SEMENTE_ALUNOS.map((a, i) => ({ id: 'a_' + i, turmaId: a.turmaId, nome: a.nome, status: 'Ativo' }));
+                db.atividades_turma = SEMENTE_ATIVIDADES;
+                db.diario = SEMENTE_DIARIO;
+                salvarDB();
+            }
+            document.getElementById('count-alunos').innerText = db.alunos.length;
+            renderTurmas();
+            
+            document.getElementById('diario-data').valueAsDate = new Date();
+            document.getElementById('diario-hora').value = new Date().toTimeString().substring(0,5);
+        };
 
-async function conectarNuvem() {
-  // Puxa o backup local primeiro para não deixar o usuário esperando
-  const localDB = localStorage.getItem('drcaio_lms_v_auto');
-  if(localDB) db = JSON.parse(localDB);
+        function salvarDB() { localStorage.setItem('GestaoProDB_v3', JSON.stringify(db)); }
 
-  try {
-    // Busca na Nuvem
-    const doc = await _dbFirestore.collection('professor').doc('dados_v2').get();
-    if (doc.exists && doc.data().DB) {
-      db = JSON.parse(doc.data().DB);
-      localStorage.setItem('drcaio_lms_v_auto', doc.data().DB);
-      iniciarUI();
-    } else if (!db.turmas.length) {
-      // Se a nuvem e o local estão vazios, pede para importar 1 vez
-      document.getElementById('loader-cloud').style.display = 'none';
-      document.getElementById('import-screen').style.display = 'flex';
-    } else {
-      iniciarUI();
-    }
-  } catch(e) {
-    // Se a internet falhar, abre com os dados locais
-    if(db.turmas.length) iniciarUI();
-    else document.getElementById('import-screen').style.display = 'flex';
-  }
-}
+        // ==========================================
+        // NAVEGAÇÃO
+        // ==========================================
+        function navTo(idTela, idNav) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(idTela).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(idNav) document.getElementById(idNav).classList.add('active');
 
-function processarImportacao(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const conteudo = JSON.parse(e.target.result);
-    db = conteudo.DB ? conteudo.DB : conteudo;
-    document.getElementById('import-screen').style.display = 'none';
-    salvarCompleto(); // Salva local e na nuvem
-    iniciarUI();
-  };
-  reader.readAsText(file);
-}
+            document.getElementById('btn-voltar').style.display = 'none';
+            document.getElementById('logo-header').style.display = 'block';
+            document.getElementById('titulo-header').style.display = 'none';
+            currentTurmaId = null;
+        }
 
-function iniciarUI() {
-  document.getElementById('loader-cloud').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  
-  const uiSalvo = localStorage.getItem('drcaio_uiprefs_auto');
-  if (uiSalvo) { UI_PREFS = JSON.parse(uiSalvo); aplicarEstilosGlobais(UI_PREFS); }
-  
-  document.getElementById('sync-badge').innerHTML = '☁️ Nuvem Ativa';
-  
-  preencherSeletorTurmas();
-  if(db.turmas.length > 0) {
-    turmaSelecionadaId = db.turmas[0].id;
-    document.getElementById('seletor-turma').value = turmaSelecionadaId;
-    renderizarPlanilha();
-  }
-}
+        function voltarTela() { navTo('tela-turmas', 'nav-turmas'); renderTurmas(); }
 
-// A Mágica Acontece Aqui: Salva no aparelho imediatamente, envia para nuvem invisível
-function salvarCompleto() {
-  // 1. Salva Local Instantâneo
-  localStorage.setItem('drcaio_lms_v_auto', JSON.stringify(db));
-  
-  // 2. Envia para a nuvem sem travar a tela
-  if(_dbFirestore) {
-    const badge = document.getElementById('sync-badge');
-    badge.innerHTML = 'A Guardar... ⏳';
-    clearTimeout(syncTimer);
-    syncTimer = setTimeout(() => {
-      _dbFirestore.collection('professor').doc('dados_v2').set({ DB: JSON.stringify(db) })
-      .then(() => { badge.innerHTML = 'Sincronizado ✅'; setTimeout(()=>badge.innerHTML='☁️ Nuvem Ativa', 2000); })
-      .catch(() => { badge.innerHTML = 'Gravado Localmente 📱'; });
-    }, 1500);
-  }
-  mostrarToast();
-}
+        // ==========================================
+        // TURMAS E ALUNOS (Com Cálculo de Pendentes)
+        // ==========================================
+        function renderTurmas() {
+            const container = document.getElementById('lista-turmas');
+            container.innerHTML = "";
+            db.turmas.forEach(t => {
+                const qtd = db.alunos.filter(a => a.turmaId === t.id).length;
+                container.innerHTML += `
+                    <div class="card list-card" onclick="entrarTurma('${t.id}', '${t.nome}')">
+                        <div style="flex:1;">
+                            <div class="c-title">${t.nome}</div>
+                            <div class="c-sub"><i class="fa-solid fa-users"></i> ${qtd} Alunos</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color: var(--accent);"></i>
+                    </div>
+                `;
+            });
+        }
 
-function mostrarToast() {
-  const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1500);
-}
+        function entrarTurma(id, nome) {
+            currentTurmaId = id;
+            document.getElementById('tela-turmas').classList.remove('active');
+            document.getElementById('tela-alunos').classList.add('active');
+            
+            document.getElementById('btn-voltar').style.display = 'block';
+            document.getElementById('logo-header').style.display = 'none';
+            document.getElementById('titulo-header').style.display = 'block';
+            document.getElementById('titulo-header').innerText = nome;
+            document.getElementById('busca').value = "";
+            renderAlunos();
+        }
 
-// --- RENDERIZAÇÃO E NAVEGAÇÃO ---
-function gerarId() { return "id_" + Math.random().toString(36).substr(2, 9); }
-function preencherSeletorTurmas() {
-  const sel = document.getElementById('seletor-turma'); sel.innerHTML = '';
-  db.turmas.forEach(t => { sel.innerHTML += `<option value="${t.id}">${t.nome}</option>`; });
-}
-function mudarTurma() { turmaSelecionadaId = document.getElementById('seletor-turma').value; renderizarPlanilha(); }
-function filtrarTabela() {
-  const termo = document.getElementById('busca-aluno').value.toLowerCase();
-  document.querySelectorAll('#planilha-body tr').forEach(linha => {
-    linha.style.display = linha.getAttribute('data-nome').toLowerCase().includes(termo) ? '' : 'none';
-  });
-}
+        function renderAlunos() {
+            const container = document.getElementById('lista-alunos');
+            const filtro = document.getElementById('busca').value.toLowerCase();
+            container.innerHTML = "";
 
-function renderizarPlanilha() {
-  if (!turmaSelecionadaId) return;
-  const turma = db.turmas.find(t => t.id === turmaSelecionadaId);
-  const colunas = db.atividades[turmaSelecionadaId] || [];
+            let alunosTurma = db.alunos.filter(a => a.turmaId === currentTurmaId);
+            if(filtro) alunosTurma = alunosTurma.filter(a => a.nome.toLowerCase().includes(filtro));
+            alunosTurma.sort((a, b) => a.nome.localeCompare(b.nome));
 
-  const thead = document.getElementById('planilha-head');
-  const tbody = document.getElementById('planilha-body');
-  
-  let trHead = `<tr><th>NOME DO ALUNO</th>`;
-  colunas.forEach(col => {
-    trHead += `<th>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <input type="text" class="cell-input" value="${col.nome}" style="font-weight:800;color:var(--muted);text-transform:uppercase; font-size:11px;" onchange="atualizarNomeColuna('${col.id}', this.value)">
-        <button class="delete-col" onclick="removerColuna('${col.id}')">✕</button>
-      </div>
-    </th>`;
-  });
-  trHead += `</tr>`;
-  thead.innerHTML = trHead;
+            const ativsTurma = db.atividades_turma.filter(at => at.turmaId === currentTurmaId);
 
-  const alunos = [...turma.alunos].sort((a,b) => a.nome.localeCompare(b.nome));
-  let htmlBody = '';
-  
-  alunos.forEach((aluno, rIndex) => {
-    if(aluno.ativo === false) return; // Esconde Inativos da Tabela
-    let tr = `<tr data-nome="${aluno.nome}">
-      <td>
-        <div style="display:flex; align-items:center; gap:8px; justify-content:space-between; width:100%">
-          <div style="display:flex; align-items:center; gap:8px; flex:1">
-            <span style="font-size:11px; color:var(--muted); font-weight:800">${rIndex+1}.</span>
-            <input type="text" class="cell-input nome" data-r="${rIndex}" data-c="0" value="${aluno.nome}" onchange="atualizarNomeAluno('${aluno.id}', this.value)" onkeydown="navGrid(event, ${rIndex}, 0)">
-          </div>
-          <button class="btn-ficha" onclick="abrirPerfilAluno('${aluno.id}')">FICHA</button>
-        </div>
-      </td>`;
-      
-    colunas.forEach((col, cIndex) => {
-      const registro = (aluno.atividades && aluno.atividades[col.id]) ? aluno.atividades[col.id] : null;
-      const c = cIndex + 1; 
+            alunosTurma.forEach(a => {
+                const badgeClass = a.status === 'Ativo' ? 'badge' : 'badge inativo';
+                
+                let pendentes = 0, soma = 0, qtd = 0, vTotal = 0, vGanhos = 0;
+                
+                ativsTurma.forEach(at => {
+                    const val = db.notas[`${a.id}_${at.id}`];
+                    if(at.tipo === 'visto') {
+                        vTotal++;
+                        if(val === true) vGanhos++;
+                        else pendentes++;
+                    } else {
+                        if(val !== undefined && val !== null && val !== "") {
+                            soma += parseFloat(val);
+                            qtd++;
+                        } else {
+                            pendentes++;
+                        }
+                    }
+                });
+                
+                const media = qtd > 0 ? (soma/qtd).toFixed(1) : '--';
+                const pendHtml = pendentes > 0 
+                    ? `<span style="color:var(--danger); font-weight:600;"><i class="fa-solid fa-circle-exclamation"></i> ${pendentes} Pendente(s)</span>`
+                    : `<span style="color:var(--success); font-weight:600;"><i class="fa-solid fa-check-double"></i> Tudo em dia</span>`;
+                    
+                const dadosHtml = `<span style="color:var(--muted);"><i class="fa-solid fa-star" style="color:var(--accent);"></i> Média: ${media} &nbsp;|&nbsp; <i class="fa-solid fa-check"></i> Vistos: ${vGanhos}/${vTotal}</span>`;
 
-      if (col.tipo === 'visto') {
-        const isChecked = (typeof registro === 'object' ? registro.visto : registro === true) ? 'checked' : '';
-        tr += `<td style="text-align:center"><label class="check-wrapper"><input type="checkbox" data-r="${rIndex}" data-c="${c}" onchange="atualizarRegistro('${aluno.id}', '${col.id}', this.checked, 'visto')" onkeydown="navGrid(event, ${rIndex}, ${c})" ${isChecked}><div class="custom-box"></div></label></td>`;
-      } else {
-        const valNota = (typeof registro === 'object' && registro.nota != null) ? registro.nota : (typeof registro === 'number' ? registro : '');
-        tr += `<td style="text-align:center"><input type="number" class="cell-input nota" data-r="${rIndex}" data-c="${c}" placeholder="--" step="0.1" min="0" max="10" value="${valNota}" onchange="atualizarRegistro('${aluno.id}', '${col.id}', this.value, 'nota')" onkeydown="navGrid(event, ${rIndex}, ${c})"></td>`;
-      }
-    });
-    tr += `</tr>`; htmlBody += tr;
-  });
-  tbody.innerHTML = htmlBody;
-}
+                container.innerHTML += `
+                    <div class="card list-card" onclick="abrirFicha('${a.id}')" style="align-items:flex-start;">
+                        <div style="flex:1;">
+                            <div class="c-title">${a.nome}</div>
+                            <div class="c-sub" style="display:flex; flex-direction:column; gap:5px; margin-top:6px;">
+                                ${dadosHtml}
+                                ${pendHtml}
+                            </div>
+                        </div>
+                        <span class="${badgeClass}" style="margin-left:10px;">${a.status}</span>
+                    </div>
+                `;
+            });
+        }
 
-function navGrid(event, r, c) {
-  const keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-  if (!keys.includes(event.key)) return;
-  let nextR = r, nextC = c;
-  if (event.key === 'ArrowUp') nextR--; if (event.key === 'ArrowDown') nextR++;
-  if (event.key === 'ArrowLeft') nextC--; if (event.key === 'ArrowRight') nextC++;
-  const nextEl = document.querySelector(`[data-r="${nextR}"][data-c="${nextC}"]`);
-  if (nextEl) { event.preventDefault(); nextEl.focus(); if(nextEl.type === 'text' || nextEl.type === 'number') nextEl.select(); }
-}
+        function adicionarAluno() {
+            const nome = prompt("Nome completo do Aluno:");
+            if(nome && nome.trim() !== "") {
+                db.alunos.push({ id: 'a_' + Date.now(), turmaId: currentTurmaId, nome: nome.trim(), status: 'Ativo' });
+                salvarDB(); renderAlunos(); document.getElementById('count-alunos').innerText = db.alunos.length;
+            }
+        }
 
-// --- AÇÕES ---
-function adicionarAluno() { const t=db.turmas.find(t=>t.id===turmaSelecionadaId); const n=prompt("Nome do aluno:"); if(n) { t.alunos.push({id:gerarId(),nome:n.trim(),atividades:{},ativo:true}); salvarCompleto(); renderizarPlanilha(); } }
-function atualizarNomeAluno(id, nome) { const t=db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.find(a=>a.id===id); if(t&&nome){t.nome=nome.trim(); salvarCompleto();} }
-function adicionarAtividade() { const n=prompt("Nome da Atividade:"); if(!n)return; const tp=confirm("OK=Visto | CANCELAR=Nota"); if(!db.atividades[turmaSelecionadaId]) db.atividades[turmaSelecionadaId]=[]; db.atividades[turmaSelecionadaId].push({id:"col_"+gerarId(),nome:n,tipo:tp?"visto":"nota"}); salvarCompleto(); renderizarPlanilha(); }
-function atualizarNomeColuna(id, nome) { const c=db.atividades[turmaSelecionadaId].find(c=>c.id===id); if(c&&nome){c.nome=nome.trim(); salvarCompleto();} }
-function removerColuna(id) { if(confirm("Excluir coluna para todos?")) { db.atividades[turmaSelecionadaId]=db.atividades[turmaSelecionadaId].filter(c=>c.id!==id); salvarCompleto(); renderizarPlanilha(); } }
-function atualizarRegistro(alunoId, colId, valor, tipo) {
-  const a = db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.find(a=>a.id===alunoId);
-  if (!a.atividades) a.atividades = {};
-  if (tipo === 'nota') a.atividades[colId] = { nota: valor===''?null:parseFloat(valor), data: new Date().toISOString() };
-  else a.atividades[colId] = { visto: valor, data: new Date().toISOString() };
-  salvarCompleto();
-}
+        // ==========================================
+        // ATIVIDADES E FICHAS
+        // ==========================================
+        function criarAtividade() {
+            const titulo = prompt("Título da Avaliação ou Dinâmica:");
+            if(!titulo) return;
+            let tipo = prompt("Digite V para Visto (Check) ou N para Nota (0-10):");
+            if(tipo) tipo = tipo.toLowerCase().trim();
+            if(tipo !== 'v' && tipo !== 'n') return alert("Cancelado. Digite V ou N.");
+            
+            let dt = prompt("Data da atividade (DD/MM/AAAA):", new Date().toLocaleDateString('pt-BR'));
+            let hr = prompt("Hora da atividade (HH:MM):", new Date().toTimeString().substring(0,5));
 
-// --- UTILIDADES ---
-function abrirModal(id) { document.getElementById(id).classList.add('show'); }
-function fecharModal(id) { document.getElementById(id).classList.remove('show'); }
-function previewUI() { document.getElementById('lbl-fs').textContent=document.getElementById('ui-fs').value+'px'; document.getElementById('lbl-cw').textContent=document.getElementById('ui-cw').value+'px'; aplicarEstilosGlobais({fontSize:document.getElementById('ui-fs').value, colWidth:document.getElementById('ui-cw').value}); }
-function salvarConfigUI() { UI_PREFS={fontSize:document.getElementById('ui-fs').value, colWidth:document.getElementById('ui-cw').value}; localStorage.setItem('drcaio_uiprefs_auto', JSON.stringify(UI_PREFS)); fecharModal('modal-config'); }
-function aplicarEstilosGlobais(prefs) { document.documentElement.style.setProperty('--ui-font-size', prefs.fontSize+'px'); document.documentElement.style.setProperty('--ui-col-width', prefs.colWidth+'px'); }
+            db.atividades_turma.push({ id: 'at_' + Date.now(), turmaId: currentTurmaId, titulo: titulo, tipo: tipo === 'v' ? 'visto' : 'nota', data: dt, hora: hr });
+            salvarDB(); alert("Atividade criada com data e hora!"); renderAlunos();
+        }
 
-function abrirPerfilAluno(id) {
-  const a = db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.find(a=>a.id===id);
-  document.getElementById('perf-nome').textContent = a.nome;
-  let html = '';
-  (db.atividades[turmaSelecionadaId]||[]).forEach(c => {
-    const r = a.atividades?.[c.id];
-    let st = '--'; if(c.tipo==='visto'){ st = (r?.visto || r===true)?'✓ Visto':'Pendente'; }else{ st = (r?.nota!=null)?r.nota+'/10':'Sem Nota'; }
-    html += `<div style="padding:8px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between"><span>${c.nome}</span><strong>${st}</strong></div>`;
-  });
-  document.getElementById('perf-atividades').innerHTML = html || 'Nenhuma atividade.';
-  document.getElementById('btn-del-aluno').onclick = () => { if(confirm("Excluir?")){ db.turmas.find(t=>t.id===turmaSelecionadaId).alunos=db.turmas.find(t=>t.id===turmaSelecionadaId).alunos.filter(x=>x.id!==id); salvarCompleto(); fecharModal('modal-perfil'); renderizarPlanilha(); } };
-  document.getElementById('btn-tog-status').onclick = () => { a.ativo=false; salvarCompleto(); fecharModal('modal-perfil'); renderizarPlanilha(); };
-  abrirModal('modal-perfil');
-}
+        function abrirFicha(idAluno) {
+            currentAlunoId = idAluno;
+            const aluno = db.alunos.find(a => a.id === idAluno);
+            document.getElementById('ficha-nome').innerText = aluno.nome;
+            document.getElementById('ficha-status').innerText = aluno.status;
+            document.getElementById('ficha-status').className = aluno.status === 'Ativo' ? 'badge' : 'badge inativo';
+            
+            const btnStatus = document.getElementById('btn-status');
+            if(aluno.status === 'Ativo') { btnStatus.innerHTML = '<i class="fa-solid fa-power-off"></i> Desativar'; btnStatus.style.background = "var(--muted)"; } 
+            else { btnStatus.innerHTML = '<i class="fa-solid fa-check"></i> Reativar'; btnStatus.style.background = "var(--success)"; }
 
-function abrirDiario(){ document.getElementById('diario-data').value=new Date().toISOString().split('T')[0]; renderDiario(); abrirModal('modal-diario'); }
-function renderDiario() {
-  const d = db.turmas.find(t=>t.id===turmaSelecionadaId).diario || [];
-  document.getElementById('lista-diario').innerHTML = d.map(x=>`<div style="padding:10px; border:1px solid #ccc; border-radius:8px; margin-bottom:8px"><strong>${x.data}</strong><br>${x.conteudo}</div>`).join('');
-}
-function salvarDiario() { const t=db.turmas.find(t=>t.id===turmaSelecionadaId); if(!t.diario)t.diario=[]; t.diario.push({data:document.getElementById('diario-data').value, conteudo:document.getElementById('diario-conteudo').value}); salvarCompleto(); renderDiario(); }
-function exportarBackup() {
-    const a = document.createElement('a'); a.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)));
-    a.setAttribute("download", `BKP_Caio_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(a); a.click(); a.remove();
-}
-</script>
+            renderLinhaAtividades();
+            document.getElementById('sheet-aluno').classList.add('active');
+        }
+
+        function fecharFicha(e) { if(e.target === document.getElementById('sheet-aluno')) fecharFichaForcado(); }
+        function fecharFichaForcado() { document.getElementById('sheet-aluno').classList.remove('active'); currentAlunoId = null; }
+
+        function renderLinhaAtividades() {
+            const linha = document.getElementById('linha-atividades');
+            linha.innerHTML = "";
+            const ativsTurma = db.atividades_turma.filter(at => at.turmaId === currentTurmaId);
+
+            if(ativsTurma.length === 0) {
+                linha.innerHTML = `<div style="font-size:13px; color:var(--muted); padding:10px;">Nenhuma atividade cadastrada.</div>`;
+                return;
+            }
+
+            ativsTurma.forEach(at => {
+                const key = `${currentAlunoId}_${at.id}`;
+                const val = db.notas[key];
+
+                let dhHtml = `<div style="font-size:10px; color:var(--muted); margin-bottom:8px;"><i class="fa-regular fa-clock"></i> ${at.data || '--'} ${at.hora || ''}</div>`;
+
+                if(at.tipo === 'visto') {
+                    const conc = (val === true);
+                    linha.innerHTML += `<div class="ativ-card ${conc ? 'concluido' : ''}">${dhHtml}<div class="ativ-title">${at.titulo}</div><button class="toggle-btn ${conc ? 'active' : ''}" onclick="salvarLancamento('${at.id}', ${!conc})"><i class="fa-solid ${conc ? 'fa-check-double' : 'fa-check'}"></i> ${conc ? 'Visto' : 'Dar Visto'}</button></div>`;
+                } else {
+                    linha.innerHTML += `<div class="ativ-card">${dhHtml}<div class="ativ-title">${at.titulo}</div><input type="number" class="nota-input" placeholder="Nota" value="${val !== undefined ? val : ''}" onchange="salvarLancamento('${at.id}', this.value)"></div>`;
+                }
+            });
+        }
+
+        function salvarLancamento(idAtiv, valor) {
+            const key = `${currentAlunoId}_${idAtiv}`;
+            if(valor === "" || valor === null) delete db.notas[key];
+            else db.notas[key] = valor;
+            salvarDB(); 
+            renderLinhaAtividades();
+            renderAlunos(); // Atualiza a lista no fundo da tela (Estatísticas e Pendentes)
+        }
+
+        function toggleStatus() {
+            const aluno = db.alunos.find(a => a.id === currentAlunoId);
+            aluno.status = aluno.status === 'Ativo' ? 'Inativo' : 'Ativo';
+            salvarDB(); abrirFicha(currentAlunoId); renderAlunos();
+        }
+
+        function excluirAluno() {
+            if(confirm("Excluir o aluno e suas notas permanentemente?")) {
+                db.alunos = db.alunos.filter(a => a.id !== currentAlunoId);
+                for (const key in db.notas) { if (key.startsWith(currentAlunoId + "_")) delete db.notas[key]; }
+                salvarDB(); fecharFichaForcado(); renderAlunos(); document.getElementById('count-alunos').innerText = db.alunos.length;
+            }
+        }
+
+        // ==========================================
+        // DIÁRIO DE AULAS
+        // ==========================================
+        function abrirDiario() {
+            navTo('tela-diario', 'nav-diario');
+            const select = document.getElementById('diario-turma');
+            select.innerHTML = '<option value="">Selecione a Turma...</option>';
+            db.turmas.forEach(t => select.innerHTML += `<option value="${t.id}">${t.nome}</option>`);
+            renderListaDiario();
+        }
+
+        function salvarDiario() {
+            const tId = document.getElementById('diario-turma').value;
+            const dt = document.getElementById('diario-data').value;
+            const hr = document.getElementById('diario-hora').value;
+            const desc = document.getElementById('diario-desc').value;
+
+            if(!tId || !dt || !desc) return alert("Preencha turma, data e o resumo.");
+            
+            db.diario.push({ id: 'd_'+Date.now(), turmaId: tId, data: dt.split('-').reverse().join('/'), hora: hr, desc: desc });
+            salvarDB();
+            document.getElementById('diario-desc').value = "";
+            renderListaDiario();
+        }
+
+        function renderListaDiario() {
+            const container = document.getElementById('lista-diario');
+            container.innerHTML = "";
+            let diarioRev = [...db.diario].reverse();
+            
+            if(diarioRev.length === 0) container.innerHTML = "<p style='font-size:13px; color:var(--muted);'>Nenhuma aula registrada.</p>";
+
+            diarioRev.forEach(d => {
+                const tNome = db.turmas.find(t => t.id === d.turmaId)?.nome || "Turma Excluída";
+                container.innerHTML += `
+                    <div class="card" style="cursor:default;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span class="badge" style="background:var(--primary); color:white;">${tNome}</span>
+                            <span style="font-size:12px; color:var(--muted); font-weight:600;"><i class="fa-regular fa-clock"></i> ${d.data} ${d.hora}</span>
+                        </div>
+                        <p style="font-size:14px; color:var(--text); line-height:1.4;">${d.desc}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // ==========================================
+        // GERADOR DE PDF
+        // ==========================================
+        function gerarPDF() {
+            if(!currentTurmaId) return;
+            const turma = db.turmas.find(t => t.id === currentTurmaId);
+            const alunos = db.alunos.filter(a => a.turmaId === currentTurmaId).sort((a,b) => a.nome.localeCompare(b.nome));
+            const ativs = db.atividades_turma.filter(at => at.turmaId === currentTurmaId);
+
+            document.getElementById('print-title').innerText = `Diário de Classe: ${turma.nome}`;
+            document.getElementById('print-subtitle').innerText = `Relatório gerado em: ${new Date().toLocaleString('pt-BR')}`;
+
+            let thead = `<tr><th>Aluno</th><th>Status</th>`;
+            ativs.forEach(at => { thead += `<th>${at.titulo}<br><span style="font-size:9px; font-weight:normal;">${at.data || ''}</span></th>`; });
+            thead += `</tr>`;
+
+            let tbody = ``;
+            alunos.forEach(al => {
+                tbody += `<tr><td>${al.nome}</td><td>${al.status}</td>`;
+                ativs.forEach(at => {
+                    const val = db.notas[`${al.id}_${at.id}`];
+                    let display = "--";
+                    if(at.tipo === 'visto') display = val === true ? "V" : "F";
+                    else display = val !== undefined ? val : "--";
+                    tbody += `<td>${display}</td>`;
+                });
+                tbody += `</tr>`;
+            });
+
+            document.getElementById('print-table-container').innerHTML = `<table><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+            window.print();
+        }
+    </script>
 </body>
 </html>
+
+```
